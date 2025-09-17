@@ -1,0 +1,7 @@
+// npx prettier --write .
+// 위 명령어를 터미널에서 실행시 프리티어 전체 적용
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "files.eol": "\n"
+}
