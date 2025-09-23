@@ -1,10 +1,12 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import { ConfigService } from '@nestjs/config';
+import { AppModule } from './app.module';
 import { HttpConfig } from './shared/config/http.config';
 import { ConfigNotFoundException } from './shared/exceptions/config-not-found.exception';
+import { CustomExceptionFilter } from './shared/middlewares/http-exception.filter';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger:
@@ -26,6 +28,9 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
+  app.useGlobalFilters(new CustomExceptionFilter());
+
   await app.listen(httpConfig.port);
 }
+
 bootstrap();
