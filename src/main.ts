@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 import { HttpConfig } from './shared/config/http.config';
 import { ConfigNotFoundException } from './shared/exceptions/config-not-found.exception';
 import { CustomExceptionFilter } from './shared/middlewares/http-exception.filter';
+import { SuccessInterceptor } from './shared/interceptors/success.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -28,9 +29,13 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
+  app.useGlobalInterceptors(new SuccessInterceptor());
   app.useGlobalFilters(new CustomExceptionFilter());
 
   await app.listen(httpConfig.port);
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('NestJS application failed to start:', error);
+  process.exit(1);
+});
