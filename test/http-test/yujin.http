@@ -1,0 +1,79 @@
+### 변수 설정 (포트가 다르면 수정하세요)
+@host = http://localhost:3000
+
+####################################################
+#                  회원가입 API 테스트                  #
+####################################################
+
+### 1. 소비자(CONSUMER) 회원가입 성공 케이스 (201 Created 예상)
+# 정상적인 데이터를 보냈을 때, 201 상태 코드와 함께 생성된 유저 정보(DTO)가 반환되어야 합니다.
+POST {{host}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "consumer@test.com",
+  "password": "password123",
+  "passwordConfirm": "password123",
+  "name": "김소비",
+  "phoneNumber": "010-1234-5678",
+  "role": "CONSUMER"
+}
+
+### 2. 기사(DRIVER) 회원가입 성공 케이스 (201 Created 예상)
+# 역할(role)만 DRIVER로 변경. 프로필 정보는 나중에 따로 등록하므로 여기서는 필요 없습니다.
+POST {{host}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "driver@test.com",
+  "password": "password123",
+  "passwordConfirm": "password123",
+  "name": "박기사",
+  "phoneNumber": "010-8765-4321",
+  "role": "DRIVER"
+}
+
+
+### 3. 유효성 검사 실패 케이스 (400 Bad Request 예상) - 비밀번호 불일치
+# password와 passwordConfirm이 다를 경우, ZodValidationPipe가 에러를 발생시켜야 합니다.
+POST {{host}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "fail@test.com",
+  "password": "password123",
+  "passwordConfirm": "password456",
+  "name": "실패",
+  "phoneNumber": "010-1111-2222",
+  "role": "CONSUMER"
+}
+
+
+### 4. 유효성 검사 실패 케이스 (400 Bad Request 예상) - 잘못된 전화번호 형식
+# phoneNumber 형식이 Zod 스키마에 정의된 정규표현식과 맞지 않을 경우 에러가 발생해야 합니다.
+POST {{host}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "fail2@test.com",
+  "password": "password123",
+  "passwordConfirm": "password123",
+  "name": "실패",
+  "phoneNumber": "01012345678",
+  "role": "CONSUMER"
+}
+
+
+### 5. 이메일 중복 케이스 (409 Conflict 예상)
+# 주의: 이 테스트를 하려면 먼저 1번이나 2번 테스트를 성공시킨 후, 동일한 이메일로 다시 요청해야 합니다.
+POST {{host}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "consumer@test.com",
+  "password": "password123",
+  "passwordConfirm": "password123",
+  "name": "김중복",
+  "phoneNumber": "010-9999-8888",
+  "role": "CONSUMER"
+}
