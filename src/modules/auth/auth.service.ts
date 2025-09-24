@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { USER_REPOSITORY, type IUserRepository } from '../users/interface/users.repository.interface'; // 경로 변경 (UserRepository 사용 시)
+import { USER_REPOSITORY, type IUserRepository } from '../users/interface/users.repository.interface';
 import { IAuthService } from './interface/auth.service.interface';
 import { SignUpInput } from './schema/signup.schema';
 import { UserAlreadyExistsException } from '@/shared/exceptions/user.exception';
 import { HASHING_SERVICE, type IHashingService } from '@/shared/hashing/hashing.service.interface';
-import { UserResponseDto } from '@/modules/users/DTO/user.response.dto'; // DTO import
+import { UserResponseDto } from '@/modules/users/DTO/user.response.dto';
+
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
