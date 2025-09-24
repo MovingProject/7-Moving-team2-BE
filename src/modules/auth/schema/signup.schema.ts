@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { RoleSchema } from '@/shared/constant/enums.schema';
+import { createZodDto } from '@anatine/zod-nestjs';
 
 export const signUpSchema = z
   .object({
@@ -21,3 +22,5 @@ export const signUpSchema = z
   });
 
 export type SignUpInput = z.infer<typeof signUpSchema>;
+
+export class SignUpDto extends createZodDto(signUpSchema) {}
