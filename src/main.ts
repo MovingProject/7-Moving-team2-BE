@@ -7,12 +7,26 @@ import { HttpConfig } from './shared/config/http.config';
 import { ConfigNotFoundException } from './shared/exceptions/config-not-found.exception';
 import { CustomExceptionFilter } from './shared/middlewares/http-exception.filter';
 import { SuccessInterceptor } from './shared/interceptors/success.interceptor';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'; // 👈 Swagger import
+import { patchNestjsSwagger } from '@anatine/zod-nestjs'; // 👈 Zod를 위한 패치 import
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger:
       process.env.NODE_ENV === 'production' ? ['error', 'warn', 'log'] : ['error', 'warn', 'log', 'debug', 'verbose'],
   });
+
+  patchNestjsSwagger();
+
+  const config = new DocumentBuilder()
+    .setTitle('Moving API')
+    .setDescription('이사 서비스 매칭 플랫폼 API 문서입니다.')
+    .setVersion('1.0')
+    .addTag('API')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document); //'/api-docs' 경로에 문서 생성
 
   const configService = app.get(ConfigService);
   const httpConfig = configService.get<HttpConfig>('http');
