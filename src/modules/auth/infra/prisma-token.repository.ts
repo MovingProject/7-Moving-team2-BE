@@ -1,4 +1,4 @@
-import { ITokenRepository, RefreshTokenEntity } from '@/modules/auth/interface/token.repository.interface';
+import { ITokenRepository, RefreshTokenEntity } from '../interface/token.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 

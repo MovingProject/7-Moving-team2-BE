@@ -8,7 +8,7 @@ import { NestjsJwtService } from '@/shared/jwt/nestjs-jwt.service';
 @Module({
   imports: [
     NestJwtModule.registerAsync({
-      inject: [ConfigService], // ConfigService를 주입받아 사용
+      inject: [ConfigService],
       useFactory: (_configService: ConfigService) => ({}),
     }),
   ],
