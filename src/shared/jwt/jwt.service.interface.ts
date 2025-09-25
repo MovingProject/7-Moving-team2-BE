@@ -5,6 +5,7 @@ export interface JwtPayload {
 }
 
 export interface AccessTokenPayload extends JwtPayload {
+  jti: string;
   role: Role;
 }
 
