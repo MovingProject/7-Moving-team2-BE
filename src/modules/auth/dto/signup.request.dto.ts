@@ -1,6 +1,6 @@
-import { z } from 'zod';
 import { RoleSchema } from '@/shared/constant/enums.schema';
 import { createZodDto } from '@anatine/zod-nestjs';
+import { z } from 'zod';
 
 export const signUpSchema = z
   .object({
@@ -21,6 +21,5 @@ export const signUpSchema = z
     path: ['passwordConfirm'],
   });
 
-export type SignUpInput = z.infer<typeof signUpSchema>;
-
-export class SignUpDto extends createZodDto(signUpSchema) {}
+export type SignUpRequest = z.infer<typeof signUpSchema>;
+export class SignUpRequestDto extends createZodDto(signUpSchema) {}
