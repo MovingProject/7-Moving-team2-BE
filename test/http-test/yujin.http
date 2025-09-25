@@ -77,3 +77,79 @@ Content-Type: application/json
   "phoneNumber": "010-9999-8888",
   "role": "CONSUMER"
 }
+
+
+####################################################
+#                  로그인 API 테스트                   #
+####################################################
+
+### 0. (사전 준비) 테스트용 소비자 계정 생성
+# 로그인 테스트를 위해 먼저 이 요청을 보내서 계정을 만들어주세요.
+POST {{host}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "login-test@test.com",
+  "password": "password123",
+  "passwordConfirm": "password123",
+  "name": "테스터",
+  "phoneNumber": "010-5555-6666",
+  "role": "CONSUMER"
+}
+
+### 1. 로그인 성공 케이스 (200 OK 예상)
+# 정상적인 응답 Body와 함께, 헤더에 __Host-access_token와 __Host-rt 쿠키가 설정되어야 합니다.
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "login-test@test.com",
+  "password": "password123",
+  "role": "CONSUMER"
+}
+
+
+### 2. 실패 케이스: 비밀번호 불일치 (401 Unauthorized 예상)
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "login-test@test.com",
+  "password": "wrong-password",
+  "role": "CONSUMER"
+}
+
+
+### 3. 실패 케이스: 권한(역할) 불일치 (403 Forbidden 예상)
+# CONSUMER 계정으로 DRIVER 로그인을 시도하는 경우입니다.
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "login-test@test.com",
+  "password": "password123",
+  "role": "DRIVER"
+}
+
+
+### 4. 실패 케이스: 존재하지 않는 이메일 (404 Not Found 예상)
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "no-such-user@test.com",
+  "password": "password123",
+  "role": "CONSUMER"
+}
+
+
+### 5. 실패 케이스: 유효성 검사 실패 (400 Bad Request 예상)
+# Zod 스키마에 따라 email 형식이 올바르지 않은 경우입니다.
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "invalid-email",
+  "password": "password123",
+  "role": "CONSUMER"
+}

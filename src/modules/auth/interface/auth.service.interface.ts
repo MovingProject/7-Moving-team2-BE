@@ -1,8 +1,16 @@
-import { UserResponseDto } from '@/modules/users/DTO/user.response.dto';
-import { SignUpInput } from '../schema/signup.schema';
+import { SignInRequest } from '../dto/signIn.request.dto';
+import { SignUpRequest } from '../dto/signup.request.dto';
+import { SignInResponseDto, SignUpResponseDto } from '@/modules/users/dto/user.response.dto';
+
+export interface SignInResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: SignInResponseDto;
+}
 
 export interface IAuthService {
-  signUp(signUpInput: SignUpInput): Promise<UserResponseDto>;
+  signUp(signUpInput: SignUpRequest): Promise<SignUpResponseDto>;
+  signIn(signInInput: SignInRequest): Promise<SignInResponse>;
 }
 
 export const AUTH_SERVICE = 'IAuthService';

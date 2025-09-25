@@ -41,9 +41,20 @@ model User {
   chatRoomsAsDriver   ChattingRoom[] @relation("RoomsByDriver")
   chattingMessages ChattingMessage[]
   notifications Notification[]
+  refreshTokens RefreshToken[]
   @@unique([provider, providerId])
 }
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime? 
+  createdAt DateTime @default(now())
 
+  @@index([userId, expiresAt])
+}
 enum Role {
   DRIVER
   CONSUMER
@@ -134,6 +145,7 @@ model ConsumerProfile {
   quotations Quotation[]
   chattingRooms ChattingRoom[]
 }
+
 
 model Request {
   id String @id @default(uuid())
