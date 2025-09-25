@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt'; // 👈 공식 JwtModule
+import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from './guards/auth.guard';
 import { UserModule } from '@/modules/users/users.module';
 import { HashingModule } from '@/shared/hashing/hashing.module';
-import { JwtModule as SharedJwtModule } from '@/shared/jwt/jwt.module'; // 👈 1. 커스텀 JwtModule을 다른 이름으로 import
+import { JwtModule as SharedJwtModule } from '@/shared/jwt/jwt.module';
 
 import { AUTH_SERVICE } from './interface/auth.service.interface';
 import { TOKEN_REPOSITORY } from './interface/token.repository.interface';
