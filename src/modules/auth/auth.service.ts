@@ -9,6 +9,9 @@ import { SignInRequestDto } from './dto/signIn.request.dto';
 import { SignUpRequest } from './dto/signup.request.dto';
 import { IAuthService } from './interface/auth.service.interface';
 import { TOKEN_REPOSITORY, type ITokenRepository } from './interface/token.repository.interface';
+import { ConfigService } from '@nestjs/config';
+import ms from 'ms';
+import { ConfigNotFoundException } from '@/shared/exceptions/config-not-found.exception';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -24,6 +27,8 @@ export class AuthService implements IAuthService {
 
     @Inject(TOKEN_REPOSITORY)
     private readonly tokenRepository: ITokenRepository,
+
+    private readonly configService: ConfigService,
   ) {}
 
   async signUp(signUpRequest: SignUpRequest) {
@@ -63,20 +68,42 @@ export class AuthService implements IAuthService {
       throw new ForbiddenException('해당 권한으로 로그인할 수 없습니다.');
     }
 
-    const accessTokenPayload: AccessTokenPayload = { sub: existingUser.id, role: existingUser.role };
     const refreshTokenPayload: JwtPayload = { sub: existingUser.id };
-
-    const accessToken = await this.jwtService.signAccessToken(accessTokenPayload);
     const refreshToken = await this.jwtService.signRefreshToken(refreshTokenPayload);
-
     const hashedRefreshToken = await this.hashingService.hash(refreshToken);
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await this.tokenRepository.saveRefreshToken(existingUser.id, hashedRefreshToken, expiresAt);
+
+    const raw = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
+    const maybeParsed: unknown = (ms as unknown as (v: string | number, opts?: { long?: boolean }) => string | number)(
+      raw,
+    );
+    if (typeof maybeParsed !== 'number') {
+      throw new ConfigNotFoundException(`JWT_REFRESH_EXPIRES_IN 형식이 잘못됨: ${raw}`);
+    }
+    const jwtRefreshExpiresInMs: number = maybeParsed;
+
+    const expiresAt = new Date(Date.now() + jwtRefreshExpiresInMs);
+
+    const storedRefreshToken = await this.tokenRepository.saveRefreshToken(
+      existingUser.id,
+      hashedRefreshToken,
+      expiresAt,
+    );
+
+    const accessTokenPayload: AccessTokenPayload = {
+      sub: existingUser.id,
+      jti: storedRefreshToken.id,
+      role: existingUser.role,
+    };
+    const accessToken = await this.jwtService.signAccessToken(accessTokenPayload);
 
     return {
       accessToken,
       refreshToken,
       user: UserDtoFactory.toSignInResponseDto(existingUser),
     };
+  }
+
+  async signOut(user: AccessTokenPayload) {
+    await this.tokenRepository.deleteTokensByUserId(user.jti);
   }
 }
