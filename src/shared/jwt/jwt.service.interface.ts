@@ -1,18 +1,10 @@
-import { Role } from '@prisma/client';
-
-export interface JwtPayload {
-  sub: string;
-}
-
-export interface AccessTokenPayload extends JwtPayload {
-  jti: string;
-  role: Role;
-}
+import { AccessTokenPayload, JwtPayload } from './jwt.payload.schema';
 
 export interface IJwtService {
   signAccessToken(payload: AccessTokenPayload): Promise<string>;
   signRefreshToken(payload: JwtPayload): Promise<string>;
-  verifyAsync<T extends JwtPayload = JwtPayload>(token: string): Promise<T>;
+  verifyAccessToken<T extends AccessTokenPayload = AccessTokenPayload>(token: string): Promise<T>;
+  verifyRefreshToken<T extends JwtPayload = JwtPayload>(token: string): Promise<T>;
 }
 
 export const JWT_SERVICE = 'IJwtService';
