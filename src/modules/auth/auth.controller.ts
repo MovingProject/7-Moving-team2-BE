@@ -7,7 +7,7 @@ import { SignUpRequestDto, signUpSchema } from './dto/signup.request.dto';
 import { AUTH_SERVICE, type IAuthService } from './interface/auth.service.interface';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthUser } from './decorators/auth-user.decorator';
-import { type AccessTokenPayload } from '@/shared/jwt/jwt.service.interface';
+import { type AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 
 @ApiTags('인증 (Auth)')
 @Controller('auth')
