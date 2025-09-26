@@ -115,7 +115,7 @@ Content-Type: application/json
 
 {
   "email": "login-test@test.com",
-  "password": "wrong-password",
+  "password": "password123",
   "role": "CONSUMER"
 }
 
@@ -158,12 +158,10 @@ Content-Type: application/json
 ### Auth APIs
 ### =================================================
 
-@baseUrl = http://localhost:3000
-
 ### -------------------------------------------------
 ### 1. 로그인 (먼저 실행하여 쿠키를 받아야 합니다)
 # @name signIn
-POST {{baseUrl}}/auth/signIn
+POST {{host}}/auth/signIn
 Content-Type: application/json
 
 {
@@ -176,10 +174,10 @@ Content-Type: application/json
 ### -------------------------------------------------
 ### 2. 로그아웃 성공 (로그인 후 실행)
 # @name signOutSuccess
-POST {{baseUrl}}/auth/signOut
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NDhhNjczOS1iOGRjLTRiYTMtYWUyYS0yOTQ4NDQzM2YzZTkiLCJqdGkiOiJmYWYwY2EwMS1mZjdhLTQ4MTUtOWNjNS1mZTBhY2VkZWM3YzQiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTg3ODc3MjAsImV4cCI6MTc1ODc4ODYyMH0.DRHGMa9GWyLW-yPhxv4SXEEmi0mqa1ZRJuFaxcjBiPs;
+POST {{host}}/auth/signOut
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiI4Y2E2NmI0Zi00OWNjLTQ1YmItOGJlMS1hODUwNDBjNDJiNzciLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTg5MTA4MTksImV4cCI6MTc1ODkxMTcxOX0.cUuzVJQwsXuJGFhEVfbuRuOUulzJfgnKG-X_y6haPzQ; Max-Age=900;
 
 ### -------------------------------------------------
 ### 3. 로그아웃 실패 (인증되지 않은 경우)
 # @name signOutFailure
-POST {{baseUrl}}/auth/signOut
+POST {{host}}/auth/signOut

@@ -1,16 +1,17 @@
-import { ITokenRepository, RefreshTokenEntity } from '../interface/token.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { ITokenRepository, RefreshTokenEntity } from '../interface/token.repository.interface';
 
 @Injectable()
 export class PrismaTokenRepository implements ITokenRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async saveRefreshToken(userId: string, tokenHash: string, expiresAt: Date): Promise<RefreshTokenEntity> {
+  async saveRefreshToken(userId: string, tokenHash: string, jti: string, expiresAt: Date): Promise<RefreshTokenEntity> {
     return await this.prisma.refreshToken.create({
       data: {
         userId,
         tokenHash,
+        jti,
         expiresAt,
       },
     });
@@ -34,9 +35,9 @@ export class PrismaTokenRepository implements ITokenRepository {
     return;
   }
 
-  async deleteTokensByUserId(userId: string): Promise<void> {
-    await this.prisma.refreshToken.deleteMany({
-      where: { userId },
+  async deleteTokenByJti(jti: string): Promise<void> {
+    await this.prisma.refreshToken.delete({
+      where: { jti },
     });
     return;
   }
