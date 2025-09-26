@@ -1,7 +1,7 @@
-import { AccessTokenPayload } from '@/shared/jwt/jwt.service.interface';
+import { SignInResponseDto, SignUpResponseDto } from '@/modules/users/dto/user.response.dto';
+import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { SignInRequest } from '../dto/signIn.request.dto';
 import { SignUpRequest } from '../dto/signup.request.dto';
-import { SignInResponseDto, SignUpResponseDto } from '@/modules/users/dto/user.response.dto';
 
 export interface SignInResponse {
   accessToken: string;

@@ -7,7 +7,7 @@ import { SignUpRequestDto, signUpSchema } from './dto/signup.request.dto';
 import { AUTH_SERVICE, type IAuthService } from './interface/auth.service.interface';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthUser } from './decorators/auth-user.decorator';
-import { type AccessTokenPayload } from '@/shared/jwt/jwt.service.interface';
+import { type AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 
 @ApiTags('인증 (Auth)')
 @Controller('auth')
@@ -57,14 +57,19 @@ export class AuthController {
   async signOut(@AuthUser() user: AccessTokenPayload, @Res({ passthrough: true }) res: Response) {
     await this.authService.signOut(user);
 
-    const cookieOptions = {
+    res.clearCookie('__Host-access_token', {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       path: '/',
-      sameSite: 'lax' as const,
-    };
-    res.clearCookie('__Host-access_token', cookieOptions);
-    res.clearCookie('__Host-refresh_token', cookieOptions);
+      sameSite: 'lax',
+    });
+
+    res.clearCookie('__Host-rt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/api/auth/refresh',
+      sameSite: 'strict',
+    });
 
     return { message: 'Successfully signed out' };
   }

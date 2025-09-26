@@ -4,7 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -13,7 +12,6 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
-
 
 model User {
   id String @id @default(uuid())
@@ -44,8 +42,10 @@ model User {
   refreshTokens RefreshToken[]
   @@unique([provider, providerId])
 }
+
 model RefreshToken {
   id        String   @id @default(uuid())
+  jti       String   @unique @default(dbgenerated("gen_random_uuid()"))
   tokenHash String   @unique
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -55,6 +55,7 @@ model RefreshToken {
 
   @@index([userId, expiresAt])
 }
+
 enum Role {
   DRIVER
   CONSUMER
@@ -146,7 +147,6 @@ model ConsumerProfile {
   chattingRooms ChattingRoom[]
 }
 
-
 model Request {
   id String @id @default(uuid())
   consumerId String 
@@ -209,7 +209,6 @@ model ChattingMessage {
   updatedAt DateTime @updatedAt
   senderId String
   sender User @relation(fields: [senderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-
   isRead Boolean @default(false)
 }
 

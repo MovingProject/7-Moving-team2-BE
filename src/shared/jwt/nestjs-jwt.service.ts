@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { AccessTokenPayload, IJwtService, JwtPayload } from '@/shared/jwt/jwt.service.interface';
+import { IJwtService } from '@/shared/jwt/jwt.service.interface';
+import { AccessTokenPayload, JwtPayload } from './jwt.payload.schema';
 
 @Injectable()
 export class NestjsJwtService implements IJwtService {
@@ -23,9 +24,15 @@ export class NestjsJwtService implements IJwtService {
     });
   }
 
-  async verifyAsync<T extends JwtPayload = JwtPayload>(token: string): Promise<T> {
+  async verifyAccessToken<T extends AccessTokenPayload = AccessTokenPayload>(token: string): Promise<T> {
     return this.jwtService.verifyAsync<T>(token, {
       secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+    });
+  }
+
+  async verifyRefreshToken<T extends JwtPayload = JwtPayload>(token: string): Promise<T> {
+    return this.jwtService.verifyAsync<T>(token, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
     });
   }
 }

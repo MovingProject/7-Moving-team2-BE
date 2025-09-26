@@ -2,7 +2,8 @@ import { UserDtoFactory } from '@/modules/users/dto/user.response.dto';
 import { BadRequestException, ForbiddenException, NotFoundException, UnauthorizedException } from '@/shared/exceptions';
 import { UserAlreadyExistsException } from '@/shared/exceptions/user.exception';
 import { HASHING_SERVICE, type IHashingService } from '@/shared/hashing/hashing.service.interface';
-import { AccessTokenPayload, JWT_SERVICE, JwtPayload, type IJwtService } from '@/shared/jwt/jwt.service.interface';
+import { JWT_SERVICE, type IJwtService } from '@/shared/jwt/jwt.service.interface';
+import { JwtPayload, AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { Inject, Injectable } from '@nestjs/common';
 import { USER_REPOSITORY, type IUserRepository } from '../users/interface/users.repository.interface';
 import { SignInRequestDto } from './dto/signIn.request.dto';
@@ -12,6 +13,7 @@ import { TOKEN_REPOSITORY, type ITokenRepository } from './interface/token.repos
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
 import { ConfigNotFoundException } from '@/shared/exceptions/config-not-found.exception';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -68,7 +70,8 @@ export class AuthService implements IAuthService {
       throw new ForbiddenException('해당 권한으로 로그인할 수 없습니다.');
     }
 
-    const refreshTokenPayload: JwtPayload = { sub: existingUser.id };
+    const jti = randomUUID();
+    const refreshTokenPayload: JwtPayload = { sub: existingUser.id, jti: jti };
     const refreshToken = await this.jwtService.signRefreshToken(refreshTokenPayload);
     const hashedRefreshToken = await this.hashingService.hash(refreshToken);
 
@@ -83,15 +86,16 @@ export class AuthService implements IAuthService {
 
     const expiresAt = new Date(Date.now() + jwtRefreshExpiresInMs);
 
-    const storedRefreshToken = await this.tokenRepository.saveRefreshToken(
+    const storedRerfreshToken = await this.tokenRepository.saveRefreshToken(
       existingUser.id,
       hashedRefreshToken,
+      jti,
       expiresAt,
     );
 
     const accessTokenPayload: AccessTokenPayload = {
       sub: existingUser.id,
-      jti: storedRefreshToken.id,
+      jti: storedRerfreshToken.jti,
       role: existingUser.role,
     };
     const accessToken = await this.jwtService.signAccessToken(accessTokenPayload);
@@ -104,6 +108,6 @@ export class AuthService implements IAuthService {
   }
 
   async signOut(user: AccessTokenPayload) {
-    await this.tokenRepository.deleteTokensByUserId(user.jti);
+    await this.tokenRepository.deleteTokenByJti(user.jti);
   }
 }
