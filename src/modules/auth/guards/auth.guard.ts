@@ -1,5 +1,5 @@
 import { UnauthorizedException } from '@/shared/exceptions/unauthorized.exception';
-import { AccessTokenPayload } from '@/shared/jwt/jwt.service.interface';
+import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
