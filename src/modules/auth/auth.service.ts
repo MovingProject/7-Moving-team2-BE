@@ -110,4 +110,61 @@ export class AuthService implements IAuthService {
   async signOut(user: AccessTokenPayload) {
     await this.tokenRepository.deleteTokenByJti(user.jti);
   }
+
+  async refreshToken(refresh: JwtPayload, refreshRaw: string) {
+    const { sub, jti } = refresh;
+
+    if (!refreshRaw) {
+      throw new UnauthorizedException('원본 리프레시 토큰이 없습니다.', { errorType: 'TOKEN_RAW_MISSING' });
+    }
+
+    const storedRefreshToken = await this.tokenRepository.findTokenByJti(jti);
+    if (!storedRefreshToken) {
+      throw new UnauthorizedException('유효하지 않은 리프레시 토큰입니다.', { errorType: 'TOKEN_NOT_FOUND' });
+    }
+
+    const isMatch = await this.hashingService.compare(refreshRaw, storedRefreshToken.tokenHash);
+    if (!isMatch) {
+      throw new UnauthorizedException('리프레시 토큰 해시가 일치하지 않습니다.', { errorType: 'TOKEN_HASH_MISMATCH' });
+    }
+
+    if (sub !== storedRefreshToken?.userId) {
+      throw new UnauthorizedException('토큰 소유자 불일치', { errorType: 'TOKEN_SUB_MISMATCH' });
+    }
+
+    const now = new Date();
+    if (storedRefreshToken.expiresAt <= now) {
+      throw new UnauthorizedException('리프레시 토큰이 만료되었습니다.', { errorType: 'TOKEN_EXPIRED' });
+    }
+
+    if (storedRefreshToken.usedAt) {
+      throw new UnauthorizedException('이미 사용된 리프레시 토큰입니다.', { errorType: 'TOKEN_ALREADY_USED' });
+    }
+    await this.tokenRepository.markTokenAsUsed(storedRefreshToken.id);
+
+    const newJti = randomUUID();
+    const refreshToken = await this.jwtService.signRefreshToken({ sub, jti: newJti });
+    const refreshHash = await this.hashingService.hash(refreshToken);
+    const raw = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
+    const maybeParsed: unknown = (ms as unknown as (v: string | number, opts?: { long?: boolean }) => string | number)(
+      raw,
+    );
+    if (typeof maybeParsed !== 'number') {
+      throw new ConfigNotFoundException(`JWT_REFRESH_EXPIRES_IN 형식이 잘못됨: ${raw}`);
+    }
+    const jwtRefreshExpiresInMs: number = maybeParsed;
+
+    const expiresAt = new Date(Date.now() + jwtRefreshExpiresInMs);
+
+    await this.tokenRepository.saveRefreshToken(storedRefreshToken.userId, refreshHash, newJti, expiresAt);
+
+    const user = await this.userRepository.findById(sub);
+    if (!user) {
+      throw new NotFoundException('존재하지 않는 유저 ID입니다.');
+    }
+    const role = user.role;
+    const accessToken = await this.jwtService.signAccessToken({ sub, jti: newJti, role });
+
+    return { accessToken, refreshToken };
+  }
 }

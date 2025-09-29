@@ -16,7 +16,15 @@ export class PrismaUserRepository implements IUserRepository {
       },
     });
   }
-
+  async findById(id: string): Promise<UserWithProfile | null> {
+    return await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        driverProfile: true,
+        consumerProfile: true,
+      },
+    });
+  }
   async createUser(signUpInput: SignUpRequest, hashedPassword: string): Promise<UserWithProfile> {
     const { email, name, phoneNumber, role } = signUpInput;
 

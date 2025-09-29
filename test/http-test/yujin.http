@@ -1,5 +1,5 @@
 ### 변수 설정 (포트가 다르면 수정하세요)
-@host = http://localhost:3000
+@host = http://localhost:4000
 
 ####################################################
 #                  회원가입 API 테스트                  #
@@ -154,9 +154,9 @@ Content-Type: application/json
   "role": "CONSUMER"
 }
 
-### =================================================
-### Auth APIs
-### =================================================
+####################################################
+#                로그아웃 API 테스트                   #
+####################################################
 
 ### -------------------------------------------------
 ### 1. 로그인 (먼저 실행하여 쿠키를 받아야 합니다)
@@ -181,3 +181,21 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJ
 ### 3. 로그아웃 실패 (인증되지 않은 경우)
 # @name signOutFailure
 POST {{host}}/auth/signOut
+
+####################################################
+#                    토큰 재발급 (REFRESH)
+####################################################
+
+### 1) 재발급 성공 (200) — 로그인 후 실행
+# 쿠키로 __Host-rt 전송
+
+POST {{host}}/auth/refresh
+Cookie: __Host-rt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiI5MTk2MGZmNy1lMGU4LTRjZWMtOTUxMy0xN2E1ZGFjOTg3NjUiLCJpYXQiOjE3NTkwODM4ODAsImV4cCI6MTc1OTY4ODY4MH0.wn2ckETqV2s9JZOIxXAAFdZb-sef9Y0vLkOgaj03xmE;
+
+### 2) 재발급 실패 - 쿠키 없음 (401)
+POST {{host}}/auth/refresh
+
+### 3) 재발급 실패(옵션) - 재사용 감지 / 이미 사용된 토큰 (401 예상)
+# 위의 1) 재발급 성공 후, 같은 요청을 다시 보내보면 usedAt 체크에 걸릴 수 있음
+POST {{host}}/auth/refresh
+Cookie: __Host-rt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiI5MTk2MGZmNy1lMGU4LTRjZWMtOTUxMy0xN2E1ZGFjOTg3NjUiLCJpYXQiOjE3NTkwODM4ODAsImV4cCI6MTc1OTY4ODY4MH0.wn2ckETqV2s9JZOIxXAAFdZb-sef9Y0vLkOgaj03xmE;

@@ -1,13 +1,11 @@
-import { Role } from '@prisma/client';
+import type { AccessTokenPayload, JwtPayload } from '@/shared/jwt/jwt.payload.schema';
 
 declare global {
   namespace Express {
     export interface Request {
-      user?: {
-        sub: string;
-        jti: string;
-        role: Role;
-      };
+      user?: AccessTokenPayload;
+      refresh?: JwtPayload;
+      refreshRaw?: string;
     }
   }
 }

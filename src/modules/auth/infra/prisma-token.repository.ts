@@ -21,8 +21,14 @@ export class PrismaTokenRepository implements ITokenRepository {
     return await this.prisma.refreshToken.findFirst({
       where: {
         tokenHash,
-        usedAt: null,
-        expiresAt: { gt: new Date() },
+      },
+    });
+  }
+
+  async findTokenByJti(jti: string): Promise<RefreshTokenEntity | null> {
+    return await this.prisma.refreshToken.findUnique({
+      where: {
+        jti,
       },
     });
   }
