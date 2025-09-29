@@ -15,7 +15,6 @@ export const validationSchema = z.object({
       message: 'JWT_ACCESS_EXPIRES_IN must be a valid time string (e.g., "15m", "1h")',
     })
     .default('15m'),
-
   JWT_REFRESH_SECRET: z.string().min(1),
   JWT_REFRESH_EXPIRES_IN: z
     .string()
@@ -23,4 +22,5 @@ export const validationSchema = z.object({
       message: 'JWT_REFRESH_EXPIRES_IN must be a valid time string (e.g., "7d")',
     })
     .default('7d'),
+  BCRYPT_SALT_ROUNDS: z.coerce.number().default(10),
 });
