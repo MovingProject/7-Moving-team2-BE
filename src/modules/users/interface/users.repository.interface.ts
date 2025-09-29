@@ -10,6 +10,7 @@ export type UserWithProfile = Prisma.UserGetPayload<{
 
 export interface IUserRepository {
   findByEmail(email: string): Promise<UserWithProfile | null>;
+  findById(id: string): Promise<UserWithProfile | null>;
   createUser(signUpRequest: SignUpRequest, hashedPassword: string): Promise<UserWithProfile>;
 }
 
