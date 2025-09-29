@@ -47,6 +47,7 @@ async function bootstrap() {
   app.useGlobalFilters(new CustomExceptionFilter());
 
   await app.listen(httpConfig.port);
+  console.log(httpConfig.port, '번 포트에서 서버 실행중');
 }
 
 bootstrap().catch((error) => {

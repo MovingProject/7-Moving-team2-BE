@@ -4,7 +4,8 @@ import { timeStringRegex } from '../constant/regex';
 export const validationSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']),
   PORT: z.coerce.number().default(3000),
-  NEXT_URL: z.string().url().optional(),
+  NEXT_URL: z.string().url(),
+  NEXT_PREVIEW_URL: z.string().url().optional(),
   EXTRA_ORIGINS: z.string().url().optional(),
   DATABASE_URL: z.string().url(),
   JWT_ACCESS_SECRET: z.string().min(1),
