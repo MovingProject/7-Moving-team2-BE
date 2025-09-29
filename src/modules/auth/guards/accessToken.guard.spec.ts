@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthGuard } from './auth.guard';
+import { AccessTokenGuard } from './accessToken.gaurd';
 import { JwtService } from '@nestjs/jwt';
 import { ExecutionContext } from '@nestjs/common';
 import { UnauthorizedException } from '@/shared/exceptions/unauthorized.exception';
@@ -13,14 +13,14 @@ const createMockExecutionContext = (request: Partial<Request>): ExecutionContext
   } as ExecutionContext;
 };
 
-describe('AuthGuard', () => {
-  let guard: AuthGuard;
+describe('AccessTokenGuard', () => {
+  let accessTokenGuard: AccessTokenGuard;
   let jwtService: JwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AuthGuard,
+        AccessTokenGuard,
         {
           provide: JwtService,
           useValue: {
@@ -30,7 +30,7 @@ describe('AuthGuard', () => {
       ],
     }).compile();
 
-    guard = module.get<AuthGuard>(AuthGuard);
+    accessTokenGuard = module.get<AccessTokenGuard>(AccessTokenGuard);
     jwtService = module.get<JwtService>(JwtService);
   });
 
@@ -39,7 +39,7 @@ describe('AuthGuard', () => {
   });
 
   it('should be defined', () => {
-    expect(guard).toBeDefined();
+    expect(accessTokenGuard).toBeDefined();
   });
 
   describe('canActivate (Success)', () => {
@@ -54,7 +54,7 @@ describe('AuthGuard', () => {
 
       const verifyAsyncSpy = jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue(mockPayload);
 
-      const result = await guard.canActivate(mockContext);
+      const result = await accessTokenGuard.canActivate(mockContext);
 
       expect(result).toBe(true);
       expect(mockRequest['user']).toEqual(mockPayload);
@@ -70,7 +70,7 @@ describe('AuthGuard', () => {
       const mockRequest = { cookies: {} };
       const mockContext = createMockExecutionContext(mockRequest);
 
-      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+      await expect(accessTokenGuard.canActivate(mockContext)).rejects.toThrow(
         new UnauthorizedException('인증 토큰이 쿠키에 존재하지 않습니다.'),
       );
     });
@@ -87,7 +87,7 @@ describe('AuthGuard', () => {
 
       jest.spyOn(jwtService, 'verifyAsync').mockRejectedValue(mockError);
 
-      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+      await expect(accessTokenGuard.canActivate(mockContext)).rejects.toThrow(
         new UnauthorizedException('유효하지 않은 토큰입니다.', {
           errorType: mockError.name,
           errorMessage: mockError.message,

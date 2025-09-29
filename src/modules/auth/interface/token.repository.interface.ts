@@ -13,6 +13,8 @@ export interface ITokenRepository {
 
   findTokenByHash(tokenHash: string): Promise<RefreshTokenEntity | null>;
 
+  findTokenByJti(jti: string): Promise<RefreshTokenEntity | null>;
+
   markTokenAsUsed(tokenId: string): Promise<void>;
 
   deleteTokenByJti(jti: string): Promise<void>;
