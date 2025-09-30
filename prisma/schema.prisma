@@ -14,44 +14,45 @@ generator client {
 }
 
 model User {
-  id String @id @default(uuid())
-  name String
-  email String @unique
-  passwordHash String? 
-  phoneNumber String
-  role Role
-  providerId String?
-  provider String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-  driverProfile DriverProfile?
-  consumerProfile ConsumerProfile?
-  consumerLikes       LIKE[] @relation("ConsumerLikesDriver")   // 내가 소비자(consumer)로서 누군가(기사)를 좋아요한 기록들
-  likedByConsumers    LIKE[] @relation("DriverLikedByConsumer") // 내가 기사(driver)로서 소비자에게 받은 좋아요들
-  requestsAsConsumer       Request[] @relation("RequestsByConsumer")
-  requestsTargetedAsDriver Request[] @relation("RequestsTargetingDriver")
-  reviewsWritten  Review[] @relation("ReviewsByConsumer")
-  reviewsReceived Review[] @relation("ReviewsForDriver")
-  quotationsAsConsumer Quotation[] @relation("QuotationsByConsumer")
-  quotationsAsDriver   Quotation[] @relation("QuotationsForDriver")
-  chatRoomsAsConsumer ChattingRoom[] @relation("RoomsByConsumer")
-  chatRoomsAsDriver   ChattingRoom[] @relation("RoomsByDriver")
-  chattingMessages ChattingMessage[]
-  notifications Notification[]
-  refreshTokens RefreshToken[]
+  id                       String            @id @default(uuid())
+  name                     String
+  email                    String            @unique
+  passwordHash             String?
+  phoneNumber              String
+  role                     Role
+  providerId               String?
+  provider                 String?
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+  deletedAt                DateTime?
+  driverProfile            DriverProfile?
+  consumerProfile          ConsumerProfile?
+  consumerLikes            LIKE[]            @relation("ConsumerLikesDriver") // 내가 소비자(consumer)로서 누군가(기사)를 좋아요한 기록들
+  likedByConsumers         LIKE[]            @relation("DriverLikedByConsumer") // 내가 기사(driver)로서 소비자에게 받은 좋아요들
+  requestsAsConsumer       Request[]         @relation("RequestsByConsumer")
+  requestsTargetedAsDriver Request[]         @relation("RequestsTargetingDriver")
+  reviewsWritten           Review[]          @relation("ReviewsByConsumer")
+  reviewsReceived          Review[]          @relation("ReviewsForDriver")
+  quotationsAsConsumer     Quotation[]       @relation("QuotationsByConsumer")
+  quotationsAsDriver       Quotation[]       @relation("QuotationsForDriver")
+  chatRoomsAsConsumer      ChattingRoom[]    @relation("RoomsByConsumer")
+  chatRoomsAsDriver        ChattingRoom[]    @relation("RoomsByDriver")
+  chattingMessages         ChattingMessage[]
+  notifications            Notification[]
+  refreshTokens            RefreshToken[]
+
   @@unique([provider, providerId])
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
-  jti       String   @unique @default(dbgenerated("gen_random_uuid()"))
-  tokenHash String   @unique
+  id        String    @id @default(uuid())
+  jti       String    @unique @default(dbgenerated("gen_random_uuid()"))
+  tokenHash String    @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
-  usedAt    DateTime? 
-  createdAt DateTime @default(now())
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 
   @@index([userId, expiresAt])
 }
@@ -62,51 +63,52 @@ enum Role {
 }
 
 model DriverProfile {
-  id String @id @default(uuid())
-  userId String @unique 
-  driver User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  image String?
-  nickname String
-  careerYears String
-  oneLiner String
-  description String
-  rating Float @default(0.0)
-  reviewCount Int @default(0)
-  confirmedCount Int @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  id                 String              @id @default(uuid())
+  userId             String              @unique
+  driver             User                @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  image              String?
+  nickname           String
+  careerYears        String
+  oneLiner           String
+  description        String
+  rating             Float               @default(0.0)
+  reviewCount        Int                 @default(0)
+  confirmedCount     Int                 @default(0)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  deletedAt          DateTime?
   driverServiceAreas DriverServiceArea[]
   driverServiceTypes DriverServiceType[]
-  reviewsReceived Review[] @relation("ReviewsForDriverProfile")
-  quotations Quotation[]
-  chattingRooms ChattingRoom[]
+  reviewsReceived    Review[]            @relation("ReviewsForDriverProfile")
+  quotations         Quotation[]
+  chattingRooms      ChattingRoom[]
 }
 
 model DriverServiceArea {
-  id String @id @default(uuid())
+  id              String        @id @default(uuid())
   driverProfileId String
-  driverProfile DriverProfile @relation(fields: [driverProfileId], references: [id], onDelete: Cascade)
-  serviceArea Area
+  driverProfile   DriverProfile @relation(fields: [driverProfileId], references: [id], onDelete: Cascade)
+  serviceArea     Area
 }
 
 model DriverServiceType {
-  id String @id @default(uuid())
-  driverProfileId String 
-  driverProfile DriverProfile @relation(fields: [driverProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  serviceType MoveType
+  id              String        @id @default(uuid())
+  driverProfileId String
+  driverProfile   DriverProfile @relation(fields: [driverProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  serviceType     MoveType
 }
 
 model LIKE {
   consumerId String
-  consumer User @relation("ConsumerLikesDriver", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  driverId String
-  driver User @relation("DriverLikedByConsumer", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  @@id([consumerId, driverId]) 
+  consumer   User   @relation("ConsumerLikesDriver", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  driverId   String
+  driver     User   @relation("DriverLikedByConsumer", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@id([consumerId, driverId])
 }
 
 enum MoveType {
-  SMALL_MOVE 
+  SMALL_MOVE
   HOME_MOVE
   OFFICE_MOVE
 }
@@ -132,45 +134,45 @@ enum Area {
 }
 
 model ConsumerProfile {
-  id String @id @default(uuid())
-  consumerId String @unique
-  consumer User @relation(fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  image String?
-  serviceType MoveType
-  areas Area 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  id              String         @id @default(uuid())
+  consumerId      String         @unique
+  consumer        User           @relation(fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  image           String?
+  serviceType     MoveType
+  areas           Area
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
   consumerRequest Request[]
-  reviewsWritten Review[] @relation("ReviewsFromConsumerProfile")
-  quotations Quotation[]
-  chattingRooms ChattingRoom[]
+  reviewsWritten  Review[]       @relation("ReviewsFromConsumerProfile")
+  quotations      Quotation[]
+  chattingRooms   ChattingRoom[]
 }
 
 model Request {
-  id String @id @default(uuid())
-  consumerId String 
-  consumer User @relation("RequestsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  id                String           @id @default(uuid())
+  consumerId        String
+  consumer          User             @relation("RequestsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   consumerProfileId String
-  consumerProfile ConsumerProfile @relation (fields: [consumerProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade) 
-  serviceType    MoveType      
-  moveAt         DateTime    
-  departureAddress String       
-  departureFloor   Int          
-  departureSize    Float      
-  arrivalAddress   String      
-  arrivalFloor     Int       
-  arrivalSize      Float     
-  requirements     String?       
-  departureArea    Area         
-  arrivalArea      Area  
-  requestStatement RequestStatement
-  targetDriverId String?
-  targetDriver User? @relation("RequestsTargetingDriver", fields: [targetDriverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  createdAt DateTime @default(now())
-  deletedAt DateTime?
-  chattingRooms ChattingRoom[]
-  quotations Quotation[] 
+  consumerProfile   ConsumerProfile  @relation(fields: [consumerProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  serviceType       MoveType
+  moveAt            DateTime
+  departureAddress  String
+  departureFloor    Int
+  departureSize     Float
+  arrivalAddress    String
+  arrivalFloor      Int
+  arrivalSize       Float
+  requirements      String?
+  departureArea     Area
+  arrivalArea       Area
+  requestStatement  RequestStatement
+  targetDriverId    String?
+  targetDriver      User?            @relation("RequestsTargetingDriver", fields: [targetDriverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt         DateTime         @default(now())
+  deletedAt         DateTime?
+  chattingRooms     ChattingRoom[]
+  quotations        Quotation[]
 }
 
 enum RequestStatement {
@@ -181,71 +183,71 @@ enum RequestStatement {
 }
 
 model ChattingRoom {
-  id String @id @default(uuid())
-  consumerId String
-  consumer User @relation("RoomsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  id                String            @id @default(uuid())
+  consumerId        String
+  consumer          User              @relation("RoomsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   consumerProfileId String
-  consumerProfile ConsumerProfile @relation(fields: [consumerProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade )
-  driverId String 
-  driver User @relation("RoomsByDriver", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  driverProfileId String 
-  driverProfile DriverProfile @relation(fields: [driverProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  requestId String
-  request Request @relation(fields: [requestId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-  quotations Quotation[]
-  messages ChattingMessage[]
+  consumerProfile   ConsumerProfile   @relation(fields: [consumerProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  driverId          String
+  driver            User              @relation("RoomsByDriver", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  driverProfileId   String
+  driverProfile     DriverProfile     @relation(fields: [driverProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  requestId         String
+  request           Request           @relation(fields: [requestId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  deletedAt         DateTime?
+  quotations        Quotation[]
+  messages          ChattingMessage[]
 }
 
 model ChattingMessage {
-  id String @id @default(uuid())
-  chattingRoomId String 
-  chattingRoom ChattingRoom @relation(fields: [chattingRoomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  content String
-  messageType MessageType
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  senderId String
-  sender User @relation(fields: [senderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  isRead Boolean @default(false)
+  id             String       @id @default(uuid())
+  chattingRoomId String
+  chattingRoom   ChattingRoom @relation(fields: [chattingRoomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  content        String
+  messageType    MessageType
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  isRead         Boolean      @default(false)
 }
 
 enum MessageType {
-    QUOTATION
-    MESSAGE
+  QUOTATION
+  MESSAGE
 }
 
 model Quotation {
-  id String @id @default(uuid())
-  consumerId String
-  consumer User @relation("QuotationsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  consumerProfileId String
-  consumerProfile ConsumerProfile @relation(fields: [consumerProfileId], references:[id], onUpdate: Cascade, onDelete: Cascade)
-  driverId String 
-  driver User @relation("QuotationsForDriver", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  driverProfileId String
-  driverProfile DriverProfile @relation(fields: [driverProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  chattingRoomId String
-  chattingRoom ChattingRoom @relation(fields: [chattingRoomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  requestId String
-  request Request @relation(fields: [requestId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  departureAddress String       
-  departureFloor   Int          
-  departureSize    Float      
-  arrivalAddress   String      
-  arrivalFloor     Int       
-  arrivalSize      Float     
-  requirements     String?       
-  departureArea    Area         
-  arrivalArea      Area 
-  price Int
+  id                 String             @id @default(uuid())
+  consumerId         String
+  consumer           User               @relation("QuotationsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  consumerProfileId  String
+  consumerProfile    ConsumerProfile    @relation(fields: [consumerProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  driverId           String
+  driver             User               @relation("QuotationsForDriver", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  driverProfileId    String
+  driverProfile      DriverProfile      @relation(fields: [driverProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  chattingRoomId     String
+  chattingRoom       ChattingRoom       @relation(fields: [chattingRoomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  requestId          String
+  request            Request            @relation(fields: [requestId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  departureAddress   String
+  departureFloor     Int
+  departureSize      Float
+  arrivalAddress     String
+  arrivalFloor       Int
+  arrivalSize        Float
+  requirements       String?
+  departureArea      Area
+  arrivalArea        Area
+  price              Int
   quotationStatement QuotationStatement
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-  reviews Review[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  deletedAt          DateTime?
+  reviews            Review[]
 }
 
 enum QuotationStatement {
@@ -256,32 +258,32 @@ enum QuotationStatement {
 }
 
 model Review {
-  id String @id @default(uuid())
-  consumerId String
-  consumer User @relation("ReviewsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  consumerProfileId String 
-  consumerProfile ConsumerProfile @relation("ReviewsFromConsumerProfile", fields: [consumerProfileId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  driverId String 
-  driver User @relation("ReviewsForDriver", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  driverProfileId String 
-  driverProfile DriverProfile @relation("ReviewsForDriverProfile", fields: [driverProfileId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  content String
-  rate Int 
-  quotationId String
-  quotation Quotation @relation(fields: [quotationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  id                String          @id @default(uuid())
+  consumerId        String
+  consumer          User            @relation("ReviewsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  consumerProfileId String
+  consumerProfile   ConsumerProfile @relation("ReviewsFromConsumerProfile", fields: [consumerProfileId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  driverId          String
+  driver            User            @relation("ReviewsForDriver", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  driverProfileId   String
+  driverProfile     DriverProfile   @relation("ReviewsForDriverProfile", fields: [driverProfileId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  content           String
+  rate              Int
+  quotationId       String
+  quotation         Quotation       @relation(fields: [quotationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  deletedAt         DateTime?
 }
 
 model Notification {
-id String @id @default(uuid())
-receiverId String 
-receiver User @relation(fields: [receiverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-content String
-createdAt DateTime @default(now())
-isRead Boolean @default(false)
-notificationType NotificationType
+  id               String           @id @default(uuid())
+  receiverId       String
+  receiver         User             @relation(fields: [receiverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  content          String
+  createdAt        DateTime         @default(now())
+  isRead           Boolean          @default(false)
+  notificationType NotificationType
 }
 
 enum NotificationType {

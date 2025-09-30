@@ -1,4 +1,4 @@
-import { User, Role, DriverProfile, ConsumerProfile } from '@prisma/client';
+import { User, Role, DriverProfile, ConsumerProfile, DriverServiceArea, DriverServiceType } from '@prisma/client';
 
 type UserWithProfile = User & {
   driverProfile: DriverProfile | null;
@@ -17,6 +17,20 @@ export class SignUpResponseDto extends BaseUserDto {}
 export class SignInResponseDto extends BaseUserDto {
   isProfileRegistered: boolean;
   profileId?: string;
+}
+
+export class EditDriverProfileDto extends BaseUserDto {
+  region: string;
+  service: string;
+  experience: string; //경력
+  bio: string; // 한줄소개
+  description: string; //상세설명
+  tel: string;
+}
+export class EditConsumerProfileDto extends BaseUserDto {
+  region: string;
+  service: string;
+  tel: string;
 }
 
 export class UserDtoFactory {
@@ -41,6 +55,40 @@ export class UserDtoFactory {
     if (dto.isProfileRegistered) {
       dto.profileId = user.driverProfile?.id || user.consumerProfile?.id;
     }
+    return dto;
+  }
+
+  static toEditConsumerProfileDto(user: User, consumberProfile: ConsumerProfile): EditConsumerProfileDto {
+    const dto = new EditConsumerProfileDto();
+
+    dto.id = user.id; //id
+    dto.name = user.name; // 이름
+    dto.email = user.email; // 이메일
+    dto.tel = user.phoneNumber; //전화번호
+    dto.service = consumberProfile.serviceType; //이용서비스
+    dto.region = consumberProfile.areas; //사는지역
+    //여기서 프로필이미지 유무도 생각해보면좋은데 일단은 그냥넘어감
+    return dto;
+  }
+
+  static toEditDriverProfileDto(
+    user: User,
+    driverProfile: DriverProfile,
+    DriverType: DriverServiceType,
+    DriverRegion: DriverServiceArea,
+  ): EditDriverProfileDto {
+    const dto = new EditDriverProfileDto();
+
+    dto.id = user.id; //id
+    dto.name = user.name; // 이름
+    dto.email = user.email; // 이메일
+    dto.service = DriverType.serviceType; //이용서비스
+    dto.region = DriverRegion.serviceArea; //사는지역
+    dto.bio = driverProfile.oneLiner; // 한줄소개
+    dto.description = driverProfile.description; // 상세설명
+    dto.experience = driverProfile.careerYears; // 경력
+    //여기서 프로필이미지 유무도 생각해보면좋은데 일단은 그냥넘어감
+    
     return dto;
   }
 }
