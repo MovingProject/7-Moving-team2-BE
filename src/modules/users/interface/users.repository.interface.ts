@@ -1,5 +1,59 @@
 import { Prisma } from '@prisma/client';
 import { SignUpRequest } from '../../auth/dto/signup.request.dto';
+import z from 'zod';
+
+const editConsumerProfileSchema = z.object({
+  region: z.enum([
+    'SEOUL',
+    'GYEONGGI',
+    'INCHEON',
+    'GANGWON',
+    'CHUNGBUK',
+    'CHUNGNAM',
+    'SEJONG',
+    'DAEJEON',
+    'JEONBUK',
+    'JEONNAM',
+    'GWANGJU',
+    'GYEONGBUK',
+    'GYEONGNAM',
+    'DAEGU',
+    'ULSAN',
+    'BUSAN',
+    'JEJU',
+  ]),
+  serviceType: z.enum(['SMALL_MOVE', 'HOME_MOVE', 'OFFICE_MOVE']),
+  phoneNumber: z.string().min(10),
+});
+
+const editDriverProfileSchema = z.object({
+  region: z.array(
+    z.enum([
+      'SEOUL',
+      'GYEONGGI',
+      'INCHEON',
+      'GANGWON',
+      'CHUNGBUK',
+      'CHUNGNAM',
+      'SEJONG',
+      'DAEJEON',
+      'JEONBUK',
+      'JEONNAM',
+      'GWANGJU',
+      'GYEONGBUK',
+      'GYEONGNAM',
+      'DAEGU',
+      'ULSAN',
+      'BUSAN',
+      'JEJU',
+    ]),
+  ),
+  serviceType: z.array(z.enum(['SMALL_MOVE', 'HOME_MOVE', 'OFFICE_MOVE'])),
+  careerYears: z.string(),
+  oneLiner: z.string(),
+  description: z.string(),
+  phoneNumber: z.string().min(10),
+});
 
 export type UserWithProfile = Prisma.UserGetPayload<{
   include: {
