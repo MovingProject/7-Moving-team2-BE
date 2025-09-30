@@ -22,5 +22,6 @@ export const validationSchema = z.object({
       message: 'JWT_REFRESH_EXPIRES_IN must be a valid time string (e.g., "7d")',
     })
     .default('7d'),
+  JWT_ISSUER: z.string().url(),
   BCRYPT_SALT_ROUNDS: z.coerce.number().default(10),
 });
