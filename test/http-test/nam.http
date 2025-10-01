@@ -15,7 +15,7 @@ Content-Type: application/json
 
 GET  {{host}}/users/me
 Content-Type: application/json
-Cookie: __Host-access_token=.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiIzMDliYTFjNS0yNGM2LTQ4ZGMtOTIwZC1hMWYwNDk3ZDMxYWEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTkyNzkwMTAsImV4cCI6MTc1OTI3OTkxMCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.cQ1Yl8ItTV2akGuw6IYYSPqIue8QBw9zyIku64BnGPk;
+Cookie: __Host-access_token=vvvvv;
 
 ### 드라이버 로그인
 
