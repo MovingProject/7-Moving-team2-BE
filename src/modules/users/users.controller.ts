@@ -15,6 +15,7 @@ export class UsersController {
   @ApiOkResponse({ type: EditConsumerProfileDto })
   @ApiNotFoundResponse({ description: '프로필이 없습니다.' })
   async getProfile(@AuthUser() authUser: AccessTokenPayload, @Res({ passthrough: true }) res: Response) {
+    console.log('AuthUser payload:', authUser);
     const user = await this.usersService.getUserWithProfile(authUser.sub);
     if (user.consumerProfile) {
       return UserDtoFactory.toEditConsumerProfileDto(user, user.consumerProfile);
