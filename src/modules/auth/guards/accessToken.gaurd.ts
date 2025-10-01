@@ -11,6 +11,7 @@ export class AccessTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const token = request.cookies?.['__Host-access_token'] as string | undefined;
+    console.log('Received token:', token);
     if (!token) {
       throw new UnauthorizedException('인증 토큰이 쿠키에 존재하지 않습니다.');
     }
