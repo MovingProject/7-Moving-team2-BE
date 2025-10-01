@@ -10,9 +10,9 @@ import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { PrismaTokenRepository } from '@/modules/auth/infra/prisma-token.repository';
 import { AUTH_SERVICE } from './interface/auth.service.interface';
 import { TOKEN_REPOSITORY } from './interface/token.repository.interface';
-
+import { CookieModule } from '@/shared/utils/cookie.module';
 @Module({
-  imports: [UserModule, HashingModule, SharedJwtModule],
+  imports: [UserModule, HashingModule, SharedJwtModule, CookieModule],
   controllers: [AuthController],
   providers: [
     AccessTokenGuard,
