@@ -26,12 +26,12 @@ export class CookiesService {
     return v;
   }
 
-  private get accessCookieName() {
+  public get accessCookieName() {
     const prefix = this.useSecure ? (this.config.get<string>('ACCESS_COOKIE_PREFIX') ?? '__Host-') : '';
     return `${prefix}access_token`;
   }
 
-  private get refreshCookieName() {
+  public get refreshCookieName() {
     const prefix = this.useSecure ? (this.config.get<string>('REFRESH_COOKIE_PREFIX') ?? '__Secure-') : '';
     return `${prefix}refresh_token`;
   }
