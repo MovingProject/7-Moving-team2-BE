@@ -1,17 +1,23 @@
 import { UnauthorizedException } from '@/shared/exceptions/unauthorized.exception';
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { JWT_SERVICE, type IJwtService } from '@/shared/jwt/jwt.service.interface';
+import { CookiesService } from '@/shared/utils/cookies.service';
 import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { JsonWebTokenError, NotBeforeError, TokenExpiredError } from 'jsonwebtoken';
+
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
-  constructor(@Inject(JWT_SERVICE) private readonly jwtService: IJwtService) {}
+  constructor(
+    @Inject(JWT_SERVICE) private readonly jwtService: IJwtService,
+    private readonly cookiesService: CookiesService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-    const token = request.cookies?.['__Host-access_token'] as string | undefined;
-    console.log('Received token:', token);
+    const tokenName = this.cookiesService.accessCookieName;
+    const token = request.cookies?.[tokenName] as string | undefined;
+
     if (!token) {
       throw new UnauthorizedException('인증 토큰이 쿠키에 존재하지 않습니다.');
     }

@@ -4,13 +4,19 @@ import { JWT_SERVICE, type IJwtService } from '@/shared/jwt/jwt.service.interfac
 import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { JsonWebTokenError, NotBeforeError, TokenExpiredError } from 'jsonwebtoken';
+import { CookiesService } from '@/shared/utils/cookies.service';
+
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
-  constructor(@Inject(JWT_SERVICE) private readonly jwtService: IJwtService) {}
+  constructor(
+    @Inject(JWT_SERVICE) private readonly jwtService: IJwtService,
+    private readonly cookiesService: CookiesService,
+  ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-
-    const token = request.cookies?.['__Host-rt'] as string | undefined;
+    const tokenName = this.cookiesService.refreshCookieName;
+    const token = request.cookies?.[tokenName] as string | undefined;
 
     if (!token) {
       throw new UnauthorizedException('리프레시 토큰이 쿠키에 존재하지 않습니다.');
