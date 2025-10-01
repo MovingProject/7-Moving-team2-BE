@@ -1,0 +1,49 @@
+@host = http://localhost:4000
+
+
+### 고객로그인
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "login-test@test.com",
+  "password": "password123",
+  "role": "CONSUMER"
+}
+
+### 고객로그인 get api
+
+GET  {{host}}/users/9e2e4b7e-3b2a-4583-bc11-6c78ec308336
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiIzMDliYTFjNS0yNGM2LTQ4ZGMtOTIwZC1hMWYwNDk3ZDMxYWEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTkyNzkwMTAsImV4cCI6MTc1OTI3OTkxMCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.cQ1Yl8ItTV2akGuw6IYYSPqIue8QBw9zyIku64BnGPk;
+
+### 드라이버 로그인
+
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "driver1@test.com",
+  "password": "password123",
+  "role": "DRIVER"
+}
+
+### 드라이버 get api
+
+GET  {{host}}/users/2e72d584-1cc5-46a8-bf12-8a156c86b59d
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTcyZDU4NC0xY2M1LTQ2YTgtYmYxMi04YTE1NmM4NmI1OWQiLCJqdGkiOiI3ZDFmMjFjMC0xMjA1LTQwMTItYWU0OS1kMzhlMGM4OWIxMDgiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzU5MjgwMjQzLCJleHAiOjE3NTkyODExNDMsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.iBkwCxLeZFLmExbg2XhlR9mEYgi1gaqr-Q1tk0mxCIA;
+
+
+
+### 실험중인거 고객id / 드라이버 쿠키
+
+GET  {{host}}/users/9e2e4b7e-3b2a-4583-bc11-6c78ec308336
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTcyZDU4NC0xY2M1LTQ2YTgtYmYxMi04YTE1NmM4NmI1OWQiLCJqdGkiOiI3ZDFmMjFjMC0xMjA1LTQwMTItYWU0OS1kMzhlMGM4OWIxMDgiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzU5MjgwMjQzLCJleHAiOjE3NTkyODExNDMsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.iBkwCxLeZFLmExbg2XhlR9mEYgi1gaqr-Q1tk0mxCIA;
+
+###
+
+GET  {{host}}/users/2e72d584-1cc5-46a8-bf12-8a156c86b59d
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiIzMDliYTFjNS0yNGM2LTQ4ZGMtOTIwZC1hMWYwNDk3ZDMxYWEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTkyNzkwMTAsImV4cCI6MTc1OTI3OTkxMCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.cQ1Yl8ItTV2akGuw6IYYSPqIue8QBw9zyIku64BnGPk;
