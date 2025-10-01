@@ -9,15 +9,13 @@ import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @UseGuards(AccessTokenGuard)
   @Get('me')
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '유저 프로필 수정시 GET 데이터(유저정보)' })
   @ApiOkResponse({ type: EditConsumerProfileDto })
   @ApiNotFoundResponse({ description: '프로필이 없습니다.' })
   async getProfile(@AuthUser() authUser: AccessTokenPayload, @Res({ passthrough: true }) res: Response) {
     const user = await this.usersService.getUserWithProfile(authUser.sub);
-
     if (user.consumerProfile) {
       return UserDtoFactory.toEditConsumerProfileDto(user, user.consumerProfile);
     } else if (user.driverProfile) {
