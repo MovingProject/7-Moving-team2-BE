@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { USER_REPOSITORY } from './interface/users.repository.interface';
 import type { IUserRepository } from './interface/users.repository.interface';
-import { NotFoundException, UnauthorizedException } from '@/shared/exceptions';
+import { NotFoundException, UnauthorizedException,  } from '@/shared/exceptions';
+import { BaseUpdateUserDto } from './dto/user.update.Dto';
 
 @Injectable()
 export class UsersService {
@@ -21,5 +22,14 @@ export class UsersService {
     if (!user) throw new NotFoundException('유저를 찾을수 없습니다.');
 
     return user;
+  }
+
+  async updateUserProfile(userId: string, dto: BaseUpdateUserDto) {
+    const user = await this.userRepository.getProfileById(userId);
+
+    if (!user) throw new NotFoundException('유저를 찾을수 없습니다.');
+    if (!dto.password) {
+      throw new UnauthorizedException('현재 비밀번호를 입력해야 수정할 수 있습니다.'); 
+    }
   }
 }
