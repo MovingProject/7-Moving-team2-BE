@@ -96,6 +96,7 @@ export class UserDtoFactory {
     dto.bio = driverProfile.oneLiner; // 한줄소개
     dto.description = driverProfile.description; // 상세설명
     dto.experience = driverProfile.careerYears; // 경력
+    dto.tel = user.phoneNumber;
     //여기서 프로필이미지 유무도 생각해보면좋은데 일단은 그냥넘어감
 
     return dto;
