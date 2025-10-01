@@ -11,6 +11,7 @@ import { PrismaTokenRepository } from '@/modules/auth/infra/prisma-token.reposit
 import { AUTH_SERVICE } from './interface/auth.service.interface';
 import { TOKEN_REPOSITORY } from './interface/token.repository.interface';
 import { CookieModule } from '@/shared/utils/cookie.module';
+import { CookiesService } from '@/shared/utils/cookies.service';
 @Module({
   imports: [UserModule, HashingModule, SharedJwtModule, CookieModule],
   controllers: [AuthController],
@@ -25,6 +26,7 @@ import { CookieModule } from '@/shared/utils/cookie.module';
       useClass: PrismaTokenRepository,
     },
     RefreshTokenGuard,
+    CookiesService,
   ],
   exports: [AUTH_SERVICE],
 })

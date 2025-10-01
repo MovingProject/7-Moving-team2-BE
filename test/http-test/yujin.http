@@ -175,7 +175,7 @@ Content-Type: application/json
 ### 2. 로그아웃 성공 (로그인 후 실행)
 # @name signOutSuccess
 POST {{host}}/auth/signOut
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiI4Y2E2NmI0Zi00OWNjLTQ1YmItOGJlMS1hODUwNDBjNDJiNzciLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTg5MTA4MTksImV4cCI6MTc1ODkxMTcxOX0.cUuzVJQwsXuJGFhEVfbuRuOUulzJfgnKG-X_y6haPzQ; Max-Age=900;
+Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiIyY2I3MDQ0Ni0zOWNiLTQ3NzgtYjJhYS0wMWFjYTZmNGJlNWUiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTkzMTMwMjIsImV4cCI6MTc1OTMxMzkyMiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.fYXY0eRcM4lvtkCfjQxVK9k8nPX9hQsjbo3MjXndP58;
 
 ### -------------------------------------------------
 ### 3. 로그아웃 실패 (인증되지 않은 경우)
