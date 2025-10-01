@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Res, Patch, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDtoFactory, EditConsumerProfileDto } from './dto/user.response.dto';
 import { NotFoundException } from '@nestjs/common';
@@ -7,6 +7,7 @@ import { ApiOkResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagge
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 
+import { BaseUpdateUserDto } from './dto/user.update.Dto';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -29,5 +30,15 @@ export class UsersController {
     } else {
       throw new NotFoundException('프로필이 없습니다.');
     }
+  }
+
+  @Patch('me')
+  async patchProfile(
+    @AuthUser() authUser: AccessTokenPayload,
+    @Body() updateUserDto: BaseUpdateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const user = await this.usersService.getUserWithProfile(authUser.sub);
+    //여기서 일단 기존 db에있는 유저정보를가져옴 그래서 채울수있는곳은 채움
   }
 }
