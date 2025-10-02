@@ -104,6 +104,10 @@ export class PatchDtoFactory {
     dto.name = user.name;
     dto.tel = user.phoneNumber;
     //고민좀
+    dto.nickname = driverProfile.nickname;
+    dto.experience =driverProfile.careerYears;
+    dto.bio = driverProfile.oneLiner;
+
     return dto;
   }
 }
