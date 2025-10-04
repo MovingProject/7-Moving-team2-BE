@@ -163,6 +163,10 @@ model Request {
   departureArea          Area 
   arrivalArea            Area 
   requestStatus          RequestStatus @default(PENDING)
+  generalQuoteCount   Int @default(0)
+  invitedQuoteCount   Int @default(0)
+  generalQuoteLimit   Int @default(5)
+  invitedQuoteLimit   Int @default(3)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
   concludedAt            DateTime?
