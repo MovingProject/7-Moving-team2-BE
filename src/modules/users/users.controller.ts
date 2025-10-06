@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Res, Patch, Body } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Res, Patch, Body, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDtoFactory, EditConsumerProfileDto } from './dto/user.response.dto';
 import { NotFoundException } from '@nestjs/common';
@@ -8,6 +8,8 @@ import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 
 import { BaseUpdateUserDto } from './dto/user.update.Dto';
+import { UpdateUserProfileDto } from './dto/user.update.Dto';
+import type { AuthenticatedRequest } from './interface/users.repository.interface';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -32,13 +34,10 @@ export class UsersController {
     }
   }
 
-  @Patch('me')
-  async patchProfile(
-    @AuthUser() authUser: AccessTokenPayload,
-    @Body() updateUserDto: BaseUpdateUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const user = await this.usersService.getUserWithProfile(authUser.sub);
-    //여기서 일단 기존 db에있는 유저정보를가져옴 그래서 채울수있는곳은 채움
+  @Patch('me/profile')
+  @UseGuards(AccessTokenGuard)
+  async updateProfile(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserProfileDto) {
+    const userId = req.user.id;
+    return this.usersService.updateProfile(userId, dto);
   }
 }

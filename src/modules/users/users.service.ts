@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { USER_REPOSITORY } from './interface/users.repository.interface';
 import type { IUserRepository } from './interface/users.repository.interface';
-import { NotFoundException, UnauthorizedException,  } from '@/shared/exceptions';
-import { BaseUpdateUserDto } from './dto/user.update.Dto';
-import { HASHING_SERVICE , type IHashingService } from '@/shared/hashing/hashing.service.interface';
+import { NotFoundException, UnauthorizedException } from '@/shared/exceptions';
+import { HASHING_SERVICE, type IHashingService } from '@/shared/hashing/hashing.service.interface';
+import { UpdateUserProfileDto } from './dto/user.update.Dto';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +12,7 @@ export class UsersService {
     private readonly userRepository: IUserRepository,
 
     @Inject(HASHING_SERVICE)
-    private readonly hashingService : IHashingService,
+    private readonly hashingService: IHashingService,
   ) {}
   //NestJS에서 의존성 주입(Dependency Injection, DI)**을 위해 쓰는 문법
   //constructor(...) : 클래스가 생성될 때 필요한 의존 객체를 받는 자리
@@ -28,20 +28,16 @@ export class UsersService {
     return user;
   }
 
-  async updateUserProfile(userId: string, dto: BaseUpdateUserDto) {
-    const user = await this.userRepository.getProfileById(userId);
+  async getProfileById(id: string) {
+    const user = await this.userRepository.getProfileById(id);
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
 
-    if (!user) throw new NotFoundException('유저를 찾을수 없습니다.');
-    if (!dto.password) {
-      throw new UnauthorizedException('현재 비밀번호를 입력해야 수정할 수 있습니다.'); 
-    }
-    if(!user.passwordHash){
-      throw new UnauthorizedException("비밀번호가 설정되어있지않습니다.")
-    }
-    const isPasswordValid = await this.hashingService.compare(dto.password,user.passwordHash);
+  async updateProfile(id: string, dto: UpdateUserProfileDto) {
+    const user = await this.userRepository.getProfileById(id);
+    if (!user) throw new NotFoundException('User not found');
 
-    if(!isPasswordValid){
-      throw new UnauthorizedException("비밀번호가 일치하지 않습니다.")
-    }
+    return this.userRepository.updateProfile(id, dto);
   }
 }

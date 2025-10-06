@@ -6,6 +6,7 @@ import {
 } from '@/modules/users/interface/users.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { UpdateUserProfileDto } from './dto/user.update.Dto';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
@@ -47,9 +48,25 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async getProfileById(id: string): Promise<UserWithFullProfile | null> {
-    return await this.prisma.user.findUnique({
+  async getProfileById(id: string) {
+    return this.prisma.user.findUnique({
       where: { id },
+      include: {
+        consumerProfile: true,
+        driverProfile: {
+          include: {
+            driverServiceTypes: true,
+            driverServiceAreas: true,
+          },
+        },
+      },
+    });
+  }
+
+  async updateProfile(id: string, dto: UpdateUserProfileDto): Promise<UserWithFullProfile> {
+    return this.prisma.user.update({
+      where: { id },
+      data: { ...dto },
       include: {
         consumerProfile: true,
         driverProfile: {
