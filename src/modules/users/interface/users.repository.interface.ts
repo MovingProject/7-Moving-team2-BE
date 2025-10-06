@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { SignUpRequest } from '../../auth/dto/signup.request.dto';
 import z from 'zod';
+import { UpdateUserProfileDto } from '../dto/user.update.Dto';
 
 const editConsumerProfileSchema = z.object({
   region: z.enum([
@@ -73,12 +74,20 @@ export type UserWithFullProfile = Prisma.UserGetPayload<{
     consumerProfile: true;
   };
 }>;
+export interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+    email: string;
+    role: string;
+  };
+}
 
 export interface IUserRepository {
   findByEmail(email: string): Promise<UserWithProfile | null>;
   findById(id: string): Promise<UserWithProfile | null>;
   createUser(signUpRequest: SignUpRequest, hashedPassword: string): Promise<UserWithProfile>;
   getProfileById(id: string): Promise<UserWithFullProfile | null>;
+  updateProfile(id: string, dto: UpdateUserProfileDto): Promise<UserWithFullProfile>;
 }
 
 export const USER_REPOSITORY = 'IUserRepository';
