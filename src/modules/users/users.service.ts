@@ -3,7 +3,7 @@ import { USER_REPOSITORY } from './interface/users.repository.interface';
 import type { IUserRepository } from './interface/users.repository.interface';
 import { NotFoundException, UnauthorizedException } from '@/shared/exceptions';
 import { HASHING_SERVICE, type IHashingService } from '@/shared/hashing/hashing.service.interface';
-import { UpdateUserProfileDto } from './dto/user.update.Dto';
+import { UpdateUserProfileDto, UpdateUserPasswordDto } from './dto/user.update.Dto';
 
 @Injectable()
 export class UsersService {
@@ -39,5 +39,17 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
 
     return this.userRepository.updateProfile(id, dto);
+  }
+
+  async updatePassword(userId: string, dto: UpdateUserPasswordDto) {
+    const user = await this.userRepository.getProfileById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    if (!user.passwordHash) throw new Error('비밀번호가 설정되어 있지 않습니다.');
+
+    const isMatch = await this.hashingService.compare(dto.currentPassword, user.passwordHash);
+    if (!isMatch) throw new UnauthorizedException('Current password is incorrect');
+
+    const hashed = await this.hashingService.hash(dto.newPassword);
+    return this.userRepository.updatePassword(userId, hashed);
   }
 }

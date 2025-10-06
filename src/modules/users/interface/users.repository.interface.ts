@@ -88,6 +88,7 @@ export interface IUserRepository {
   createUser(signUpRequest: SignUpRequest, hashedPassword: string): Promise<UserWithProfile>;
   getProfileById(id: string): Promise<UserWithFullProfile | null>;
   updateProfile(id: string, dto: UpdateUserProfileDto): Promise<UserWithFullProfile>;
+  updatePassword(userId: string, hashedPassword: string): Promise<UserWithFullProfile>;
 }
 
 export const USER_REPOSITORY = 'IUserRepository';
