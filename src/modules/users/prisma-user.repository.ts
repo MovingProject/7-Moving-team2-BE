@@ -78,4 +78,20 @@ export class PrismaUserRepository implements IUserRepository {
       },
     });
   }
+
+  async updatePassword(userId: string, hashedPassword: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: hashedPassword },
+      include: {
+        consumerProfile: true,
+        driverProfile: {
+          include: {
+            driverServiceTypes: true,
+            driverServiceAreas: true,
+          },
+        },
+      },
+    });
+  }
 }

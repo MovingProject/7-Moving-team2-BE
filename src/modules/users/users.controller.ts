@@ -6,9 +6,7 @@ import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { ApiOkResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
-
-import { BaseUpdateUserDto } from './dto/user.update.Dto';
-import { UpdateUserProfileDto } from './dto/user.update.Dto';
+import { UpdateUserProfileDto, UpdateUserPasswordDto } from './dto/user.update.Dto';
 import type { AuthenticatedRequest } from './interface/users.repository.interface';
 @Controller('users')
 export class UsersController {
@@ -39,5 +37,12 @@ export class UsersController {
   async updateProfile(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserProfileDto) {
     const userId = req.user.id;
     return this.usersService.updateProfile(userId, dto);
+  }
+
+  @Patch('me/password')
+  @UseGuards(AccessTokenGuard)
+  async updatePassword(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserPasswordDto) {
+    const userId = req.user.id;
+    return this.usersService.updatePassword(userId, dto);
   }
 }
