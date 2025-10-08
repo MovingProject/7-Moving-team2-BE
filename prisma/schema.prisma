@@ -180,6 +180,7 @@ model Request {
   chattingRooms          ChattingRoom[]
   quotations             Quotation[]
   notifications          Notification[]
+  @@index([consumerId, requestStatus, createdAt(sort: Desc)], map: "Request_pending_lookup")
   @@index([departureArea])
   @@index([arrivalArea])
 }
