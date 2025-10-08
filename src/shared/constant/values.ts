@@ -23,4 +23,9 @@ export const AREAS = [
   'BUSAN',
   'JEJU',
 ] as const;
+
 export type Area = (typeof AREAS)[number];
+
+export const REQUEST_STATUSES = ['PENDING', 'CONCLUDED', 'COMPLETE', 'EXPIRED', 'CANCELED', 'WITHDRAWN'] as const;
+
+export type RequestStatus = (typeof REQUEST_STATUSES)[number];
