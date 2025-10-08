@@ -1,0 +1,25 @@
+import { type AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
+import { ZodValidationPipe } from '@/shared/pipes/zod-validation.pipe';
+import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthUser } from '../auth/decorators/auth-user.decorator';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { CreateQuoteRequestBodyDto, createQuoteRequestBodySchema } from './dto/create-quote-request.dto';
+import { type IRequestService, REQUEST_SERVICE } from './interface/request.service.interface';
+
+@ApiTags('견적 요청 (Request)')
+@Controller('requests')
+export class RequestController {
+  constructor(@Inject(REQUEST_SERVICE) private readonly requestService: IRequestService) {}
+
+  @Post()
+  @ApiOperation({ summary: '견적 요청서 생성' })
+  @ApiResponse({ status: 201, description: '견적 요청서 생성 완료' })
+  @UseGuards(AccessTokenGuard)
+  async createQuoteRequest(
+    @Body(new ZodValidationPipe(createQuoteRequestBodySchema)) body: CreateQuoteRequestBodyDto,
+    @AuthUser() user: AccessTokenPayload,
+  ) {
+    return this.requestService.createQuoteRequest(body, user);
+  }
+}
