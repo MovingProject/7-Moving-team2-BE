@@ -1,11 +1,12 @@
-import { Controller, Get, Param, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDtoFactory, EditConsumerProfileDto } from './dto/user.response.dto';
 import { NotFoundException } from '@nestjs/common';
-import { AccessTokenGuard } from '../auth/guards/accessToken.gaurd';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { ApiOkResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
+
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

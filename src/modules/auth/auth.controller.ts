@@ -9,7 +9,7 @@ import { RefreshPayload } from './decorators/refresh-payload.decorator';
 import { RefreshRaw } from './decorators/refresh-raw.decorator';
 import { SignInRequestDto, signInSchema } from './dto/signIn.request.dto';
 import { SignUpRequestDto, signUpSchema } from './dto/signup.request.dto';
-import { AccessTokenGuard } from './guards/accessToken.gaurd';
+import { AccessTokenGuard } from './guards/accessToken.guard';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { AUTH_SERVICE, type IAuthService } from './interface/auth.service.interface';
 
