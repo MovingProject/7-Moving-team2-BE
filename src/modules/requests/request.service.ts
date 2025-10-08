@@ -9,7 +9,6 @@ import { type IRequestRepository } from './interface/request.repository.interfac
 import { type IRequestService } from './interface/request.service.interface';
 import { getAreaFromAddress } from '@/shared/utils/address.util';
 import { CreateRequestData } from './types';
-import { PendingRequestConflictError } from './interface/errors';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -63,16 +62,7 @@ export class RequestService implements IRequestService {
       arrivalArea: arrivalArea,
     };
 
-    try {
-      const newRequest = await this.requestRepository.createRequest(createData);
-      return newRequest;
-    } catch (e) {
-      if (e instanceof PendingRequestConflictError) {
-        throw new ConflictException(
-          '이미 진행중인 요청이 있습니다. 기존 요청을 완료하거나 취소한 뒤 다시 시도해주세요.',
-        );
-      }
-      throw e;
-    }
+    const newRequest = await this.requestRepository.createRequest(createData);
+    return newRequest;
   }
 }
