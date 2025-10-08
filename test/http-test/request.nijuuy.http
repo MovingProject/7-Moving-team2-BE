@@ -1,0 +1,43 @@
+# ========================================================
+# 변수 설정
+# ========================================================
+
+# @name baseUrl
+@host = http://localhost:4000
+
+# @name accessCookieName
+@cookie = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NDhhNjczOS1iOGRjLTRiYTMtYWUyYS0yOTQ4NDQzM2YzZTkiLCJqdGkiOiIxZjI4NTIxYy03NWUwLTQ0MjItODYwOC0zMWU4ZDg1YTAzZjUiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTk5NDI4NzgsImV4cCI6MTc1OTk0Mzc3OCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.MfARQrElmj6bJL0CdYoLYI_kVgrQFBdxfFMy90dI5Ic;
+
+
+# ========================================================
+# 1. 견적 요청 생성 (POST /requests)
+# ========================================================
+
+### 1. 로그인 성공 케이스
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "consumer7@test.com",
+  "password": "password123",
+  "role": "CONSUMER"
+}
+
+###
+POST {{host}}/requests
+Content-Type: application/json
+Cookie: {{cookie}}
+
+{
+  "serviceType": "HOME_MOVE",
+  "moveAt": "2025-11-20",
+  "departureAddress": "서울특별시 강남구 테헤란로 427 위워크타워",
+  "departureFloor": 10,
+  "departurePyeong": 25.5,
+  "departureElevator": true,
+  "arrivalAddress": "경기도 성남시 분당구 판교역로 235 에이치스퀘어",
+  "arrivalFloor": 5,
+  "arrivalPyeong": 32.0,
+  "arrivalElevator": true,
+  "additionalRequirements": "피아노가 있어서 조심해서 옮겨주세요."
+}

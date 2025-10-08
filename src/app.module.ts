@@ -4,6 +4,7 @@ import { validationSchema } from './shared/config/env.validation';
 import httpConfig from './shared/config/http.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './shared/prisma/prisma.module';
+import { RequestModule } from './modules/requests/request.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaModule } from './shared/prisma/prisma.module';
     }),
     AuthModule,
     PrismaModule,
+    RequestModule,
   ],
   controllers: [],
   providers: [],

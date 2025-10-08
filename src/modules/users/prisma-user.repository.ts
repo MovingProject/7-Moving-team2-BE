@@ -22,7 +22,7 @@ export class PrismaUserRepository implements IUserRepository {
   }
   async findById(id: string): Promise<UserWithProfile | null> {
     return await this.prisma.user.findUnique({
-      where: { id },
+      where: { id, deletedAt: null },
       include: {
         driverProfile: true,
         consumerProfile: true,
