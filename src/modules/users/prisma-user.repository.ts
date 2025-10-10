@@ -73,6 +73,10 @@ export class PrismaUserRepository implements IUserRepository {
       profileImage: dto.profileImage,
     };
 
+    if (dto.passwordHash) {
+      data.passwordHash = dto.passwordHash; // 여기에 hashed password 추가
+    }
+
     if (dto.driverProfile) {
       data.driverProfile = {
         upsert: {
