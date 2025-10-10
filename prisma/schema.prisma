@@ -73,6 +73,7 @@ model DriverProfile {
   careerYears        String
   oneLiner           String
   description        String
+  likeCount          Int                 @default(0)
   rating             Float               @default(0.0)
   reviewCount        Int                 @default(0)
   confirmedCount     Int                 @default(0)
