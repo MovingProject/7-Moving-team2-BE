@@ -3,7 +3,7 @@ import { USER_REPOSITORY } from './interface/users.repository.interface';
 import type { IUserRepository } from './interface/users.repository.interface';
 import { NotFoundException, UnauthorizedException } from '@/shared/exceptions';
 import { HASHING_SERVICE, type IHashingService } from '@/shared/hashing/hashing.service.interface';
-import { UpdateUserProfileDto, UpdateUserPasswordDto } from './dto/user.update.Dto';
+import { UpdateUserProfileDto } from './dto/user.update.Dto';
 
 @Injectable()
 export class UsersService {
@@ -35,21 +35,23 @@ export class UsersService {
   }
 
   async updateProfile(id: string, dto: UpdateUserProfileDto) {
+    console.log('🔥 [updateProfile] id:', id);
+
     const user = await this.userRepository.getProfileById(id);
     if (!user) throw new NotFoundException('User not found');
 
+    // 비밀번호 변경 로직
+    if (dto.currentPassword && dto.newPassword) {
+      if (!user.passwordHash) throw new Error('비밀번호가 설정되어 있지 않습니다.');
+
+      const isMatch = await this.hashingService.compare(dto.currentPassword, user.passwordHash);
+      if (!isMatch) throw new UnauthorizedException('Current password is incorrect');
+
+      const hashed = await this.hashingService.hash(dto.newPassword);
+      dto = { ...dto, passwordHash: hashed }; // DTO에 hashed password 추가
+    }
+
+    // profile + password 동시에 업데이트
     return this.userRepository.updateProfile(id, dto);
-  }
-
-  async updatePassword(userId: string, dto: UpdateUserPasswordDto) {
-    const user = await this.userRepository.getProfileById(userId);
-    if (!user) throw new NotFoundException('User not found');
-    if (!user.passwordHash) throw new Error('비밀번호가 설정되어 있지 않습니다.');
-
-    const isMatch = await this.hashingService.compare(dto.currentPassword, user.passwordHash);
-    if (!isMatch) throw new UnauthorizedException('Current password is incorrect');
-
-    const hashed = await this.hashingService.hash(dto.newPassword);
-    return this.userRepository.updatePassword(userId, hashed);
   }
 }
