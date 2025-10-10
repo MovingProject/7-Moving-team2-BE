@@ -6,7 +6,7 @@ import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { ApiOkResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
-import { UpdateUserProfileDto, UpdateUserPasswordDto } from './dto/user.update.Dto';
+import { UpdateUserProfileDto } from './dto/user.update.Dto';
 import type { AuthenticatedRequest } from './interface/users.repository.interface';
 @Controller('users')
 export class UsersController {
@@ -34,15 +34,11 @@ export class UsersController {
 
   @Patch('me/profile')
   @UseGuards(AccessTokenGuard)
-  async updateProfile(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserProfileDto) {
-    const userId = req.user.id;
+  async updateProfile(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: UpdateUserProfileDto, // 프로필 수정 + 비밀번호 변경 포함
+  ) {
+    const userId = req.user.sub;
     return this.usersService.updateProfile(userId, dto);
-  }
-
-  @Patch('me/password')
-  @UseGuards(AccessTokenGuard)
-  async updatePassword(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserPasswordDto) {
-    const userId = req.user.id;
-    return this.usersService.updatePassword(userId, dto);
   }
 }

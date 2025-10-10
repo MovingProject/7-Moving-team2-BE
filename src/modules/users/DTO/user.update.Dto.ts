@@ -1,29 +1,36 @@
-import { IsOptional, IsString, IsEmail,MinLength } from 'class-validator';
+import { z } from 'zod';
+import { createZodDto } from '@anatine/zod-nestjs';
+import { MoveType, Area } from '@prisma/client';
 
-export class UpdateUserProfileDto {
-  @IsOptional()
-  @IsString()
-  name?: string;
+// 공통 UserProfile DTO
+const updateUserProfileSchema = z.object({
+  name: z.string().optional(),
+  email: z.string().email().optional(),
+  phoneNumber: z.string().optional(),
+  profileImage: z.string().optional(),
+  currentPassword: z.string().optional(),
+  newPassword: z.string().min(8).optional(),
+  passwordHash: z.string().optional(),
 
-  @IsOptional()
-  @IsEmail()
-  email?: string;
+  driverProfile: z
+    .object({
+      nickname: z.string().optional(),
+      careerYears: z.string().optional(),
+      oneLiner: z.string().optional(),
+      description: z.string().optional(),
+      rating: z.number().optional(),
+      driverServiceAreas: z.array(z.nativeEnum(Area)).optional(),
+      driverServiceTypes: z.array(z.nativeEnum(MoveType)).optional(),
+    })
+    .optional(),
 
-  @IsOptional()
-  @IsString()
-  phoneNumber?: string;
+  consumerProfile: z
+    .object({
+      serviceType: z.nativeEnum(MoveType).optional(),
+      areas: z.nativeEnum(Area).optional(),
+      image: z.string().optional(),
+    })
+    .optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  profileImage?: string;
-}
-
-
-export class UpdateUserPasswordDto {
-  @IsString()
-  currentPassword: string;
-
-  @IsString()
-  @MinLength(8)
-  newPassword: string;
-}
+export class UpdateUserProfileDto extends createZodDto(updateUserProfileSchema) {}

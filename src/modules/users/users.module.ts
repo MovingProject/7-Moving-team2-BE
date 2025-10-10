@@ -5,9 +5,10 @@ import { PrismaModule } from '@/shared/prisma/prisma.module';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { CookiesService } from '@/shared/utils/cookies.service';
+import { HashingModule } from '@/shared/hashing/hashing.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, HashingModule],
   controllers: [UsersController],
   providers: [
     UsersService,

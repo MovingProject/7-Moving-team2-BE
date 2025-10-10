@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { SignUpRequest } from '../../auth/dto/signup.request.dto';
 import z from 'zod';
 import { UpdateUserProfileDto } from '../dto/user.update.Dto';
+import { Area, MoveType } from '@prisma/client';
 
 const editConsumerProfileSchema = z.object({
   region: z.enum([
@@ -76,19 +77,38 @@ export type UserWithFullProfile = Prisma.UserGetPayload<{
 }>;
 export interface AuthenticatedRequest extends Request {
   user: {
-    id: string;
+    sub: string;
     email: string;
     role: string;
   };
 }
+
+export type PartialUserProfile = {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string | null;
+  phoneNumber: string;
+  // 드라이버 필드
+  nickname?: string;
+  careerYears?: string;
+  oneLiner?: string;
+  description?: string;
+  rating?: number;
+  driverServiceAreas?: Area[];
+  driverServiceTypes?: MoveType[];
+  // 소비자 필드
+  serviceType?: MoveType;
+  areas?: Area;
+  image?: string;
+};
 
 export interface IUserRepository {
   findByEmail(email: string): Promise<UserWithProfile | null>;
   findById(id: string): Promise<UserWithProfile | null>;
   createUser(signUpRequest: SignUpRequest, hashedPassword: string): Promise<UserWithProfile>;
   getProfileById(id: string): Promise<UserWithFullProfile | null>;
-  updateProfile(id: string, dto: UpdateUserProfileDto): Promise<UserWithFullProfile>;
-  updatePassword(userId: string, hashedPassword: string): Promise<UserWithFullProfile>;
+  updateProfile(id: string, dto: UpdateUserProfileDto): Promise<PartialUserProfile>;
 }
 
 export const USER_REPOSITORY = 'IUserRepository';
