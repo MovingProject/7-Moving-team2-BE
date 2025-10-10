@@ -40,7 +40,7 @@ export class UsersService {
     const user = await this.userRepository.getProfileById(id);
     if (!user) throw new NotFoundException('User not found');
 
-    // 비밀번호 변경 로직
+    // 비밀번호 변경 처리
     if (dto.currentPassword && dto.newPassword) {
       if (!user.passwordHash) throw new Error('비밀번호가 설정되어 있지 않습니다.');
 
@@ -48,10 +48,38 @@ export class UsersService {
       if (!isMatch) throw new UnauthorizedException('Current password is incorrect');
 
       const hashed = await this.hashingService.hash(dto.newPassword);
-      dto = { ...dto, passwordHash: hashed }; // DTO에 hashed password 추가
+      dto.passwordHash = hashed; // DTO에 hashed password 추가
     }
 
-    // profile + password 동시에 업데이트
-    return this.userRepository.updateProfile(id, dto);
+    // Prisma용 data 변환
+    const data: any = {
+      name: dto.name,
+      email: dto.email,
+      phoneNumber: dto.phoneNumber,
+      profileImage: dto.profileImage,
+      passwordHash: dto.passwordHash,
+    };
+
+    // DriverProfile upsert
+    if (dto.driverProfile) {
+      data.driverProfile = {
+        upsert: {
+          create: dto.driverProfile,
+          update: dto.driverProfile,
+        },
+      };
+    }
+
+    // ConsumerProfile upsert
+    if (dto.consumerProfile) {
+      data.consumerProfile = {
+        upsert: {
+          create: dto.consumerProfile,
+          update: dto.consumerProfile,
+        },
+      };
+    }
+
+    return this.userRepository.updateProfile(id, data);
   }
 }

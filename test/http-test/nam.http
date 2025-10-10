@@ -52,13 +52,11 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJ
 
 PATCH {{host}}/users/me/profile
 Content-Type: application/json
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiIxYjlkNTMyMS04YmE3LTQ2NzgtOWQ1Yy1lNTFmM2QzOTIxM2MiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjAwNzE0ODUsImV4cCI6MTc2MDA3MjM4NSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.uV1y0hKgDGLHxGi3EaXC271lJVvGNr-sflqk9HSakBc
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiJhYjUyZGZmYS00MzVlLTQxMWUtYmRlOC0zMTU1ZmVmYTgxNTgiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjAwNzI4NjEsImV4cCI6MTc2MDA3Mzc2MSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.TGOyFtNbYoCfKHrO3fXaCes-hjXxI44fm1ByZNryt-k
 
 {
-  "name": "patch비밀번호바꾸기 password1234로",
-  "email": "login-test@test.com",
-  "currentPassword":"password123",
-  "newPassword": "password1234"
+  "currentPassword": "password1233",
+  "newPassword": "password123"    
 }
 
 
