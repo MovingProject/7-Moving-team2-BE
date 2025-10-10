@@ -3,6 +3,7 @@ import {
   IUserRepository,
   UserWithProfile,
   UserWithFullProfile,
+  PartialUserProfile,
 } from '@/modules/users/interface/users.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
@@ -49,6 +50,7 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async getProfileById(id: string) {
+    console.log('🔥 [getProfileById] id:', id);
     return this.prisma.user.findUnique({
       where: { id },
       include: {
@@ -63,34 +65,45 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async updateProfile(id: string, dto: UpdateUserProfileDto): Promise<UserWithFullProfile> {
+  async updateProfile(id: string, dto: UpdateUserProfileDto): Promise<PartialUserProfile> {
+    const data: any = {
+      name: dto.name,
+      email: dto.email,
+      phoneNumber: dto.phoneNumber,
+      profileImage: dto.profileImage,
+    };
+
+    if (dto.driverProfile) {
+      data.driverProfile = {
+        upsert: {
+          create: {
+            nickname: dto.driverProfile?.nickname || '임시닉네임',
+            careerYears: dto.driverProfile?.careerYears || '0',
+            oneLiner: dto.driverProfile?.oneLiner || '',
+            description: dto.driverProfile?.description || '',
+          },
+          update: dto.driverProfile,
+        },
+      };
+    }
+
+    if (dto.consumerProfile) {
+      data.consumerProfile = {
+        upsert: {
+          create: dto.consumerProfile,
+          update: dto.consumerProfile,
+        },
+      };
+    }
+
     return this.prisma.user.update({
       where: { id },
-      data: { ...dto },
+      data,
       include: {
-        consumerProfile: true,
         driverProfile: {
-          include: {
-            driverServiceTypes: true,
-            driverServiceAreas: true,
-          },
+          include: { driverServiceAreas: true, driverServiceTypes: true },
         },
-      },
-    });
-  }
-
-  async updatePassword(userId: string, hashedPassword: string) {
-    return this.prisma.user.update({
-      where: { id: userId },
-      data: { passwordHash: hashedPassword },
-      include: {
         consumerProfile: true,
-        driverProfile: {
-          include: {
-            driverServiceTypes: true,
-            driverServiceAreas: true,
-          },
-        },
       },
     });
   }
