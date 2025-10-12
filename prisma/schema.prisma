@@ -99,11 +99,14 @@ model DriverServiceType {
 }
 
 model LIKE {
+  id        String  @id @default(uuid())
   consumerId String
   consumer   User   @relation("ConsumerLikesDriver", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   driverId   String
   driver     User   @relation("DriverLikedByConsumer", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  @@id([consumerId, driverId])
+  likedAt    DateTime @default(now())
+  @@unique([consumerId, driverId])
+  @@index([consumerId, likedAt(sort: Desc), id(sort: Desc)])
 }
 
 enum MoveType {
