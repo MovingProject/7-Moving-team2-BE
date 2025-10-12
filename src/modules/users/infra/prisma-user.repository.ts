@@ -7,7 +7,7 @@ import {
 } from '@/modules/users/interface/users.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { UpdateUserProfileDto } from './dto/user.update.Dto';
+import { UpdateUserProfileDto } from '../dto/user.update.dto';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
