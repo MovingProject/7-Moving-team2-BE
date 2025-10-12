@@ -9,6 +9,7 @@ import { type IRequestRepository } from './interface/request.repository.interfac
 import { type IRequestService } from './interface/request.service.interface';
 import { getAreaFromAddress } from '@/shared/utils/address.util';
 import { CreateRequestData } from './types';
+import { ReceivedRequestsResponseSchema, ReceivedRequest } from './dto/request-quote-request-received.dto';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -64,5 +65,11 @@ export class RequestService implements IRequestService {
 
     const newRequest = await this.requestRepository.createRequest(createData);
     return newRequest;
+  }
+
+  async findReceivedByDriverId(driverId: string) {
+    const result = await this.requestRepository.findInvitesByDriverId(driverId);
+
+    return ReceivedRequestsResponseSchema.parse(result);
   }
 }
