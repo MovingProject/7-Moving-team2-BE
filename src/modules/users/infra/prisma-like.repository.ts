@@ -20,4 +20,15 @@ export class PrismaLikeRepository implements ILikeRepository {
 
     return result.length > 0;
   }
+
+  async deleteIfExists(consumerId: string, driverId: string, ctx?: TransactionContext): Promise<boolean> {
+    const db = getDb(ctx, this.prisma);
+
+    const result = await db.$queryRaw<{ deleted: number }[]>`
+      DELETE FROM "LIKE" WHERE "consumerId" = ${consumerId} AND "driverId" = ${driverId}
+      RETURNING 1 AS deleted
+    `;
+
+    return result.length > 0;
+  }
 }
