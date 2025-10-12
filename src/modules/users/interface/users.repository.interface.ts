@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { SignUpRequest } from '../../auth/dto/signup.request.dto';
 import z from 'zod';
-import { UpdateUserProfileDto } from '../dto/user.update.Dto';
+import { UpdateUserProfileDto } from '../dto/user.update.dto';
 import { Area, MoveType } from '@prisma/client';
 
 const editConsumerProfileSchema = z.object({
