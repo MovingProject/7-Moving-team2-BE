@@ -1,0 +1,15 @@
+### ─────────────────────────────────────────────────────────────
+### 환경 변수 
+@baseUrl = http://localhost:4000
+@consumerEmail = consumer7@test.com
+@consumerPassword = password123
+@moverEmail = mover@example.com
+@moverPassword = moverPw123!
+
+# 테스트용 대상 드라이버 ID (DB에 실제 존재하는 DRIVER 사용자 ID)
+@driverId = 2e72d584-1cc5-46a8-bf12-8a156c86b59d
+
+### 좋아요 테스트(comsumer -> driver)
+POST {{baseUrl}}/drivers/{{driverId}}/likes
+Content-Type: application/json
+Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiI5Nzk5ZmExYS0yNjFkLTQ2N2QtYTEwNy0xZjdiNzM3ZTYxNmUiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjAyNjE4NDAsImV4cCI6MTc2MDI2Mjc0MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.EgHRzVCnmnfLP96rDImQPRT-f-tIzGtuCduoMb-bsa8;
