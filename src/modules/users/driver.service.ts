@@ -52,4 +52,37 @@ export default class DriverService implements IDriverService {
 
     return result;
   }
+
+  async unlikeDriver(driverId: string, user: AccessTokenPayload) {
+    const consumerId = user.sub;
+    const existingConsumer = await this.userRepository.findById(consumerId);
+    if (!existingConsumer) {
+      throw new NotFoundException('User not found');
+    }
+
+    const existingDriver = await this.userRepository.findById(driverId);
+    if (!existingDriver) {
+      throw new NotFoundException('Driver not found');
+    }
+
+    if (!existingDriver.driverProfile) {
+      throw new NotFoundException('Driver profile not found');
+    }
+
+    if (existingDriver.role !== 'DRIVER') {
+      throw new ForbiddenException('User is not a driver');
+    }
+
+    const result = await this.transactionRunner.run(async (ctx) => {
+      const deleted = await this.likeRepository.deleteIfExists(consumerId, driverId, ctx);
+      if (deleted) {
+        await this.driverProfileRepository.decrementLikeCount(driverId, ctx);
+        return { unliked: true } as const;
+      }
+
+      return { unliked: false, message: 'Already unliked' } as const;
+    });
+
+    return result;
+  }
 }
