@@ -24,7 +24,7 @@ Content-Type: application/json
 
 {
   "email": "driver1@test.com",
-  "password": "password123",
+  "password": "password1234",
   "role": "DRIVER"
 }
 
@@ -60,4 +60,7 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJ
 }
 
 
-//login-test@test.com
+### 기사 받은 요청 조회
+GET {{host}}/requests/received
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTcyZDU4NC0xY2M1LTQ2YTgtYmYxMi04YTE1NmM4NmI1OWQiLCJqdGkiOiIyNTljMzA2NC04N2VlLTQ1ZmQtODQ0OS0zYWEzOGQ3YmQxZDQiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwMjc3MjIzLCJleHAiOjE3NjAyNzgxMjMsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.0EqPkmVKmhWuUdwIcRJPVabBF2O7_zuxBtQJ-mwOxSI
