@@ -4,6 +4,7 @@ import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { ConflictException } from '@/shared/exceptions';
 import { CreateRequestData, RequestEntity } from './types';
+import { ReceivedRequest } from './dto/request-quote-request-received.dto';
 
 @Injectable()
 export class PrismaRequestRepository implements IRequestRepository {
@@ -47,5 +48,32 @@ export class PrismaRequestRepository implements IRequestRepository {
       }
       throw e;
     }
+  }
+
+  async findInvitesByDriverId(driverId: string): Promise<ReceivedRequest[]> {
+    const invites = await this.prisma.invite.findMany({
+      where: { driverId },
+      include: {
+        request: {
+          include: {
+            consumer: { select: { name: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return invites.map((invite) => {
+      const req = invite.request;
+      return {
+        id: req.id,
+        consumerName: req.consumer.name,
+        moveAt: req.moveAt,
+        departureAddress: req.departureAddress,
+        arrivalAddress: req.arrivalAddress,
+        serviceType: req.serviceType,
+        createdAt: req.createdAt,
+      };
+    });
   }
 }

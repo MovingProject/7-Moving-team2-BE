@@ -1,6 +1,6 @@
 import { type AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { ZodValidationPipe } from '@/shared/pipes/zod-validation.pipe';
-import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Inject, Post, UseGuards, Get, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
@@ -21,5 +21,12 @@ export class RequestController {
     @AuthUser() user: AccessTokenPayload,
   ) {
     return this.requestService.createQuoteRequest(body, user);
+  }
+
+  @Get('received')
+  @UseGuards(AccessTokenGuard)
+  async getReceivedRequests(@Req() req) {
+    const driverId = req.user.id;
+    return this.requestService.findReceivedByDriverId(driverId);
   }
 }
