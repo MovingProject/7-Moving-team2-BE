@@ -5,6 +5,7 @@ import httpConfig from './shared/config/http.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { RequestModule } from './modules/requests/request.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RequestModule } from './modules/requests/request.module';
     AuthModule,
     PrismaModule,
     RequestModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
