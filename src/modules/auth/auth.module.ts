@@ -1,4 +1,4 @@
-import { UserModule } from '@/modules/users/users.module';
+import { UsersModule } from '@/modules/users/users.module';
 import { HashingModule } from '@/shared/hashing/hashing.module';
 import { JwtModule as SharedJwtModule } from '@/shared/jwt/jwt.module';
 import { Module } from '@nestjs/common';
@@ -13,7 +13,7 @@ import { TOKEN_REPOSITORY } from './interface/token.repository.interface';
 import { CookieModule } from '@/shared/utils/cookie.module';
 import { CookiesService } from '@/shared/utils/cookies.service';
 @Module({
-  imports: [UserModule, HashingModule, SharedJwtModule, CookieModule],
+  imports: [UsersModule, HashingModule, SharedJwtModule, CookieModule],
   controllers: [AuthController],
   providers: [
     AccessTokenGuard,

@@ -4,12 +4,12 @@ import { RequestService } from './request.service';
 import { PrismaRequestRepository } from './prisma-request.repository';
 import { REQUEST_SERVICE } from './interface/request.service.interface';
 import { REQUEST_REPOSITORY } from './interface/request.repository.interface';
-import { UserModule } from '../users/users.module';
+import { UsersModule } from '../users/users.module';
 import { CookiesService } from '@/shared/utils/cookies.service';
 import { PrismaModule } from '@/shared/prisma/prisma.module';
 
 @Module({
-  imports: [UserModule, PrismaModule],
+  imports: [UsersModule, PrismaModule],
   controllers: [RequestController],
   providers: [
     {
