@@ -26,7 +26,8 @@ export class RequestController {
   @Get('received')
   @UseGuards(AccessTokenGuard)
   async getReceivedRequests(@Req() req) {
-    const driverId = req.user.id;
+    console.log('10/13 req.user:', req.user);
+    const driverId = req.user.sub;
     return this.requestService.findReceivedByDriverId(driverId);
   }
 }
