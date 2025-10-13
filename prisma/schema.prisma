@@ -27,8 +27,8 @@ model User {
   deletedAt                DateTime?
   driverProfile            DriverProfile?
   consumerProfile          ConsumerProfile?
-  consumerLikes            LIKE[]            @relation("ConsumerLikesDriver") // 내가 소비자(consumer)로서 누군가(기사)를 좋아요한 기록들
-  likedByConsumers         LIKE[]            @relation("DriverLikedByConsumer") // 내가 기사(driver)로서 소비자에게 받은 좋아요들
+  consumerLikes            Like[]            @relation("ConsumerLikesDriver") // 내가 소비자(consumer)로서 누군가(기사)를 좋아요한 기록들
+  likedByConsumers         Like[]            @relation("DriverLikedByConsumer") // 내가 기사(driver)로서 소비자에게 받은 좋아요들
   requestsAsConsumer       Request[]         @relation("RequestsByConsumer")
   reviewsWritten           Review[]          @relation("ReviewsByConsumer")
   reviewsReceived          Review[]          @relation("ReviewsForDriver")
@@ -98,7 +98,7 @@ model DriverServiceType {
   serviceType     MoveType
 }
 
-model LIKE {
+model Like {
   id        String  @id @default(uuid())
   consumerId String
   consumer   User   @relation("ConsumerLikesDriver", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -107,6 +107,7 @@ model LIKE {
   likedAt    DateTime @default(now())
   @@unique([consumerId, driverId])
   @@index([consumerId, likedAt(sort: Desc), id(sort: Desc)])
+  @@unique([likedAt, id], name: "likedAt_id") 
 }
 
 enum MoveType {
