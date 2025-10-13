@@ -35,7 +35,6 @@ export class UsersService {
   }
 
   async updateProfile(id: string, dto: UpdateUserProfileDto) {
-    console.log('🔥 [updateProfile] id:', id);
 
     const user = await this.userRepository.getProfileById(id);
     if (!user) throw new NotFoundException('User not found');
