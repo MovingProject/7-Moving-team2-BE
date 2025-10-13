@@ -5,16 +5,19 @@ import { PrismaModule } from '@/shared/prisma/prisma.module';
 // controllers
 import { UsersController } from './users.controller';
 import { DriverController } from './driver.controller';
+import { ConsumerController } from './consumer.controller';
 
 // services
 import { UsersService } from './users.service';
 import DriverService from './driver.service';
+import { ConsumerService } from './consumer.service';
 
 // DI tokens (interfaces)
 import { USER_REPOSITORY } from './interface/users.repository.interface';
 import { DRIVER_PROFILE_REPOSITORY } from './interface/driverProfile.interface';
 import { LIKE_REPOSITORY } from './interface/like.repository.interface';
 import { DRIVER_SERVICE } from './interface/driver.service.interface';
+import { CONSUMER_SERVICE } from './interface/consumer.service.interface';
 
 // infra implementations
 import { PrismaUserRepository } from './infra/prisma-user.repository';
@@ -25,13 +28,14 @@ import { HashingModule } from '@/shared/hashing/hashing.module';
 
 @Module({
   imports: [PrismaModule, HashingModule],
-  controllers: [UsersController, DriverController],
+  controllers: [UsersController, DriverController, ConsumerController],
   providers: [
     UsersService,
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: DRIVER_PROFILE_REPOSITORY, useClass: PrismaDriverProfileRepository },
     { provide: LIKE_REPOSITORY, useClass: PrismaLikeRepository },
     { provide: DRIVER_SERVICE, useClass: DriverService },
+    { provide: CONSUMER_SERVICE, useClass: ConsumerService },
     CookiesService,
   ],
   exports: [UsersService, USER_REPOSITORY, DRIVER_SERVICE],
