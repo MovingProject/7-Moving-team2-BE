@@ -50,7 +50,6 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async getProfileById(id: string) {
-    console.log('🔥 [getProfileById] id:', id);
     return this.prisma.user.findUnique({
       where: { id },
       include: {
