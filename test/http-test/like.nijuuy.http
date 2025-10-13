@@ -8,13 +8,32 @@
 
 # 테스트용 대상 드라이버 ID (DB에 실제 존재하는 DRIVER 사용자 ID)
 @driverId = 2e72d584-1cc5-46a8-bf12-8a156c86b59d
+@cookie = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiIwMDAyYTI1Yy02ZmEwLTQ3MzUtOTI4Yi0wNzMxZDA2MGY4NzQiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjAzMzg4MTEsImV4cCI6MTc2MDMzOTcxMSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.1wQMOXExJsEzxTyRT89Z52uendl1VHeR5Qi1jiduZvw;
 
 ### 좋아요 테스트(comsumer -> driver)
 POST {{baseUrl}}/drivers/{{driverId}}/likes
 Content-Type: application/json
-Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiI5Nzk5ZmExYS0yNjFkLTQ2N2QtYTEwNy0xZjdiNzM3ZTYxNmUiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjAyNjE4NDAsImV4cCI6MTc2MDI2Mjc0MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.EgHRzVCnmnfLP96rDImQPRT-f-tIzGtuCduoMb-bsa8;
+Cookie:{{cookie}}
 
 ### 좋아요 취소 테스트(comsumer -> driver)
 DELETE {{baseUrl}}/drivers/{{driverId}}/likes
 Content-Type: application/json
-Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiI2ZTU4M2RlOS0xYmYxLTQ3MzktYTYyNC0zNTBmZjg2NDM3MGEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjAyNjg1NzUsImV4cCI6MTc2MDI2OTQ3NSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.0RuPyibLLh8DZcYFR9gMFBcxUShyLGnQdBX_6DiDoRs;
+Cookie:{{cookie}}
+
+### 💙 내가 좋아요한 기사 목록 조회 (첫 페이지)
+GET {{baseUrl}}/consumers/liked-drivers
+Content-Type: application/json
+Cookie:{{cookie}}
+
+### 💙 좋아요한 기사 목록 (limit=5)
+GET {{baseUrl}}/consumers/liked-drivers?limit=5
+Content-Type: application/json
+Cookie:{{cookie}}
+
+###
+
+### 💙 다음 페이지 (cursor 기반)
+# 아래 cursor 값은 이전 응답의 nextCursor 값을 그대로 넣어 테스트
+GET {{baseUrl}}/consumers/liked-drivers?limit=5&cursor=eyJsaWtlZEF0IjoiMjAyNS0xMC0xM1QwNjowMDowMC4wMDBaIiwiaWQiOiI4NDJhY2YtYTU5Mi00YWI4LTg4OTAtZTM1YmRiZDNlOTNlIn0=
+Content-Type: application/json
+Cookie:{{cookie}}
