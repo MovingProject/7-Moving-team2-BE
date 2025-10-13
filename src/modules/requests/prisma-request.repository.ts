@@ -51,6 +51,7 @@ export class PrismaRequestRepository implements IRequestRepository {
   }
 
   async findInvitesByDriverId(driverId: string): Promise<ReceivedRequest[]> {
+    console.log('driverId:', driverId);
     const invites = await this.prisma.invite.findMany({
       where: { driverId },
       include: {
@@ -62,6 +63,8 @@ export class PrismaRequestRepository implements IRequestRepository {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    console.log('invites raw:', invites);
 
     return invites.map((invite) => {
       const req = invite.request;
