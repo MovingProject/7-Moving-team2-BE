@@ -6,6 +6,8 @@ import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { CreateQuoteRequestBodyDto, createQuoteRequestBodySchema } from './dto/create-quote-request.dto';
 import { type IRequestService, REQUEST_SERVICE } from './interface/request.service.interface';
+import { RolesGuard } from '../auth/guards/role.guard';
+import { RequireRoles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('견적 요청 (Request)')
 @Controller('requests')
@@ -24,7 +26,8 @@ export class RequestController {
   }
 
   @Get('received')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('DRIVER')
   async getReceivedRequests(@Req() req) {
     const driverId = req.user.sub;
     return this.requestService.findReceivedByDriverId(driverId);

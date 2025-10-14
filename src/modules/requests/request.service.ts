@@ -1,4 +1,10 @@
-import { BadRequestException, ConflictException, ForbiddenException, UnauthorizedException } from '@/shared/exceptions';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@/shared/exceptions';
 // remove prisma dependency from service layer
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { Inject, Injectable } from '@nestjs/common';
@@ -70,7 +76,13 @@ export class RequestService implements IRequestService {
   async findReceivedByDriverId(driverId: string) {
     const result = await this.requestRepository.findInvitesByDriverId(driverId);
 
+    if (!result) {
+      throw new UnauthorizedException('유효하지 않은 사용자입니다.');
+    }
+    if (Array.isArray(result) && result.length === 0) {
+      throw new NotFoundException('결과값이 비어있습니다.');
+    }
+
     return ReceivedRequestsResponseSchema.parse(result);
   }
-  
 }
