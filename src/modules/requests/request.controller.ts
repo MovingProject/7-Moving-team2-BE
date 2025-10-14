@@ -1,9 +1,12 @@
 import { type AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { ZodValidationPipe } from '@/shared/pipes/zod-validation.pipe';
-import { Body, Controller, Inject, Post, UseGuards, Get, Req } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Inject, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
+import { RequireRoles } from '../auth/decorators/roles.decorator';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { RolesGuard } from '../auth/guards/role.guard';
+import { DriverIdParamDto, driverIdParamSchema } from '../users/dto/driverIdParamSchema';
 import { CreateQuoteRequestBodyDto, createQuoteRequestBodySchema } from './dto/create-quote-request.dto';
 import { type IRequestService, REQUEST_SERVICE } from './interface/request.service.interface';
 import { RolesGuard } from '../auth/guards/role.guard';
@@ -31,5 +34,17 @@ export class RequestController {
   async getReceivedRequests(@Req() req) {
     const driverId = req.user.sub;
     return this.requestService.findReceivedByDriverId(driverId);
+  }
+
+  @Post('/invite/:driverId')
+  @ApiOperation({ summary: '지정 견적 요청하기' })
+  @ApiParam({ name: 'driverId', description: '기사 ID(UUID)' })
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('CONSUMER')
+  async inviteToRequest(
+    @Param(new ZodValidationPipe(driverIdParamSchema)) param: DriverIdParamDto,
+    @AuthUser() user: AccessTokenPayload,
+  ) {
+    return this.requestService.inviteToRequest(param.driverId, user);
   }
 }

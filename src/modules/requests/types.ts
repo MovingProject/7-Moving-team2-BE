@@ -47,3 +47,11 @@ export interface CreateRequestData {
   departureArea: Area;
   arrivalArea: Area;
 }
+
+export interface InviteEntity {
+  id: string;
+  requestId: string;
+  driverId: string;
+  createdAt: Date;
+  canceledAt: Date | null;
+}

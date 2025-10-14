@@ -1,17 +1,20 @@
 import { Prisma, Request } from '@prisma/client';
-import { IRequestRepository } from './interface/request.repository.interface';
+import { IRequestRepository } from '../interface/request.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { ConflictException } from '@/shared/exceptions';
-import { CreateRequestData, RequestEntity } from './types';
-import { ReceivedRequest } from './dto/request-quote-request-received.dto';
+import { CreateRequestData, RequestEntity } from '../types';
+import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
+import { getDb } from '@/shared/prisma/get-db';
+import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 
 @Injectable()
 export class PrismaRequestRepository implements IRequestRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findPendingByConsumerId(consumerId: string): Promise<RequestEntity | null> {
-    const row = await this.prisma.request.findFirst({
+  async findPendingByConsumerId(consumerId: string, ctx?: TransactionContext): Promise<RequestEntity | null> {
+    const db = getDb(ctx, this.prisma);
+    const row = await db.request.findFirst({
       where: { consumerId, requestStatus: 'PENDING' },
       orderBy: { createdAt: 'desc' },
     });
@@ -85,5 +88,18 @@ export class PrismaRequestRepository implements IRequestRepository {
       createdAt: req.createdAt,
       isInvited: req.invites.length > 0,
     }));
+  }
+
+  async incrementInvitedCountIfAvailable(requestId: string, ctx?: TransactionContext): Promise<boolean> {
+    const db = getDb(ctx, this.prisma);
+    const affected = await db.$executeRawUnsafe<number>(
+      `
+      UPDATE "Request"
+      SET "invitedQuoteCount" = "invitedQuoteCount" + 1
+      WHERE "id" = $1 AND "invitedQuoteCount" < "invitedQuoteLimit"
+      `,
+      requestId,
+    );
+    return affected === 1; // 1행 갱신되면 성공, 0이면 한도 초과
   }
 }

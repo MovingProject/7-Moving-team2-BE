@@ -1,14 +1,9 @@
+import { IUserRepository, PartialUserProfile, UserWithProfile } from '../interface/users.repository.interface';
 import { SignUpRequest } from '@/modules/auth/dto/signup.request.dto';
-import {
-  IUserRepository,
-  UserWithProfile,
-  UserWithFullProfile,
-  PartialUserProfile,
-} from '@/modules/users/interface/users.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { UpdateUserProfileDto } from '../dto/user.update.dto';
-
+import { UpdateUserProfileDto } from '../dto/user.update.Dto';
+import { UserWithFullProfile } from '../interface/users.repository.interface';
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -22,11 +17,16 @@ export class PrismaUserRepository implements IUserRepository {
       },
     });
   }
-  async findById(id: string): Promise<UserWithProfile | null> {
+  async findById(id: string): Promise<UserWithFullProfile | null> {
     return await this.prisma.user.findUnique({
       where: { id, deletedAt: null },
       include: {
-        driverProfile: true,
+        driverProfile: {
+          include: {
+            driverServiceTypes: true,
+            driverServiceAreas: true,
+          },
+        },
         consumerProfile: true,
       },
     });
