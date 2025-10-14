@@ -8,6 +8,7 @@ import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
 import { getDb } from '@/shared/prisma/get-db';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 
+import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
 @Injectable()
 export class PrismaRequestRepository implements IRequestRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -101,5 +102,57 @@ export class PrismaRequestRepository implements IRequestRepository {
       requestId,
     );
     return affected === 1; // 1행 갱신되면 성공, 0이면 한도 초과
+  }
+  async filterRequests(driverId: string, filter: ReceivedRequestFilter) {
+    console.log('레포지토리: ', filter);
+    // driver의 서비스 지역 조회
+    const driverAreas = await this.prisma.driverServiceArea.findMany({
+      where: { driverProfile: { driver: { id: driverId } } },
+      select: { serviceArea: true },
+    });
+    const serviceAreas = driverAreas.map((a) => a.serviceArea);
+
+    // 요청 조회 (지정 + 일반 + 필터)
+    const requests = await this.prisma.request.findMany({
+      where: {
+        OR: [
+          { invites: { some: { driverId } } },
+          {
+            invites: { none: { driverId } },
+            OR: [{ departureArea: { in: serviceAreas } }, { arrivalArea: { in: serviceAreas } }],
+          },
+        ],
+        serviceType: filter.serviceTypes ? { in: filter.serviceTypes } : undefined,
+        moveAt:
+          filter.moveAtFrom || filter.moveAtTo
+            ? {
+                gte: filter.moveAtFrom ? new Date(filter.moveAtFrom) : undefined,
+                lte: filter.moveAtTo ? new Date(filter.moveAtTo) : undefined,
+              }
+            : undefined,
+        consumer: filter.consumerName
+          ? {
+              name: { contains: filter.consumerName, mode: 'insensitive' },
+            }
+          : undefined,
+      },
+      include: {
+        consumer: { select: { name: true } },
+        invites: { where: { driverId } },
+      },
+      orderBy: [{ invites: { _count: 'desc' } }, { createdAt: 'desc' }],
+    });
+
+    // DTO 변환
+    return requests.map((req) => ({
+      id: req.id,
+      consumerName: req.consumer.name,
+      moveAt: req.moveAt,
+      departureAddress: req.departureAddress,
+      arrivalAddress: req.arrivalAddress,
+      serviceType: req.serviceType,
+      createdAt: req.createdAt,
+      isInvited: req.invites.length > 0,
+    }));
   }
 }

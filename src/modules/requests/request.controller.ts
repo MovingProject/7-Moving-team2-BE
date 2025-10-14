@@ -3,13 +3,14 @@ import { ZodValidationPipe } from '@/shared/pipes/zod-validation.pipe';
 import { Body, Controller, Get, Inject, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
-import { RequireRoles } from '../auth/decorators/roles.decorator';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
-import { RolesGuard } from '../auth/guards/role.guard';
 import { DriverIdParamDto, driverIdParamSchema } from '../users/dto/driverIdParamSchema';
 import { CreateQuoteRequestBodyDto, createQuoteRequestBodySchema } from './dto/create-quote-request.dto';
 import { type IRequestService, REQUEST_SERVICE } from './interface/request.service.interface';
 
+import { RolesGuard } from '../auth/guards/role.guard';
+import { RequireRoles } from '../auth/decorators/roles.decorator';
+import { type ReceivedRequestFilter } from './dto/request-filter-post.dto';
 @ApiTags('견적 요청 (Request)')
 @Controller('requests')
 export class RequestController {
@@ -44,5 +45,13 @@ export class RequestController {
     @AuthUser() user: AccessTokenPayload,
   ) {
     return this.requestService.inviteToRequest(param.driverId, user);
+  }
+  @Post('received/search')
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('DRIVER')
+  async filterReceivedRequests(@Req() req, @Body() filter: ReceivedRequestFilter) {
+    const driverId = req.user.sub;
+    console.log('filter received(컨트롤):', filter);
+    return this.requestService.filterReceivedRequests(driverId, filter);
   }
 }
