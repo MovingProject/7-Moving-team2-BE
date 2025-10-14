@@ -33,7 +33,7 @@ export interface driverProfileEntity {
   driverServiceTypes: driverServiceTypeEntity[];
 }
 
-export interface consumerProfileEntity {
+export interface ConsumerProfileEntity {
   id: string;
   consumerId: string;
   image: string | null;

@@ -1,6 +1,7 @@
 import { GetLikedDriversQuerySchemaDto } from '../dto/getLikedDriversQuerySchema';
-import { driverProfileEntity, userEntity } from '../types';
+import { driverProfileEntity, userEntity, ConsumerProfileEntity } from '../types';
 import { Area, MoveType } from '@/shared/constant/values';
+import { CreateConsumerProfileBody } from '../dto/createConsumerProfileBodySchema';
 
 export interface LikedDriverEntity {
   id: userEntity['id'];
@@ -16,14 +17,15 @@ export interface LikedDriverEntity {
   likedAt: Date;
 }
 
-export interface getLikedDriverListResponse {
+export interface GetLikedDriverListResponse {
   likedDriverList: LikedDriverEntity[];
   nextCursor: string | null;
   hasNext: boolean;
 }
 
 export interface IConsumerService {
-  getLikedDriverList(consumerId: string, query: GetLikedDriversQuerySchemaDto): Promise<getLikedDriverListResponse>;
+  createConsumerProfile(consumerId: string, body: CreateConsumerProfileBody): Promise<ConsumerProfileEntity>;
+  getLikedDriverList(consumerId: string, query: GetLikedDriversQuerySchemaDto): Promise<GetLikedDriverListResponse>;
 }
 
 export const CONSUMER_SERVICE = 'IConsumerService';

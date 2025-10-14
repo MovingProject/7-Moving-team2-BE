@@ -3,7 +3,10 @@ import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { TRANSACTION_RUNNER, type ITransactionRunner } from '@/shared/prisma/transaction-runner.interface';
 import { Inject, Injectable } from '@nestjs/common';
 import { IDriverService } from './interface/driver.service.interface';
-import { DRIVER_PROFILE_REPOSITORY, type IDriverProfileRepository } from './interface/driverProfile.interface';
+import {
+  DRIVER_PROFILE_REPOSITORY,
+  type IDriverProfileRepository,
+} from './interface/driverProfile.repository.interface';
 import { LIKE_REPOSITORY, type ILikeRepository } from './interface/like.repository.interface';
 import { USER_REPOSITORY, type IUserRepository } from './interface/users.repository.interface';
 
