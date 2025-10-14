@@ -14,7 +14,7 @@ export interface userEntity {
   deletedAt: Date | null;
 }
 
-export interface driverProfileEntity {
+export interface DriverProfileEntity {
   id: string;
   userId: string;
   image: string | null;

@@ -1,17 +1,17 @@
 import { GetLikedDriversQuerySchemaDto } from '../dto/getLikedDriversQuerySchema';
-import { driverProfileEntity, userEntity, ConsumerProfileEntity } from '../types';
+import { DriverProfileEntity, userEntity, ConsumerProfileEntity } from '../types';
 import { Area, MoveType } from '@/shared/constant/values';
 import { CreateConsumerProfileBody } from '../dto/createConsumerProfileBodySchema';
 
 export interface LikedDriverEntity {
   id: userEntity['id'];
-  nickname: driverProfileEntity['nickname'];
-  rating: driverProfileEntity['rating'];
-  reviewCount: driverProfileEntity['reviewCount'];
-  careerYears: driverProfileEntity['careerYears'];
-  confirmedCount: driverProfileEntity['confirmedCount'];
-  likeCount: driverProfileEntity['likeCount'];
-  avatarUrl: driverProfileEntity['image'];
+  nickname: DriverProfileEntity['nickname'];
+  rating: DriverProfileEntity['rating'];
+  reviewCount: DriverProfileEntity['reviewCount'];
+  careerYears: DriverProfileEntity['careerYears'];
+  confirmedCount: DriverProfileEntity['confirmedCount'];
+  likeCount: DriverProfileEntity['likeCount'];
+  avatarUrl: DriverProfileEntity['image'];
   serviceAreas: Area[];
   serviceTypes: MoveType[];
   likedAt: Date;

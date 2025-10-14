@@ -9,6 +9,9 @@ import {
 } from './interface/driverProfile.repository.interface';
 import { LIKE_REPOSITORY, type ILikeRepository } from './interface/like.repository.interface';
 import { USER_REPOSITORY, type IUserRepository } from './interface/users.repository.interface';
+import { CreateDriverProfileBody } from './dto/createDriverProfileBodySchema';
+import { ConflictException } from '@/shared/exceptions';
+import { DriverProfileEntity } from './types';
 
 @Injectable()
 export default class DriverService implements IDriverService {
@@ -22,6 +25,30 @@ export default class DriverService implements IDriverService {
     @Inject(DRIVER_PROFILE_REPOSITORY)
     private readonly driverProfileRepository: IDriverProfileRepository,
   ) {}
+
+  async createDriverProfile(driverId: string, body: CreateDriverProfileBody) {
+    const existingDriver = await this.userRepository.findById(driverId);
+
+    if (!existingDriver) {
+      throw new NotFoundException('Driver not found');
+    }
+
+    if (existingDriver.driverProfile) {
+      throw new ConflictException('이미 등록된 프로필입니다.');
+    }
+
+    try {
+      return await this.driverProfileRepository.createDriverProfile(driverId, body);
+    } catch (error) {
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        const prismaError = error as { code?: string };
+        if (prismaError.code === 'P2002') {
+          throw new ConflictException('이미 등록된 프로필입니다.');
+        }
+      }
+      throw error;
+    }
+  }
 
   async likeDriver(driverId: string, user: AccessTokenPayload) {
     const consumerId = user.sub;
