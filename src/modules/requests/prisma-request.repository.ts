@@ -51,30 +51,39 @@ export class PrismaRequestRepository implements IRequestRepository {
   }
 
   async findInvitesByDriverId(driverId: string): Promise<ReceivedRequest[]> {
-    const invites = await this.prisma.invite.findMany({
-      where: { driverId },
-      include: {
-        request: {
-          include: {
-            consumer: { select: { name: true } },
+    const area = await this.prisma.driverServiceArea.findMany({
+      where: { driverProfile: { driver: { id: driverId } } },
+      select: { serviceArea: true },
+    });
+
+    const serviceArea = area.map((e) => e.serviceArea);
+
+    //일반견적조회
+    const requests = await this.prisma.request.findMany({
+      where: {
+        OR: [
+          { invites: { some: { driverId } } },
+          {
+            invites: { none: { driverId } },
+            OR: [{ departureArea: { in: serviceArea } }, { arrivalArea: { in: serviceArea } }],
           },
-        },
+        ],
       },
-      orderBy: { createdAt: 'desc' },
+      include: {
+        consumer: { select: { name: true } },
+        invites: { where: { driverId } },
+      },
+      orderBy: [{ invites: { _count: 'desc' } }, { createdAt: 'desc' }],
     });
-
-
-    return invites.map((invite) => {
-      const req = invite.request;
-      return {
-        id: req.id,
-        consumerName: req.consumer.name,
-        moveAt: req.moveAt,
-        departureAddress: req.departureAddress,
-        arrivalAddress: req.arrivalAddress,
-        serviceType: req.serviceType,
-        createdAt: req.createdAt,
-      };
-    });
+    return requests.map((req) => ({
+      id: req.id,
+      consumerName: req.consumer.name,
+      moveAt: req.moveAt,
+      departureAddress: req.departureAddress,
+      arrivalAddress: req.arrivalAddress,
+      serviceType: req.serviceType,
+      createdAt: req.createdAt,
+      isInvited: req.invites.length > 0,
+    }));
   }
 }
