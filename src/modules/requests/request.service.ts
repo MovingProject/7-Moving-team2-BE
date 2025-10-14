@@ -11,13 +11,14 @@ import { getAreaFromAddress } from '@/shared/utils/address.util';
 import { Inject, Injectable } from '@nestjs/common';
 import { type IUserRepository, USER_REPOSITORY } from '../users/interface/users.repository.interface';
 import { CreateQuoteRequestBody } from './dto/create-quote-request.dto';
-import { ReceivedRequestsResponseSchema } from './dto/request-quote-request-received.dto';
 import { type IInviteRepository, INVITE_REPOSITORY } from './interface/invite.repository.interface';
 import { type IRequestRepository, REQUEST_REPOSITORY } from './interface/request.repository.interface';
 import { type IRequestService } from './interface/request.service.interface';
 import { CreateRequestData } from './types';
 import { InviteResult } from './interface/request.service.interface';
 
+import { ReceivedRequestsResponseSchema, ReceivedRequest } from './dto/request-quote-request-received.dto';
+import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
 @Injectable()
 export class RequestService implements IRequestService {
   constructor(
@@ -146,5 +147,13 @@ export class RequestService implements IRequestService {
     });
 
     return result;
+  }
+  async filterReceivedRequests(driverId: string, filter: ReceivedRequestFilter) {
+    console.log('filter received(서비스):', filter);
+    const result = await this.requestRepository.filterRequests(driverId, filter);
+    if (!result) throw new UnauthorizedException('유효하지 않은 사용자입니다.');
+    if (Array.isArray(result) && result.length === 0) throw new NotFoundException('조건에 맞는 결과가 없습니다.');
+
+    return ReceivedRequestsResponseSchema.parse(result);
   }
 }
