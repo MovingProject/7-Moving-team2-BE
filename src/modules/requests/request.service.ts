@@ -5,17 +5,18 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@/shared/exceptions';
-// remove prisma dependency from service layer
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
+import { type ITransactionRunner, TRANSACTION_RUNNER } from '@/shared/prisma/transaction-runner.interface';
+import { getAreaFromAddress } from '@/shared/utils/address.util';
 import { Inject, Injectable } from '@nestjs/common';
 import { type IUserRepository, USER_REPOSITORY } from '../users/interface/users.repository.interface';
 import { CreateQuoteRequestBody } from './dto/create-quote-request.dto';
-import { REQUEST_REPOSITORY } from './interface/request.repository.interface';
-import { type IRequestRepository } from './interface/request.repository.interface';
+import { ReceivedRequestsResponseSchema } from './dto/request-quote-request-received.dto';
+import { type IInviteRepository, INVITE_REPOSITORY } from './interface/invite.repository.interface';
+import { type IRequestRepository, REQUEST_REPOSITORY } from './interface/request.repository.interface';
 import { type IRequestService } from './interface/request.service.interface';
-import { getAreaFromAddress } from '@/shared/utils/address.util';
 import { CreateRequestData } from './types';
-import { ReceivedRequestsResponseSchema, ReceivedRequest } from './dto/request-quote-request-received.dto';
+import { InviteResult } from './interface/request.service.interface';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -24,6 +25,10 @@ export class RequestService implements IRequestService {
     private readonly userRepository: IUserRepository,
     @Inject(REQUEST_REPOSITORY)
     private readonly requestRepository: IRequestRepository,
+    @Inject(TRANSACTION_RUNNER)
+    private readonly transactionRunner: ITransactionRunner,
+    @Inject(INVITE_REPOSITORY)
+    private readonly inviteRepository: IInviteRepository,
   ) {}
 
   async createQuoteRequest(dto: CreateQuoteRequestBody, user: AccessTokenPayload) {
@@ -84,5 +89,62 @@ export class RequestService implements IRequestService {
     }
 
     return ReceivedRequestsResponseSchema.parse(result);
+  }
+
+  async inviteToRequest(driverId: string, user: AccessTokenPayload): Promise<InviteResult> {
+    const existingDriver = await this.userRepository.findById(driverId);
+    if (!existingDriver) {
+      throw new NotFoundException('기사를 찾을 수 없습니다.');
+    }
+
+    if (existingDriver.role !== 'DRIVER') {
+      throw new ForbiddenException('CONSUMER에게 견적을 보낼 수 없습니다.');
+    }
+
+    if (!existingDriver.driverProfile) {
+      throw new ForbiddenException('기사 프로필이 완성되지 않아 초대를 보낼 수 없습니다.');
+    }
+
+    const existingUser = await this.userRepository.findById(user.sub);
+    if (!existingUser) {
+      throw new UnauthorizedException('유효하지 않은 사용자입니다.');
+    }
+
+    const result = await this.transactionRunner.run(async (ctx) => {
+      const pendingRequest = await this.requestRepository.findPendingByConsumerId(user.sub, ctx);
+      if (!pendingRequest) {
+        throw new ConflictException('진행중인 요청이 없습니다. 요청을 생성해주세요.');
+      }
+
+      if (pendingRequest.invitedQuoteCount >= pendingRequest.invitedQuoteLimit) {
+        throw new ConflictException('지정견적 요청 수를 초과하여 더 이상 지정 요청을 할 수 없습니다.');
+      }
+
+      const driverAreas = existingDriver.driverProfile?.driverServiceAreas.map((a) => a.serviceArea) ?? [];
+      const coversDeparture = driverAreas.includes(pendingRequest.departureArea);
+      const coversArrival = driverAreas.includes(pendingRequest.arrivalArea);
+
+      if (!coversDeparture || !coversArrival) {
+        throw new ForbiddenException('해당 기사 서비스 지역과 요청 지역이 일치하지 않습니다.');
+      }
+
+      const driverTypes = existingDriver.driverProfile?.driverServiceTypes.map((t) => t.serviceType) ?? [];
+      if (!driverTypes.includes(pendingRequest.serviceType)) {
+        throw new ForbiddenException('해당 기사 서비스 타입이 요청과 일치하지 않습니다.');
+      }
+
+      const inserted = await this.inviteRepository.insertIfAbsent(pendingRequest.id, driverId, ctx);
+      if (!inserted) {
+        return { invited: true, alreadyExisted: true };
+      }
+      const ok = await this.requestRepository.incrementInvitedCountIfAvailable(pendingRequest.id, ctx);
+      if (!ok) {
+        throw new ConflictException('지정견적 요청 수를 초과하여 더 이상 지정 요청을 할 수 없습니다.');
+      }
+
+      return { invited: true, alreadyExisted: false };
+    });
+
+    return result;
   }
 }

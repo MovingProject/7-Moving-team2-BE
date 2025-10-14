@@ -6,8 +6,8 @@
 @host = http://localhost:4000
 
 # @name accessCookieName
-@cookie = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NDhhNjczOS1iOGRjLTRiYTMtYWUyYS0yOTQ4NDQzM2YzZTkiLCJqdGkiOiIxMjM2ZGJjOS1iMGY4LTRiMjctODc3NC03OGRjNmQ0ZDYxZGEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NTk5NDQ4NDMsImV4cCI6MTc1OTk0NTc0MywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.DfLJF5OINq76GUVXLn6zNbb8vGH9Q6rpxu9g3LH6t5s;
-
+@cookie = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NDhhNjczOS1iOGRjLTRiYTMtYWUyYS0yOTQ4NDQzM2YzZTkiLCJqdGkiOiJjMTE4ZjgxOS1jYTYzLTQ3MzMtYTIzMi05YTU1ZmJiY2Y2NzkiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjA0MTU2NjYsImV4cCI6MTc2MDQxNjU2NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.gnOkLb-ObTtR26lspVqpw0GNXU8HWZrm1l8NE6-2eXQ;
+@driverId = 2e72d584-1cc5-46a8-bf12-8a156c86b59d
 
 # ========================================================
 # 1. 견적 요청 생성 (POST /requests)
@@ -41,3 +41,79 @@ Cookie: {{cookie}}
   "arrivalElevator": true,
   "additionalRequirements": "피아노가 있어서 조심해서 옮겨주세요."
 }
+
+###
+# 1) (선택) 일반견적 생성 - PENDING 요청 만들기
+#  - 이미 PENDING이 있으면 409가 날 수 있음
+POST {{host}}/requests
+Content-Type: application/json
+Cookie: {{cookie}}
+
+{
+  "serviceType": "HOME_MOVE",
+  "moveAt": "2025-11-15",
+  "departureAddress": "서울특별시 강남구 테헤란로 123",
+  "departureFloor": 10,
+  "departurePyeong": 25,
+  "departureElevator": true,
+  "arrivalAddress": "경기도 성남시 분당구 정자동 11",
+  "arrivalFloor": 7,
+  "arrivalPyeong": 25,
+  "arrivalElevator": true,
+  "additionalRequirements": "박스 20개 예상"
+}
+
+###
+# 2) 지정 초대 - 정상(신규 생성)
+#  - 조건: PENDING 요청 1개 존재 + 드라이버 서비스 지역/타입 매칭 + 한도 미초과
+# 응답 예: { "success": true, "invited": true, "alreadyExisted": false }
+POST {{host}}/requests/invite/{{driverId}}
+Content-Type: application/json
+Cookie: {{cookie}}
+
+
+###
+# 3) 지정 초대 - 멱등(이미 존재)
+#  - 위 요청을 다시 보내서 alreadyExisted 확인
+# 응답 예: { "success": true, "invited": true, "alreadyExisted": true }
+POST {{host}}/requests/invite/{{driverId}}
+Content-Type: application/json
+Cookie: {{cookie}}
+
+###
+# 4) 에러 케이스 - PENDING 없음
+#  - 사전에 모든 요청을 완료/취소해둔 계정으로 테스트
+# 기대: 409 (REQUEST_NOT_FOUND), 메시지: 진행중인 요청이 없습니다...
+POST {{host}}/requests/invite/{{driverId}}
+Content-Type: application/json
+Cookie: {{cookie}}
+
+###
+# 5) 에러 케이스 - 한도 초과(invitedQuoteLimit)
+#  - invitedQuoteLimit에 도달하도록 여러 드라이버에게 초대한 뒤 재시도
+# 기대: 409 (INVITED_QUOTE_LIMIT_EXCEEDED) 또는 팀 규약 메시지
+POST {{host}}/requests/invite/{{driverId}}
+Content-Type: application/json
+Cookie: {{cookie}}
+
+###
+# 6) 에러 케이스 - 서비스 지역/타입 불일치
+#  - 드라이버가 커버하지 않는 지역/타입의 요청 상태에서 시도
+# 기대: 403/422 정책 위반 메시지
+POST {{host}}/requests/invite/{{driverId}}
+Content-Type: application/json
+Cookie: {{cookie}}
+
+###
+# 7) 에러 케이스 - 인증 누락
+# 기대: 401 Unauthorized
+POST {{host}}/requests/invite/{{driverId}}
+Content-Type: application/json
+Accept: application/json
+
+###
+# 8) 에러 케이스 - 권한 불일치(드라이버/관리자 토큰으로 호출)
+# 기대: 403 Forbidden (RolesGuard에서 차단)
+POST {{host}}/requests/invite/{{driverId}}
+Cookie: {{cookie}}
+Content-Type: application/json
