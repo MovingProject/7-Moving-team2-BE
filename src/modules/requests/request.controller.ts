@@ -9,8 +9,6 @@ import { RolesGuard } from '../auth/guards/role.guard';
 import { DriverIdParamDto, driverIdParamSchema } from '../users/dto/driverIdParamSchema';
 import { CreateQuoteRequestBodyDto, createQuoteRequestBodySchema } from './dto/create-quote-request.dto';
 import { type IRequestService, REQUEST_SERVICE } from './interface/request.service.interface';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { RequireRoles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('견적 요청 (Request)')
 @Controller('requests')

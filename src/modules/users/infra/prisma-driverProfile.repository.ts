@@ -1,4 +1,4 @@
-import { IDriverProfileRepository } from '../interface/driverProfile.interface';
+import { IDriverProfileRepository } from '../interface/driverProfile.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
