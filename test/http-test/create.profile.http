@@ -1,0 +1,38 @@
+### 환경 변수
+@baseUrl = http://localhost:4000
+
+### 1) 로그인 (쿠키 세팅:)
+POST {{baseUrl}}/auth/signIn
+Content-Type: application/json
+
+{
+  "email": "consumer7@test.com",
+  "password": "password123",
+  "role": "CONSUMER"
+}
+
+###
+# 2) 소비자 프로필 생성 (JWT 쿠키 필요)
+POST {{baseUrl}}/profiles/consumer
+Content-Type: application/json
+
+{
+  "image": "https://img.example.com/user1.png",
+  "serviceType": "HOME_MOVE",
+  "area": "SEOUL"
+}
+
+###
+# 3) 기사(드라이버) 프로필 생성
+POST {{baseUrl}}/profiles/driver
+Content-Type: application/json
+
+{
+  "image": "https://img.example.com/driver1.png",
+  "nickname": "빠른이사맨",
+  "careerYears": "5",
+  "oneLiner": "안전하고 빠르게!",
+  "description": "사다리/포장이사 전문",
+  "serviceAreas": ["SEOUL", "GYEONGGI"],
+  "serviceTypes": ["HOME_MOVE", "OFFICE_MOVE"]
+}
