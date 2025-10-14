@@ -1,6 +1,6 @@
 ### 환경 변수
 @baseUrl = http://localhost:4000
-@accessToken = 
+@consumerAccessToken = 
 
 
 ### 공통 헤더 (필요 시 복사해서 각 요청에 붙여 사용)
@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ###
 POST {{baseUrl}}/consumers/profile
-Cookie: {{accessToken}}
+Cookie: {{consumerAccessToken}}
 Content-Type: application/json
 
 {
@@ -35,7 +35,7 @@ Content-Type: application/json
 
 ### 1-1) 소비자 프로필 등록 - image 없이(201)
 POST {{baseUrl}}/consumers/profile
-Cookie: {{accessToken}}
+Cookie: {{consumerAccessToken}}
 Content-Type: application/json
 
 {
@@ -45,7 +45,7 @@ Content-Type: application/json
 
 ### 1-2) 소비자 프로필 등록 - 중복 시도 (409 기대)
 POST {{baseUrl}}/consumers/profile
-Cookie: {{accessToken}}
+Cookie: {{consumerAccessToken}}
 Content-Type: application/json
 
 {
@@ -64,3 +64,99 @@ Cookie:
   "areas": "SEOUL"
 }
 
+
+################################################################
+# 2) 드라이버 로그인 (쿠키 받기)
+################################################################
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "driver6@test.com",
+  "password": "password123",
+  "role": "DRIVER"
+}
+
+### 위 요청 응답의 Set-Cookie 에서 access_token=... 전체를 복사해 아래 변수에 넣어주세요.
+@driverAccessToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2Njk3ZGI2ZC1kMWFlLTQwNGQtOTc2OS03YTEzNjBkZDU5NjciLCJqdGkiOiJiNDdlODJlYS0xNTRkLTRjZjAtOWQ3Yy1iZWIyMDhjZjU3OTgiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwNDMxNjU5LCJleHAiOjE3NjA0MzI1NTksImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.WYnfqByVa9yCZEC5YT3lxSev-ghkr5UAbh3YcJQU0Mg;
+
+################################################################
+# 3) 드라이버 프로필 등록 - 성공(201)
+################################################################
+POST {{baseUrl}}/drivers/profile
+Cookie: {{driverAccessToken}}
+Content-Type: application/json
+
+{
+  "image": "https://cdn.example.com/driver.png",
+  "nickname": "이사왕",
+  "careerYears": 5,
+  "oneLiner": "빠르고 안전하게!",
+  "description": "10년 경력의 이사 전문가입니다.",
+  "serviceTypes": ["HOME_MOVE", "OFFICE_MOVE"],
+  "serviceAreas": ["SEOUL", "GYEONGGI"]
+}
+
+################################################################
+# 3-1) 드라이버 프로필 등록 - 이미지 없이(201)
+################################################################
+POST {{baseUrl}}/drivers/profile
+Cookie: {{driverAccessToken}}
+Content-Type: application/json
+
+{
+  "nickname": "포장이사123",
+  "careerYears": 0,
+  "oneLiner": "정직한 견적",
+  "description": "초보지만 성실히 하겠습니다!",
+  "serviceTypes": ["HOME_MOVE"],
+  "serviceAreas": ["SEOUL"]
+}
+
+################################################################
+# 3-2) 드라이버 프로필 등록 - 중복 시도(409 기대)
+################################################################
+POST {{baseUrl}}/drivers/profile
+Cookie: {{driverAccessToken}}
+Content-Type: application/json
+
+{
+  "nickname": "이사왕",
+  "careerYears": 5,
+  "oneLiner": "빠르고 안전하게!",
+  "description": "중복 생성 테스트",
+  "serviceTypes": ["HOME_MOVE"],
+  "serviceAreas": ["SEOUL"]
+}
+
+################################################################
+# 3-3) 드라이버 프로필 등록 - 미인증(401 기대)
+################################################################
+POST {{baseUrl}}/drivers/profile
+Content-Type: application/json
+
+{
+  "nickname": "무면허",
+  "careerYears": 1,
+  "oneLiner": "테스트",
+  "description": "테스트",
+  "serviceTypes": ["HOME_MOVE"],
+  "serviceAreas": ["SEOUL"]
+}
+
+################################################################
+# 3-4) 드라이버 프로필 등록 - 잘못된 역할(403 기대)
+# (컨슈머 쿠키로 드라이버 프로필 생성 시도)
+################################################################
+POST {{baseUrl}}/drivers/profile
+Cookie: {{consumerAccessToken}}
+Content-Type: application/json
+
+{
+  "nickname": "권한오류테스트",
+  "careerYears": 2,
+  "oneLiner": "권한체크",
+  "description": "컨슈머 쿠키로 드라이버 프로필 생성 시도",
+  "serviceTypes": ["HOME_MOVE"],
+  "serviceAreas": ["SEOUL"]
+}

@@ -1,12 +1,12 @@
 import { Area, MoveType } from '@/shared/constant/values';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 import { LikedDriversKey } from '@/shared/utils/cursor.helper';
-import { driverProfileEntity, likeEntity, userEntity } from '../types';
+import { DriverProfileEntity, likeEntity, userEntity } from '../types';
 
 export type LikeWithDriverAggregate = likeEntity & {
   driver: userEntity & {
     driverProfile:
-      | (Omit<driverProfileEntity, 'driverServiceAreas' | 'driverServiceTypes'> & {
+      | (Omit<DriverProfileEntity, 'driverServiceAreas' | 'driverServiceTypes'> & {
           driverServiceAreas: { serviceArea: Area }[];
           driverServiceTypes: { serviceType: MoveType }[];
         })

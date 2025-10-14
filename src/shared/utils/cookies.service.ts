@@ -54,7 +54,7 @@ export class CookiesService {
     const opts: CookieOptions = {
       httpOnly: true,
       secure: this.useSecure,
-      path: '/api/auth/refresh',
+      path: '/auth/refresh',
       sameSite,
       maxAge,
     };
