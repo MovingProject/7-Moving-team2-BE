@@ -1,13 +1,12 @@
-import { Controller, Get, Param, UseGuards, Res, Patch, Body, Req } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UserDtoFactory, EditConsumerProfileDto } from './dto/user.response.dto';
-import { NotFoundException } from '@nestjs/common';
-import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
-import { ApiOkResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
-import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
-import { UpdateUserProfileDto } from './dto/user.update.dto';
+import { Body, Controller, Get, NotFoundException, Patch, Req, Res, UseGuards } from '@nestjs/common';
+import { ApiNotFoundResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { AuthUser } from '../auth/decorators/auth-user.decorator';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { EditConsumerProfileDto, UserDtoFactory } from './dto/user.response.dto';
+import { UpdateUserProfileDto } from './dto/user.update.Dto';
 import type { AuthenticatedRequest } from './interface/users.repository.interface';
+import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
