@@ -1,0 +1,66 @@
+### 환경 변수
+@baseUrl = http://localhost:4000
+@accessToken = 
+
+
+### 공통 헤더 (필요 시 복사해서 각 요청에 붙여 사용)
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+
+POST {{baseUrl}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "consumer12@test.com",
+  "password": "password123",
+  "role": "CONSUMER"
+}
+################################################################
+# 1) 소비자 프로필 등록 - 성공(201)
+#    image는 선택(Optional). 문자열로 URL 또는 key 어떤 것이든 허용.
+#    serviceType, areas는 프로젝트 enum에 맞게 수정!
+################################################################
+
+
+###
+POST {{baseUrl}}/consumers/profile
+Cookie: {{accessToken}}
+Content-Type: application/json
+
+{
+  "image": "https://cdn.example.com/sample-avatar.png",
+  "serviceType": "HOME_MOVE",   
+  "areas": "SEOUL"               
+}
+
+### 1-1) 소비자 프로필 등록 - image 없이(201)
+POST {{baseUrl}}/consumers/profile
+Cookie: {{accessToken}}
+Content-Type: application/json
+
+{
+  "serviceType": "HOME_MOVE",
+  "areas": "SEOUL"
+}
+
+### 1-2) 소비자 프로필 등록 - 중복 시도 (409 기대)
+POST {{baseUrl}}/consumers/profile
+Cookie: {{accessToken}}
+Content-Type: application/json
+
+{
+  "image": "avatar-key-or-url",
+  "serviceType": "HOME_MOVE",
+  "areas": "SEOUL"
+}
+
+### 1-3) 소비자 프로필 등록 - 미인증 (401 기대)
+POST {{baseUrl}}/consumers/profile
+Content-Type: application/json
+Cookie: 
+
+{
+  "serviceType": "HOME_MOVE",
+  "areas": "SEOUL"
+}
+

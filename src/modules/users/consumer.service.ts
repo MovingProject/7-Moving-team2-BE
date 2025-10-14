@@ -1,18 +1,50 @@
-import { NotFoundException } from '@/shared/exceptions';
+import { ConflictException, NotFoundException } from '@/shared/exceptions';
 import { decodeLikedDriverCursor, encodeLikedDriverCursor, LikedDriversKey } from '@/shared/utils/cursor.helper';
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { GetLikedDriversQuerySchemaDto } from './dto/getLikedDriversQuerySchema';
 import { LikedDriverEntity } from './interface/consumer.service.interface';
 import { LIKE_REPOSITORY, type ILikeRepository } from './interface/like.repository.interface';
 import { USER_REPOSITORY, type IUserRepository } from './interface/users.repository.interface';
+import { CreateConsumerProfileBody } from './dto/createConsumerProfileBodySchema';
+import {
+  CONSUMER_PROFILE_REPOSITORY,
+  type IConsumerProfileRepository,
+} from './interface/consumerProfile.repository.interface';
 
+@Injectable()
 export class ConsumerService {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
     @Inject(LIKE_REPOSITORY)
     private readonly likeRepository: ILikeRepository,
+    @Inject(CONSUMER_PROFILE_REPOSITORY)
+    private readonly consumerProfileRepository: IConsumerProfileRepository,
   ) {}
+
+  async createConsumerProfile(consumerId: string, body: CreateConsumerProfileBody) {
+    const existingConsumer = await this.userRepository.findById(consumerId);
+
+    if (!existingConsumer) {
+      throw new NotFoundException('Consumer not found');
+    }
+
+    if (existingConsumer.consumerProfile) {
+      throw new ConflictException('이미 등록된 프로필입니다.');
+    }
+
+    try {
+      return await this.consumerProfileRepository.createConsumerProfile(consumerId, body);
+    } catch (error) {
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        const prismaError = error as { code?: string };
+        if (prismaError.code === 'P2002') {
+          throw new ConflictException('이미 등록된 프로필입니다.');
+        }
+      }
+      throw error;
+    }
+  }
 
   async getLikedDriverList(consumerId: string, query: GetLikedDriversQuerySchemaDto) {
     const existingConsumer = await this.userRepository.findById(consumerId);
