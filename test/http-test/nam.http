@@ -68,8 +68,28 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTc
 ### 기사 받은 요청 필터 조회
 POST {{host}}/requests/received/search
 Content-Type: application/json
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTcyZDU4NC0xY2M1LTQ2YTgtYmYxMi04YTE1NmM4NmI1OWQiLCJqdGkiOiI1NTEyMzc0Zi1kODM1LTQyYWMtYjc1ZS01YWYyNjQyMTBkYjUiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwNDI0NDgzLCJleHAiOjE3NjA0MjUzODMsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.C77_eqAGLO1NypdM5aRZmiDpM1EYZ-GpREBzBUAp_JI
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTcyZDU4NC0xY2M1LTQ2YTgtYmYxMi04YTE1NmM4NmI1OWQiLCJqdGkiOiI5ZmFhNDE2NS1jMDFmLTQwY2QtYmQ2OC0xMTExZjM2YmMwYTUiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwNDk1NzIzLCJleHAiOjE3NjA0OTY2MjMsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.sVDRkm8kU6_EqHTwST5FaRMIaNBtU8zXw9M9CPq-Eyo
+
 
 {
-   "serviceType": "HOME_MOVE"
+
+}
+
+
+###
+asdasd
+asd
+{
+  "isInvited": false,
+  "areas": ["SEOUL"],
+  "serviceTypes": ["HOME_MOVE"],
+  "consumerName": "김",
+  "sortByMoveAt": "asc",
+  "moveAtFrom": "2025-11-11T00:00:00.000Z",
+  "moveAtTo": "2025-11-30T23:59:59.999Z"
+}
+
+{
+  "isInvited": false,
+  "serviceTypes": ["SMALL_MOVE"]
 }
