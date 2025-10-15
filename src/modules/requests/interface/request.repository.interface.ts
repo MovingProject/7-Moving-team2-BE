@@ -9,6 +9,13 @@ export interface IRequestRepository {
   findInvitesByDriverId(driverId: string): Promise<ReceivedRequest[]>;
   incrementInvitedCountIfAvailable(requestId: string, ctx?: TransactionContext): Promise<boolean>;
   filterRequests(driverId: string, filter: ReceivedRequestFilter): Promise<ReceivedRequest[]>;
+  countRequests(driverId: string): Promise<{
+    HOME_MOVE: number;
+    SMALL_MOVE: number;
+    OFFICE_MOVE: number;
+    INVITED: number;
+    AREA: number;
+  }>;
 }
 
 export const REQUEST_REPOSITORY = 'IRequestRepository';

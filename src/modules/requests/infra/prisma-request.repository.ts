@@ -1,4 +1,4 @@
-import { Prisma, Request } from '@prisma/client';
+import { Area, Prisma, Request } from '@prisma/client';
 import { IRequestRepository } from '../interface/request.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
@@ -163,5 +163,38 @@ export class PrismaRequestRepository implements IRequestRepository {
       createdAt: req.createdAt,
       isInvited: req.invites.length > 0,
     }));
+  }
+
+  //카운팅
+  async countRequests(driverId: string) {
+    // 기사 서비스 지역 조회
+    const driverAreas = await this.prisma.driverServiceArea.findMany({
+      where: { driverProfile: { driver: { id: driverId } } },
+      select: { serviceArea: true },
+    });
+    const serviceAreas = driverAreas.map((a) => a.serviceArea);
+
+    const [home, small, office, invited, area] = await Promise.all([
+      // 서비스 타입별
+      this.prisma.request.count({ where: { serviceType: 'HOME_MOVE' } }),
+      this.prisma.request.count({ where: { serviceType: 'SMALL_MOVE' } }),
+      this.prisma.request.count({ where: { serviceType: 'OFFICE_MOVE' } }),
+      // 지정견적 요청
+      this.prisma.request.count({ where: { invites: { some: { driverId } } } }),
+      // 기사 서비스 지역 기준
+      this.prisma.request.count({
+        where: {
+          OR: [{ departureArea: { in: serviceAreas } }, { arrivalArea: { in: serviceAreas } }],
+        },
+      }),
+    ]);
+
+    return {
+      HOME_MOVE: home,
+      SMALL_MOVE: small,
+      OFFICE_MOVE: office,
+      INVITED: invited,
+      AREA: area,
+    };
   }
 }
