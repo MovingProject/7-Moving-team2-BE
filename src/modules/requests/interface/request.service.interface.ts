@@ -14,7 +14,13 @@ export interface IRequestService {
   findReceivedByDriverId(driverId: string): Promise<ReceivedRequest[]>;
   inviteToRequest(driverId: string, user: AccessTokenPayload): Promise<InviteResult>;
   filterReceivedRequests(driverId: string, filter: ReceivedRequestFilter): Promise<ReceivedRequest[]>;
+  countRequests(driverId: string): Promise<{
+    HOME_MOVE: number;
+    SMALL_MOVE: number;
+    OFFICE_MOVE: number;
+    INVITED: number;
+    AREA: number;
+  }>;
 }
-
 
 export const REQUEST_SERVICE = 'IRequestService';
