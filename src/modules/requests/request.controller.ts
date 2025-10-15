@@ -54,4 +54,11 @@ export class RequestController {
     console.log('filter received(컨트롤):', filter);
     return this.requestService.filterReceivedRequests(driverId, filter);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('count')
+  async getCounts(@Req() req: any) {
+    const driverId = req.user.sub; // 로그인한 기사 ID
+    return this.requestService.countRequests(driverId);
+  }
 }
