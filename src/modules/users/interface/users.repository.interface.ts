@@ -1,6 +1,6 @@
 import { Area, MoveType, Prisma } from '@prisma/client';
 import { SignUpRequest } from '../../auth/dto/signup.request.dto';
-import { UpdateUserProfileDto } from '../dto/user.update.Dto';
+import { UpdateUserProfileDto } from '../dto/user.update.dto';
 
 export type UserWithProfile = Prisma.UserGetPayload<{
   include: {

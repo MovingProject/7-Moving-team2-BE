@@ -3,7 +3,7 @@ import { USER_REPOSITORY } from './interface/users.repository.interface';
 import type { IUserRepository } from './interface/users.repository.interface';
 import { NotFoundException, UnauthorizedException } from '@/shared/exceptions';
 import { HASHING_SERVICE, type IHashingService } from '@/shared/hashing/hashing.service.interface';
-import { UpdateUserProfileDto } from './dto/user.update.Dto';
+import { UpdateUserProfileDto } from './dto/user.update.dto';
 
 @Injectable()
 export class UsersService {

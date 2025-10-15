@@ -8,7 +8,7 @@ import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
 import { getDb } from '@/shared/prisma/get-db';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 
-import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
+import { ReceivedRequestFilter } from '../dto/request-filter-post.dto';
 @Injectable()
 export class PrismaRequestRepository implements IRequestRepository {
   constructor(private readonly prisma: PrismaService) {}

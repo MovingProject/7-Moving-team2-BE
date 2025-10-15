@@ -24,7 +24,7 @@ Content-Type: application/json
 
 {
   "email": "driver1@test.com",
-  "password": "password123",
+  "password": "password1234",
   "role": "DRIVER"
 }
 
@@ -68,11 +68,11 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTc
 ### 기사 받은 요청 필터 조회
 POST {{host}}/requests/received/search
 Content-Type: application/json
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTcyZDU4NC0xY2M1LTQ2YTgtYmYxMi04YTE1NmM4NmI1OWQiLCJqdGkiOiI5ZmFhNDE2NS1jMDFmLTQwY2QtYmQ2OC0xMTExZjM2YmMwYTUiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwNDk1NzIzLCJleHAiOjE3NjA0OTY2MjMsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.sVDRkm8kU6_EqHTwST5FaRMIaNBtU8zXw9M9CPq-Eyo
-
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTcyZDU4NC0xY2M1LTQ2YTgtYmYxMi04YTE1NmM4NmI1OWQiLCJqdGkiOiIxMjkyOGYwYS05OTdkLTQ1ODYtYjhhNC00OTZiNGM5M2FmZDciLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwNTAxNjgzLCJleHAiOjE3NjA1MDI1ODMsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.6kNvRicR2MspUcsTRdQ0XPxCvrMYOpL7f-_ESw4Z49Y
 
 {
-
+  "isInvited": false,
+  "serviceTypes": ["SMALL_MOVE"]
 }
 
 

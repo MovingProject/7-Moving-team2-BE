@@ -4,7 +4,7 @@ import { ApiNotFoundResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagge
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { EditConsumerProfileDto, UserDtoFactory } from './dto/user.response.dto';
-import { UpdateUserProfileDto } from './dto/user.update.Dto';
+import { UpdateUserProfileDto } from './dto/user.update.dto';
 import type { AuthenticatedRequest } from './interface/users.repository.interface';
 import { UsersService } from './users.service';
 @Controller('users')
