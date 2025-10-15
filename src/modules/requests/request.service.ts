@@ -156,4 +156,8 @@ export class RequestService implements IRequestService {
 
     return ReceivedRequestsResponseSchema.parse(result);
   }
+
+  async countRequests(driverId: string) {
+    return this.requestRepository.countRequests(driverId);
+  }
 }
