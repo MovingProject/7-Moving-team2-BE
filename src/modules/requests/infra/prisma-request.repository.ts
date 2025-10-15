@@ -110,18 +110,27 @@ export class PrismaRequestRepository implements IRequestRepository {
       where: { driverProfile: { driver: { id: driverId } } },
       select: { serviceArea: true },
     });
+    console.log('기사님 서비스지역 : ', driverAreas);
     const serviceAreas = driverAreas.map((a) => a.serviceArea);
 
     // 요청 조회 (지정 + 일반 + 필터)
     const requests = await this.prisma.request.findMany({
       where: {
-        OR: [
-          { invites: { some: { driverId } } },
-          {
-            invites: { none: { driverId } },
-            OR: [{ departureArea: { in: serviceAreas } }, { arrivalArea: { in: serviceAreas } }],
-          },
-        ],
+        // 지정견적 필터
+        ...(filter.isInvited === true
+          ? { invites: { some: { driverId } } }
+          : filter.isInvited === false
+            ? { invites: { none: { driverId } } }
+            : {}),
+
+        // 지역 필터 (지정/일반 상관없이 둘 다 가능)
+        OR: filter.areas?.length
+          ? [
+              { departureArea: { in: filter.areas ?? serviceAreas } },
+              // { arrivalArea: { in: filter.areas ?? serviceAreas } },
+            ]
+          : undefined,
+
         serviceType: filter.serviceTypes ? { in: filter.serviceTypes } : undefined,
         moveAt:
           filter.moveAtFrom || filter.moveAtTo
