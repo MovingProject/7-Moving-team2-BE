@@ -18,9 +18,6 @@ export class UsersService {
     const user = await this.userRepository.getProfileById(userId);
     if (!user) throw new NotFoundException('유저를 찾을 수 없습니다.');
 
-    if (!user.consumerProfile || !user.driverProfile) {
-      throw new NotFoundException('프로필 정보를 찾을 수 없습니다.');
-    }
     return user;
   }
 
