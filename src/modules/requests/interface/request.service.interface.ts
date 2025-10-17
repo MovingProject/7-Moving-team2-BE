@@ -1,8 +1,9 @@
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { CreateQuoteRequestBody } from '../dto/create-quote-request.dto';
-import { Request } from '@prisma/client';
+import { DriverRequestAction, Request } from '@prisma/client';
 import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
 import { ReceivedRequestFilter } from '../dto/request-filter-post.dto';
+import { DriverRequestActionDTO } from '../dto/request-reject-request-received.dto';
 
 export interface InviteResult {
   invited: boolean;
@@ -21,6 +22,7 @@ export interface IRequestService {
     INVITED: number;
     AREA: number;
   }>;
+  rejecctRequest(driverId: string, dto: DriverRequestActionDTO): Promise<DriverRequestAction>;
 }
 
 export const REQUEST_SERVICE = 'IRequestService';
