@@ -19,6 +19,8 @@ import { InviteResult } from './interface/request.service.interface';
 
 import { ReceivedRequestsResponseSchema, ReceivedRequest } from './dto/request-quote-request-received.dto';
 import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
+import { DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
+import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class RequestService implements IRequestService {
   constructor(
@@ -159,5 +161,17 @@ export class RequestService implements IRequestService {
 
   async countRequests(driverId: string) {
     return this.requestRepository.countRequests(driverId);
+  }
+
+  async rejecctRequest(driverId: string, dto: DriverRequestActionDTO) {
+    return this.transactionRunner.run(async (ctx) => {
+      const tx = ctx.tx as PrismaClient;
+
+      const request = await this.requestRepository.findById(dto.requestId);
+
+      if (!request) throw new NotFoundException('요청을 찾을수가 없습니다.');
+
+      return this.requestRepository.createDriverAction(tx, dto);
+    });
   }
 }

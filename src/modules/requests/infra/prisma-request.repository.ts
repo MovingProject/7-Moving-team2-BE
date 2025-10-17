@@ -1,4 +1,4 @@
-import { Area, Prisma, Request } from '@prisma/client';
+import { Area, Prisma, PrismaClient, Request } from '@prisma/client';
 import { IRequestRepository } from '../interface/request.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
@@ -9,6 +9,7 @@ import { getDb } from '@/shared/prisma/get-db';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 
 import { ReceivedRequestFilter } from '../dto/request-filter-post.dto';
+import { DriverRequestActionDTO } from '../dto/request-reject-request-received.dto';
 @Injectable()
 export class PrismaRequestRepository implements IRequestRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -196,5 +197,16 @@ export class PrismaRequestRepository implements IRequestRepository {
       INVITED: invited,
       AREA: area,
     };
+  }
+
+  async createDriverAction(tx: PrismaClient, data: DriverRequestActionDTO) {
+    return tx.driverRequestAction.create({ data });
+  }
+
+  async findById(requestId: string) {
+    return this.prisma.request.findUnique({
+      where: { id: requestId },
+      include: { consumer: true, invites: true },
+    });
   }
 }
