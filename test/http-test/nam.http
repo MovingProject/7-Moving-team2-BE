@@ -23,8 +23,8 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "driver1@test.com",
-  "password": "password1234",
+  "email": "a@naver.com",
+  "password": "123123123",
   "role": "DRIVER"
 }
 
@@ -108,3 +108,20 @@ asd
   "isInvited": false,
   "serviceTypes": ["SMALL_MOVE"]
 }
+
+
+### 받은 요청거절
+POST {{host}}/requests/reject
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwODE0NzMyNi0wZWU1LTQyNDItODc3Mi1hOGJhZTA3NjNmY2YiLCJqdGkiOiI5NDVmZDEwOS00YmQxLTRkY2EtOTljYS1mMmQwNzIzZTBhYjQiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwNjg5MjE1LCJleHAiOjE3NjA2OTAxMTUsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.RCvvaYJTidW30BvVUW4gvzEP22iwSOOh8YvZz0cocTM
+
+{
+  "requestId": "2d4bda80-45a1-43f8-9106-eb562b6a7642",
+  "driverId": "08147326-0ee5-4242-8772-a8bae0763fcf",
+  "state": "REJECTED",
+  "source": "GENERAL",
+  "note": "테스트 거절"
+}
+// 보내지기는 하는데 생각해보면 현재 이렇게만 만들면 흠 의미없지않나 다시 로직생각해보기. POST로 이렇게보내면 거절인데
+// 거기서 추가적으로 결과값으로 동작해야하는게 받은견적(요청)한 상태를 바꿔줘야한다.?
+// 지금은 createDriverAction 여기에 그냥 만드는거 create 밖에안됨 추가적으로 해야됨 ㅇㅋ?
