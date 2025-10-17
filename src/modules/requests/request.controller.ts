@@ -11,6 +11,7 @@ import { type IRequestService, REQUEST_SERVICE } from './interface/request.servi
 import { RolesGuard } from '../auth/guards/role.guard';
 import { RequireRoles } from '../auth/decorators/roles.decorator';
 import { type ReceivedRequestFilter } from './dto/request-filter-post.dto';
+import { type DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
 @ApiTags('견적 요청 (Request)')
 @Controller('requests')
 export class RequestController {
@@ -60,5 +61,12 @@ export class RequestController {
   async getCounts(@Req() req: any) {
     const driverId = req.user.sub; // 로그인한 기사 ID
     return this.requestService.countRequests(driverId);
+  }
+
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('DRIVER')
+  @Post('reject')
+  async rejectRequest(@Body() dto: DriverRequestActionDTO, @AuthUser() user: AccessTokenPayload) {
+    return this.requestService.rejecctRequest(user.sub, dto);
   }
 }
