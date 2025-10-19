@@ -70,7 +70,7 @@ model DriverProfile {
   driver             User                @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   image              String?
   nickname           String
-  careerYears        String
+  careerYears        Int
   oneLiner           String
   description        String
   likeCount          Int                 @default(0)
