@@ -4,7 +4,7 @@ import { MoveType, Area } from '@prisma/client';
 
 const driverProfileSchema = z.object({
   nickname: z.string().optional(),
-  careerYears: z.string().optional(),
+  careerYears: z.coerce.number().int().optional(),
   oneLiner: z.string().optional(),
   description: z.string().optional(),
   rating: z.number().optional(),

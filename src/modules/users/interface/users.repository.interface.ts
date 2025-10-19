@@ -37,7 +37,7 @@ export type PartialUserProfile = {
   phoneNumber: string;
   // 드라이버 필드
   nickname?: string;
-  careerYears?: string;
+  careerYears?: number;
   oneLiner?: string;
   description?: string;
   rating?: number;
