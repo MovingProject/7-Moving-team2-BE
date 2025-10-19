@@ -84,7 +84,7 @@ export class ConsumerService {
         nickname: p?.nickname ?? '',
         rating: p?.rating ?? 0,
         reviewCount: p?.reviewCount ?? 0,
-        careerYears: p?.careerYears ?? '',
+        careerYears: p?.careerYears ?? 0,
         confirmedCount: p?.confirmedCount ?? 0,
         likeCount: p?.likeCount ?? 0,
         avatarUrl: p?.image ?? null,
