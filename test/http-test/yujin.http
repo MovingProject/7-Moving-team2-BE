@@ -11,7 +11,7 @@ POST {{host}}/auth/signup
 Content-Type: application/json
 
 {
-  "email": "consumer12@test.com",
+  "email": "consumer@test.com",
   "password": "password123",
   "passwordConfirm": "password123",
   "name": "김소비",
@@ -25,7 +25,7 @@ POST {{host}}/auth/signup
 Content-Type: application/json
 
 {
-  "email": "driver6@test.com",
+  "email": "driver@test.com",
   "password": "password123",
   "passwordConfirm": "password123",
   "name": "박기사",
@@ -103,7 +103,7 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "login-test@test.com",
+  "email": "consumer@test.com",
   "password": "password123",
   "role": "CONSUMER"
 }

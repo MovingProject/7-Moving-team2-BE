@@ -1,6 +1,6 @@
 ### 환경 변수
 @baseUrl = http://localhost:4000
-@consumerAccessToken = 
+@consumerAccessToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQxOTAyNS1jNzJlLTQxYTgtYmM3Zi0yMWNkOGZhMzA3MzYiLCJqdGkiOiI2YzYzMzlkMS0xNDNmLTQ3ZDMtOGU1ZC03YTYxNmMyYzkyZTciLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjA4ODg1ODMsImV4cCI6MTc2MDg4OTQ4MywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.hw4POzvYyicktz8C05oRi3iLdrwERr0rPpvqAv1KDOw;
 
 
 ### 공통 헤더 (필요 시 복사해서 각 요청에 붙여 사용)
@@ -11,7 +11,7 @@ POST {{baseUrl}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "consumer12@test.com",
+  "email": "consumer@test.com",
   "password": "password123",
   "role": "CONSUMER"
 }
@@ -72,13 +72,13 @@ POST {{baseUrl}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "driver6@test.com",
+  "email": "driver@test.com",
   "password": "password123",
   "role": "DRIVER"
 }
 
 ### 위 요청 응답의 Set-Cookie 에서 access_token=... 전체를 복사해 아래 변수에 넣어주세요.
-@driverAccessToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2Njk3ZGI2ZC1kMWFlLTQwNGQtOTc2OS03YTEzNjBkZDU5NjciLCJqdGkiOiJiNDdlODJlYS0xNTRkLTRjZjAtOWQ3Yy1iZWIyMDhjZjU3OTgiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwNDMxNjU5LCJleHAiOjE3NjA0MzI1NTksImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.WYnfqByVa9yCZEC5YT3lxSev-ghkr5UAbh3YcJQU0Mg;
+@driverAccessToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDk0OTNjOS1mYTQzLTQyYTItODExOS1jNDAwNDUwYjkxYTMiLCJqdGkiOiIyMDBhMTJjNC01OWUwLTRiMjAtOTYzYy1kMjI2OGExZTU1YjMiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwODg4NjMwLCJleHAiOjE3NjA4ODk1MzAsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.0Qxa3OC0r-UoheMDQfC7HlHIZ_ps0eCg0JTyKkcueKk;
 
 ################################################################
 # 3) 드라이버 프로필 등록 - 성공(201)

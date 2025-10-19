@@ -22,7 +22,7 @@ export class PrismaDriverProfileRepository implements IDriverProfileRepository {
         userId: driverId,
         image: body.image ?? null,
         nickname: body.nickname,
-        careerYears: String(body.careerYears), // Prisma 스키마가 String이므로 변환
+        careerYears: body.careerYears,
         oneLiner: body.oneLiner,
         description: body.description,
         driverServiceAreas: {
