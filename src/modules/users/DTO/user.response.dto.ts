@@ -22,7 +22,7 @@ export class SignInResponseDto extends BaseUserDto {
 export class EditDriverProfileDto extends BaseUserDto {
   region: string[];
   service: string[];
-  experience: string;
+  experience: number;
   bio: string;
   description: string;
   tel: string;
