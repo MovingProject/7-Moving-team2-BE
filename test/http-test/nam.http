@@ -6,7 +6,7 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "login-test@test.com",
+  "email": "consumer@test.com",
   "password": "password123",
   "role": "CONSUMER"
 }
@@ -23,8 +23,8 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "a@naver.com",
-  "password": "123123123",
+  "email": "driverkim@test.com",
+  "password": "driverkim123",
   "role": "DRIVER"
 }
 
@@ -113,11 +113,10 @@ asd
 ### 받은 요청거절
 POST {{host}}/requests/reject
 Content-Type: application/json
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwODE0NzMyNi0wZWU1LTQyNDItODc3Mi1hOGJhZTA3NjNmY2YiLCJqdGkiOiI5NDVmZDEwOS00YmQxLTRkY2EtOTljYS1mMmQwNzIzZTBhYjQiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwNjg5MjE1LCJleHAiOjE3NjA2OTAxMTUsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.RCvvaYJTidW30BvVUW4gvzEP22iwSOOh8YvZz0cocTM
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0ZDM1M2I4NC1jYWQyLTRmNzYtYTAxOS05OTVhZDhiNDEyMmIiLCJqdGkiOiIyYjg2MmUxNy1hZTY3LTRmMTctYmVmMy0yOWM2MWVlOTk4N2YiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYwOTM3MDkwLCJleHAiOjE3NjA5Mzc5OTAsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.oA9BS5cwtI3sq0Xv_BE4GUm8K65vO-gt5SEu9GkGZXc
 
 {
-  "requestId": "2d4bda80-45a1-43f8-9106-eb562b6a7642",
-  "driverId": "08147326-0ee5-4242-8772-a8bae0763fcf",
+  "requestId": "198fb801-4372-40ad-afbf-93e794521a91",
   "state": "REJECTED",
   "source": "GENERAL",
   "note": "테스트 거절"
