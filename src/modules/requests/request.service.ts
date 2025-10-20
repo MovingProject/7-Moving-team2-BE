@@ -163,15 +163,15 @@ export class RequestService implements IRequestService {
     return this.requestRepository.countRequests(driverId);
   }
 
-  async rejecctRequest(driverId: string, dto: DriverRequestActionDTO) {
+  async rejectRequest(driverId: string, dto: DriverRequestActionDTO) {
     return this.transactionRunner.run(async (ctx) => {
-      const tx = ctx.tx as PrismaClient;
+      const input = { ...dto, driverId };
 
-      const request = await this.requestRepository.findById(dto.requestId);
+      const request = await this.requestRepository.findById(input.requestId);
 
       if (!request) throw new NotFoundException('요청을 찾을수가 없습니다.');
 
-      return this.requestRepository.createDriverAction(tx, dto);
+      return this.requestRepository.createDriverAction(ctx.tx as PrismaClient, input);
     });
   }
 }
