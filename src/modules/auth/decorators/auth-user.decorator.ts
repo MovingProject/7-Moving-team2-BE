@@ -14,3 +14,8 @@ export const AuthUser = createParamDecorator((data: unknown, ctx: ExecutionConte
 
   return request.user;
 });
+
+export const AuthUserOptional = createParamDecorator((data, ctx): AccessTokenPayload | null => {
+  const req: Request = ctx.switchToHttp().getRequest();
+  return req.user ?? null;
+});
