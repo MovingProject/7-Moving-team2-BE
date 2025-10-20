@@ -165,11 +165,13 @@ export class RequestService implements IRequestService {
 
   async rejectRequest(driverId: string, dto: DriverRequestActionDTO) {
     return this.transactionRunner.run(async (ctx) => {
-      const input = { ...dto, driverId };
-
-      const request = await this.requestRepository.findById(input.requestId);
-
+      const request = await this.requestRepository.findById(dto.requestId);
       if (!request) throw new NotFoundException('요청을 찾을수가 없습니다.');
+      const input = {
+        ...dto,
+        driverId,
+        source: request.invites.some((i) => i.driverId === driverId) ? 'INVITED' : 'GENERAL',
+      };
 
       return this.requestRepository.createDriverAction(ctx.tx as PrismaClient, input);
     });
