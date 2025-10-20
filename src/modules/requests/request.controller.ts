@@ -67,6 +67,6 @@ export class RequestController {
   @RequireRoles('DRIVER')
   @Post('reject')
   async rejectRequest(@Body() dto: DriverRequestActionDTO, @AuthUser() user: AccessTokenPayload) {
-    return this.requestService.rejecctRequest(user.sub, dto);
+    return this.requestService.rejectRequest(user.sub, dto);
   }
 }
