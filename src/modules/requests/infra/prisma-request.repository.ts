@@ -213,7 +213,7 @@ export class PrismaRequestRepository implements IRequestRepository {
 
   async findById(requestId: string) {
     return this.prisma.request.findUnique({
-      where: { id: requestId },
+      where: { id: requestId, requestStatus: 'PENDING' },
       include: { consumer: true, invites: true },
     });
   }
