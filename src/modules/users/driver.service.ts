@@ -3,7 +3,9 @@ import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { TRANSACTION_RUNNER, type ITransactionRunner } from '@/shared/prisma/transaction-runner.interface';
 import { decodeDriverCursor, encodeDriverCursor } from '@/shared/utils/driver.cursor.helper';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { INVITE_REPOSITORY, type IInviteRepository } from '../requests/interface/invite.repository.interface';
 import { SORT_FIELD_MAP } from './domain/driver-sort.helper';
+import { toDriverListItem } from './domain/driver.mapper';
 import { CreateDriverProfileBody } from './dto/createDriverProfileBodySchema';
 import { GetDriverListQuery } from './dto/getDriverListQuerySchema';
 import { IDriverService } from './interface/driver.service.interface';
@@ -14,9 +16,6 @@ import {
 } from './interface/driverProfile.repository.interface';
 import { LIKE_REPOSITORY, type ILikeRepository } from './interface/like.repository.interface';
 import { USER_REPOSITORY, type IUserRepository } from './interface/users.repository.interface';
-import { DriverSortType } from '@/shared/constant/values';
-import { type IInviteRepository, INVITE_REPOSITORY } from '../requests/interface/invite.repository.interface';
-import { toDriverListItem } from './domain/driver.mapper';
 
 @Injectable()
 export default class DriverService implements IDriverService {
