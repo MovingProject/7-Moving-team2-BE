@@ -166,7 +166,13 @@ export class RequestService implements IRequestService {
   async rejectRequest(driverId: string, dto: DriverRequestActionDTO) {
     return this.transactionRunner.run(async (ctx) => {
       const request = await this.requestRepository.findById(dto.requestId);
+
       if (!request) throw new NotFoundException('요청을 찾을수가 없습니다.');
+
+      if (request.requestStatus !== 'PENDING') {
+        throw new ConflictException('이미 완료되었거나 취소된 요청은 반려할 수 없습니다.');
+      }
+      
       const input = {
         ...dto,
         driverId,
