@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ActionSource, ActionState } from '@prisma/client';
 export const driverRequestActionSchema = z.object({
-  requestId: z.string(),
+  requestId: z.string().uuid(),
   state: z.nativeEnum(ActionState),
   source: z.nativeEnum(ActionSource),
   note: z.string().optional(),
