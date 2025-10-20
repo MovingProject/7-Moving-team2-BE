@@ -1,19 +1,45 @@
 import { type AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { ZodValidationPipe } from '@/shared/pipes/zod-validation.pipe';
-import { Body, Controller, Delete, HttpCode, HttpStatus, Inject, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthUser } from '../auth/decorators/auth-user.decorator';
+import { AuthUser, AuthUserOptional } from '../auth/decorators/auth-user.decorator';
 import { RequireRoles } from '../auth/decorators/roles.decorator';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { CreateDriverProfileBodyDto, createDriverProfileBodySchema } from './dto/createDriverProfileBodySchema';
 import { driverIdParamSchema, type DriverIdParam } from './dto/driverIdParamSchema';
 import { DRIVER_SERVICE, type IDriverService } from './interface/driver.service.interface';
+import { GetDriverListQuerySchema, type GetDriverListQuery } from './dto/getDriverListQuerySchema';
+import { OptionalAccessTokenGuard } from '../auth/guards/optionalAccessToken.guard';
 
 @ApiTags('Driver')
 @Controller('drivers')
 export class DriverController {
   constructor(@Inject(DRIVER_SERVICE) private readonly driverService: IDriverService) {}
+
+  @Get()
+  @ApiOperation({ summary: '드라이버 목록 조회' })
+  @ApiResponse({ status: 200, description: '드라이버 목록 조회 성공' })
+  @ApiResponse({ status: 400, description: '잘못된 쿼리 파라미터' })
+  @UseGuards(OptionalAccessTokenGuard)
+  async getDrivers(
+    @AuthUserOptional() user: AccessTokenPayload | null,
+    @Query(new ZodValidationPipe(GetDriverListQuerySchema)) query: GetDriverListQuery,
+  ) {
+    return this.driverService.getDrivers(user, query);
+  }
 
   @Post('profile')
   @ApiOperation({ summary: '드라이버 프로필 등록' })

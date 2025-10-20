@@ -1,17 +1,22 @@
-import { ForbiddenException, NotFoundException } from '@/shared/exceptions';
+import { ConflictException, ForbiddenException, NotFoundException } from '@/shared/exceptions';
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { TRANSACTION_RUNNER, type ITransactionRunner } from '@/shared/prisma/transaction-runner.interface';
-import { Inject, Injectable } from '@nestjs/common';
+import { decodeDriverCursor, encodeDriverCursor } from '@/shared/utils/driver.cursor.helper';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { SORT_FIELD_MAP } from './domain/driver-sort.helper';
+import { CreateDriverProfileBody } from './dto/createDriverProfileBodySchema';
+import { GetDriverListQuery } from './dto/getDriverListQuerySchema';
 import { IDriverService } from './interface/driver.service.interface';
 import {
   DRIVER_PROFILE_REPOSITORY,
+  RepoFindDriversInput,
   type IDriverProfileRepository,
 } from './interface/driverProfile.repository.interface';
 import { LIKE_REPOSITORY, type ILikeRepository } from './interface/like.repository.interface';
 import { USER_REPOSITORY, type IUserRepository } from './interface/users.repository.interface';
-import { CreateDriverProfileBody } from './dto/createDriverProfileBodySchema';
-import { ConflictException } from '@/shared/exceptions';
-import { DriverProfileEntity } from './types';
+import { DriverSortType } from '@/shared/constant/values';
+import { type IInviteRepository, INVITE_REPOSITORY } from '../requests/interface/invite.repository.interface';
+import { toDriverListItem } from './domain/driver.mapper';
 
 @Injectable()
 export default class DriverService implements IDriverService {
@@ -24,7 +29,70 @@ export default class DriverService implements IDriverService {
     private readonly likeRepository: ILikeRepository,
     @Inject(DRIVER_PROFILE_REPOSITORY)
     private readonly driverProfileRepository: IDriverProfileRepository,
+    @Inject(INVITE_REPOSITORY)
+    private readonly inviteRepository: IInviteRepository,
   ) {}
+
+  async getDrivers(user: AccessTokenPayload | null, query: GetDriverListQuery) {
+    const { area, type, sort, take, cursor } = query;
+    const sortField = SORT_FIELD_MAP[sort];
+
+    let cursorPrimaryNumeric: number | undefined;
+    let cursorId: string | undefined;
+
+    if (cursor) {
+      const payload = decodeDriverCursor(cursor);
+      if (payload.sort !== sort) {
+        throw new BadRequestException('Cursor sort does not match current sort.');
+      }
+
+      const rawPrimary = payload.primary.trim();
+      cursorPrimaryNumeric = Number(rawPrimary);
+      cursorId = payload.id;
+    }
+
+    const repoInput: RepoFindDriversInput = {
+      area,
+      type,
+      sortField,
+      cursorPrimary: cursorPrimaryNumeric,
+      cursorId,
+      takePlusOne: Number(take) + 1,
+    };
+
+    const aggregates = await this.driverProfileRepository.findDrivers(repoInput);
+
+    const hasNext = aggregates.length > take;
+    const page = hasNext ? aggregates.slice(0, take) : aggregates;
+
+    let nextCursor: string | null = null;
+    if (hasNext && page.length > 0) {
+      const sortKey = sort;
+      const cursorSortField = SORT_FIELD_MAP[sortKey];
+      const last = page[page.length - 1];
+      const primaryValue = last[cursorSortField];
+      nextCursor = encodeDriverCursor({
+        sort: sortKey,
+        primary: String(primaryValue),
+        id: last.userId,
+      });
+    }
+
+    let invitedSet = new Set<string>();
+
+    if (user?.role === 'CONSUMER' && page.length > 0) {
+      const driverIds = Array.from(new Set(page.map((r) => r.userId)));
+      invitedSet = await this.inviteRepository.findInvitedDriverIds(user.sub, driverIds);
+    }
+
+    const items = page.map((r) => toDriverListItem(r, invitedSet.has(r.userId)));
+
+    return {
+      items: items,
+      nextCursor,
+      hasNext,
+    };
+  }
 
   async createDriverProfile(driverId: string, body: CreateDriverProfileBody) {
     const existingDriver = await this.userRepository.findById(driverId);

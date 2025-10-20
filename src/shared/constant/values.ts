@@ -29,3 +29,7 @@ export type Area = (typeof AREAS)[number];
 export const REQUEST_STATUSES = ['PENDING', 'CONCLUDED', 'COMPLETE', 'EXPIRED', 'CANCELED', 'WITHDRAWN'] as const;
 
 export type RequestStatus = (typeof REQUEST_STATUSES)[number];
+
+export const DRIVER_SORT_TYPES = ['REVIEW_DESC', 'RATING_DESC', 'CAREER_DESC', 'CONFIRMED_DESC'] as const;
+
+export type DriverSortType = (typeof DRIVER_SORT_TYPES)[number];
