@@ -172,10 +172,11 @@ export class RequestService implements IRequestService {
       if (request.requestStatus !== 'PENDING') {
         throw new ConflictException('이미 완료되었거나 취소된 요청은 반려할 수 없습니다.');
       }
-      
+
       const input = {
         ...dto,
         driverId,
+        state: 'REJECTED',
         source: request.invites.some((i) => i.driverId === driverId) ? 'INVITED' : 'GENERAL',
       };
 
