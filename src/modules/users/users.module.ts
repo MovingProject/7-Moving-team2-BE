@@ -18,7 +18,7 @@ import { LIKE_REPOSITORY } from './interface/like.repository.interface';
 import { DRIVER_SERVICE } from './interface/driver.service.interface';
 import { CONSUMER_SERVICE } from './interface/consumer.service.interface';
 import { CONSUMER_PROFILE_REPOSITORY } from './interface/consumerProfile.repository.interface';
-
+import { INVITE_REPOSITORY } from '../requests/interface/invite.repository.interface';
 // infra implementations
 import { PrismaUserRepository } from './infra/prisma-user.repository';
 import { PrismaDriverProfileRepository } from './infra/prisma-driverProfile.repository';
@@ -26,7 +26,7 @@ import { PrismaLikeRepository } from './infra/prisma-like.repository';
 import { CookiesService } from '@/shared/utils/cookies.service';
 import { HashingModule } from '@/shared/hashing/hashing.module';
 import { PrismaConsumerProfileRepository } from './infra/prisma-consumerProfile.repository';
-
+import { PrismaInviteRepository } from '../requests/infra/prisma-invite.repository';
 @Module({
   imports: [PrismaModule, HashingModule],
   controllers: [UsersController, DriverController, ConsumerController],
@@ -38,7 +38,7 @@ import { PrismaConsumerProfileRepository } from './infra/prisma-consumerProfile.
     { provide: DRIVER_SERVICE, useClass: DriverService },
     { provide: CONSUMER_SERVICE, useClass: ConsumerService },
     { provide: CONSUMER_PROFILE_REPOSITORY, useClass: PrismaConsumerProfileRepository },
-
+    { provide: INVITE_REPOSITORY, useClass: PrismaInviteRepository },
     CookiesService,
   ],
   exports: [UsersService, USER_REPOSITORY, DRIVER_SERVICE],

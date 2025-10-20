@@ -160,3 +160,22 @@ Content-Type: application/json
   "serviceTypes": ["HOME_MOVE"],
   "serviceAreas": ["SEOUL"]
 }
+### ------------------------------------------------------------
+
+### 1) 비로그인: 기본 정렬(RATING_DESC 기본값), 첫 페이지
+GET {{baseUrl}}/drivers?take=3
+Accept: application/json
+
+### 1-2) 비로그인: 기본 정렬, area/type 필터 포함
+GET {{baseUrl}}/drivers?take=3&area=SEOUL&type=HOME_MOVE
+Accept: application/json
+
+
+### 2) 로그인(소비자): 초대 배지 확인용
+GET {{baseUrl}}/drivers?take=5&sort=REVIEW_DESC
+Accept: application/json
+
+
+### 2-1) 로그인(소비자) + 필터 조합
+GET {{baseUrl}}/drivers?take=5&area=GYEONGGI&type=OFFICE_MOVE&sort=CONFIRMED_DESC
+Accept: application/json
