@@ -1,14 +1,60 @@
-import { IDriverProfileRepository } from '../interface/driverProfile.repository.interface';
+import {
+  DriverAggregate,
+  IDriverProfileRepository,
+  RepoFindDriversInput,
+} from '../interface/driverProfile.repository.interface';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 import { getDb } from '@/shared/prisma/get-db';
 import { CreateDriverProfileBody } from '../dto/createDriverProfileBodySchema';
 import { DriverProfileEntity } from '../types';
+import { Prisma, Role } from '@prisma/client';
 
 @Injectable()
 export class PrismaDriverProfileRepository implements IDriverProfileRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findDrivers(input: RepoFindDriversInput): Promise<DriverAggregate[]> {
+    const { area, type, sortField, cursorPrimary, cursorId, takePlusOne } = input;
+
+    const baseWhere: Prisma.DriverProfileWhereInput = {
+      deletedAt: null,
+      driver: { role: Role.DRIVER, deletedAt: null },
+      ...(area ? { driverServiceAreas: { some: { serviceArea: area } } } : {}),
+      ...(type ? { driverServiceTypes: { some: { serviceType: type } } } : {}),
+    };
+
+    const where: Prisma.DriverProfileWhereInput =
+      cursorPrimary != null && cursorId
+        ? {
+            AND: [
+              baseWhere,
+              {
+                OR: [
+                  { [sortField]: { lt: cursorPrimary } },
+                  {
+                    AND: [{ [sortField]: cursorPrimary }, { userId: { lt: cursorId } }],
+                  },
+                ],
+              },
+            ],
+          }
+        : baseWhere;
+
+    const rows = await this.prisma.driverProfile.findMany({
+      where,
+      orderBy: [{ [sortField]: 'desc' }, { userId: 'desc' }],
+      take: takePlusOne,
+      include: {
+        driver: { select: { id: true, name: true, role: true, createdAt: true, deletedAt: true } },
+        driverServiceAreas: { select: { serviceArea: true } },
+        driverServiceTypes: { select: { serviceType: true } },
+      },
+    });
+
+    return rows;
+  }
 
   async createDriverProfile(
     driverId: string,
