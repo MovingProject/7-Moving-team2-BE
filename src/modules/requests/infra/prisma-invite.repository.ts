@@ -20,4 +20,22 @@ export class PrismaInviteRepository implements IInviteRepository {
 
     return rows.length > 0;
   }
+
+  async findInvitedDriverIds(consumerId: string, driverIds: string[]): Promise<Set<string>> {
+    if (!driverIds?.length) return new Set();
+
+    const rows = await this.prisma.invite.findMany({
+      where: {
+        driverId: { in: driverIds },
+        canceledAt: null,
+        request: {
+          consumerId,
+          deletedAt: null,
+          requestStatus: 'PENDING',
+        },
+      },
+      select: { driverId: true },
+    });
+    return new Set(rows.map((r) => r.driverId));
+  }
 }
