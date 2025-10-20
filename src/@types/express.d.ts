@@ -3,7 +3,7 @@ import type { AccessTokenPayload, JwtPayload } from '@/shared/jwt/jwt.payload.sc
 declare global {
   namespace Express {
     export interface Request {
-      user?: AccessTokenPayload;
+      user?: AccessTokenPayload | null;
       refresh?: JwtPayload;
       refreshRaw?: string;
     }
