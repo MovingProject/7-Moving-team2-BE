@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { ActionSource, ActionState } from '@prisma/client';
 export const driverRequestActionSchema = z.object({
-  driverId: z.string(),
   requestId: z.string(),
   state: z.nativeEnum(ActionState),
   source: z.nativeEnum(ActionSource),
@@ -9,3 +8,4 @@ export const driverRequestActionSchema = z.object({
 });
 
 export type DriverRequestActionDTO = z.infer<typeof driverRequestActionSchema>;
+export type CreateDriverRequestActionInput = DriverRequestActionDTO & { driverId: string };

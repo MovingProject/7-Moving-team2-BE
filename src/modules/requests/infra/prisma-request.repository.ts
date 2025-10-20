@@ -9,7 +9,7 @@ import { getDb } from '@/shared/prisma/get-db';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 
 import { ReceivedRequestFilter } from '../dto/request-filter-post.dto';
-import { DriverRequestActionDTO } from '../dto/request-reject-request-received.dto';
+import { CreateDriverRequestActionInput, DriverRequestActionDTO } from '../dto/request-reject-request-received.dto';
 @Injectable()
 export class PrismaRequestRepository implements IRequestRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -199,8 +199,16 @@ export class PrismaRequestRepository implements IRequestRepository {
     };
   }
 
-  async createDriverAction(tx: PrismaClient, data: DriverRequestActionDTO) {
-    return tx.driverRequestAction.create({ data });
+  async createDriverAction(tx: PrismaClient, data: CreateDriverRequestActionInput) {
+    return tx.driverRequestAction.create({
+      data: {
+        request: { connect: { id: data.requestId } },
+        driver: { connect: { id: data.driverId } },
+        state: data.state,
+        source: data.source,
+        note: data.note,
+      },
+    });
   }
 
   async findById(requestId: string) {

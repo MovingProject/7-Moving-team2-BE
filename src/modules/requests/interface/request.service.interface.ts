@@ -22,7 +22,7 @@ export interface IRequestService {
     INVITED: number;
     AREA: number;
   }>;
-  rejecctRequest(driverId: string, dto: DriverRequestActionDTO): Promise<DriverRequestAction>;
+  rejectRequest(driverId: string, dto: DriverRequestActionDTO): Promise<DriverRequestAction>;
 }
 
 export const REQUEST_SERVICE = 'IRequestService';
