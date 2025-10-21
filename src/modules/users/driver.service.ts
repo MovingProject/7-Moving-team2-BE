@@ -5,7 +5,7 @@ import { decodeDriverCursor, encodeDriverCursor } from '@/shared/utils/driver.cu
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { INVITE_REPOSITORY, type IInviteRepository } from '../requests/interface/invite.repository.interface';
 import { SORT_FIELD_MAP } from './domain/driver-sort.helper';
-import { toDriverListItem } from './domain/driver.mapper';
+import { toDriverListItem, toPublicDriverProfile } from './domain/driver.mapper';
 import { CreateDriverProfileBody } from './dto/createDriverProfileBodySchema';
 import { GetDriverListQuery } from './dto/getDriverListQuerySchema';
 import { IDriverService } from './interface/driver.service.interface';
@@ -16,7 +16,7 @@ import {
 } from './interface/driverProfile.repository.interface';
 import { LIKE_REPOSITORY, type ILikeRepository } from './interface/like.repository.interface';
 import { USER_REPOSITORY, type IUserRepository } from './interface/users.repository.interface';
-
+import { REQUEST_REPOSITORY, type IRequestRepository } from '../requests/interface/request.repository.interface';
 @Injectable()
 export default class DriverService implements IDriverService {
   constructor(
@@ -30,6 +30,8 @@ export default class DriverService implements IDriverService {
     private readonly driverProfileRepository: IDriverProfileRepository,
     @Inject(INVITE_REPOSITORY)
     private readonly inviteRepository: IInviteRepository,
+    @Inject(REQUEST_REPOSITORY)
+    private readonly requestRepository: IRequestRepository,
   ) {}
 
   async getDrivers(user: AccessTokenPayload | null, query: GetDriverListQuery) {
@@ -90,6 +92,28 @@ export default class DriverService implements IDriverService {
       items: items,
       nextCursor,
       hasNext,
+    };
+  }
+
+  async getDriverProfile(driverId: string, user: AccessTokenPayload | null) {
+    const driverProfile = await this.driverProfileRepository.findById(driverId);
+    if (!driverProfile) {
+      throw new NotFoundException('Driver profile not found');
+    }
+
+    let isInvitedByMe = false;
+    if (user?.role === 'CONSUMER') {
+      const pendingRequest = await this.requestRepository.findPendingByConsumerId(user.sub);
+      const invite = pendingRequest
+        ? await this.inviteRepository.findByRequestAndDriver(pendingRequest.id, driverId)
+        : null;
+
+      isInvitedByMe = !!invite;
+    }
+
+    return {
+      ...toPublicDriverProfile(driverProfile),
+      isInvitedByMe,
     };
   }
 

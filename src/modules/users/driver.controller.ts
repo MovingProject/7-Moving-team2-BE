@@ -41,6 +41,18 @@ export class DriverController {
     return this.driverService.getDrivers(user, query);
   }
 
+  @Get(':driverId')
+  @ApiOperation({ summary: '드라이버 프로필 조회' })
+  @ApiParam({ name: 'driverId', type: 'string', format: 'uuid', required: true, description: 'Driver user ID' })
+  @ApiResponse({ status: 200, description: '드라이버 프로필 조회 성공' })
+  @UseGuards(OptionalAccessTokenGuard)
+  async getDriverProfile(
+    @Param(new ZodValidationPipe(driverIdParamSchema)) params: DriverIdParam,
+    @AuthUserOptional() user: AccessTokenPayload | null,
+  ) {
+    return this.driverService.getDriverProfile(params.driverId, user);
+  }
+
   @Post('profile')
   @ApiOperation({ summary: '드라이버 프로필 등록' })
   @ApiResponse({ status: 201, description: '드라이버 프로필 등록 성공' })
