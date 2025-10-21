@@ -103,4 +103,16 @@ export class PrismaDriverProfileRepository implements IDriverProfileRepository {
       data: { likeCount: { decrement: 1 } },
     });
   }
+
+  async findById(driverId: string, ctx?: TransactionContext): Promise<DriverProfileEntity | null> {
+    const db = getDb(ctx, this.prisma);
+
+    return db.driverProfile.findUnique({
+      where: { userId: driverId },
+      include: {
+        driverServiceAreas: true,
+        driverServiceTypes: true,
+      },
+    });
+  }
 }

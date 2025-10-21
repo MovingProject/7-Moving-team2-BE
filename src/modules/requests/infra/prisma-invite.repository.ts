@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { IInviteRepository } from '../interface/invite.repository.interface';
 import { getDb } from '@/shared/prisma/get-db';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
+import { InviteEntity } from '../types';
 
 @Injectable()
 export class PrismaInviteRepository implements IInviteRepository {
@@ -37,5 +38,17 @@ export class PrismaInviteRepository implements IInviteRepository {
       select: { driverId: true },
     });
     return new Set(rows.map((r) => r.driverId));
+  }
+
+  async findByRequestAndDriver(
+    requestId: string,
+    driverId: string,
+    ctx?: TransactionContext,
+  ): Promise<InviteEntity | null> {
+    const db = getDb(ctx, this.prisma);
+
+    return await db.invite.findUnique({
+      where: { requestId_driverId: { requestId, driverId } },
+    });
   }
 }
