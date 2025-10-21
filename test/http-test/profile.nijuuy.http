@@ -179,3 +179,9 @@ Accept: application/json
 ### 2-1) 로그인(소비자) + 필터 조합
 GET {{baseUrl}}/drivers?take=5&area=GYEONGGI&type=OFFICE_MOVE&sort=CONFIRMED_DESC
 Accept: application/json
+
+
+### ------------------------------------------------------------
+### 드라이버 상세조회
+GET {{baseUrl}}/drivers/2b746e3c-cc3b-4276-b430-8f71d01d3b03
+Content-Type: application/json

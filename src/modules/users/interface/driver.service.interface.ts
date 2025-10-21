@@ -1,8 +1,8 @@
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { CreateDriverProfileBody } from '../dto/createDriverProfileBodySchema';
-import { DriverProfileEntity, userEntity } from '../types';
 import { GetDriverListQuery } from '../dto/getDriverListQuerySchema';
-import { Area, MoveType } from '@/shared/constant/values';
+import { DriverProfileEntity, userEntity } from '../types';
+import { Area, MoveType } from '@shared/constant/values';
 
 export interface DriverUserSummary {
   id: userEntity['id'];
@@ -11,19 +11,19 @@ export interface DriverUserSummary {
   createdAt: userEntity['createdAt'];
 }
 
-export interface DriverProfileSummary {
-  userId: DriverProfileEntity['userId'];
-  image: DriverProfileEntity['image'];
-  nickname: DriverProfileEntity['nickname'];
-  oneLiner: DriverProfileEntity['oneLiner'];
-  careerYears: DriverProfileEntity['careerYears'];
-  rating: DriverProfileEntity['rating'];
-  reviewCount: DriverProfileEntity['reviewCount'];
-  confirmedCount: DriverProfileEntity['confirmedCount'];
-  likeCount: DriverProfileEntity['likeCount'];
+export type PublicDriverProfile = Omit<
+  DriverProfileEntity,
+  'createdAt' | 'updatedAt' | 'deletedAt' | 'driverServiceAreas' | 'driverServiceTypes'
+> & {
   serviceAreas: Area[];
   serviceTypes: MoveType[];
-}
+};
+
+export type DriverProfileDetail = PublicDriverProfile & {
+  isInvitedByMe: boolean;
+};
+
+export type DriverProfileSummary = Omit<PublicDriverProfile, 'id' | 'description'> & {};
 
 export interface DriverListItem {
   user: DriverUserSummary;
@@ -42,6 +42,7 @@ type UnlikeDriverResult = { unliked: true } | { unliked: false; message: 'Alread
 
 export interface IDriverService {
   getDrivers(user: AccessTokenPayload | null, query: GetDriverListQuery): Promise<GetDriverListResponse>;
+  getDriverProfile(driverId: string, user: AccessTokenPayload | null): Promise<DriverProfileDetail>;
   createDriverProfile(driverId: string, body: CreateDriverProfileBody): Promise<DriverProfileEntity>;
   likeDriver(driverId: string, user: AccessTokenPayload): Promise<LikeDriverResult>;
   unlikeDriver(driverId: string, user: AccessTokenPayload): Promise<UnlikeDriverResult>;
