@@ -125,7 +125,8 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0ZDM
 ### 리뷰 등록하기
 POST {{host}}/reviews
 Content-Type: application/json
-Cookie: __Host-access_token=
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQxOTAyNS1jNzJlLTQxYTgtYmM3Zi0yMWNkOGZhMzA3MzYiLCJqdGkiOiI0OTk1MDBkMS1hMWE1LTRmMjAtOTNlNS04MTFhNzc4NmZmMWMiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjEwMDk1NDcsImV4cCI6MTc2MTAxMDQ0NywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.61dPNNVXVRRIMHGAFbG8_1Z1auSimXy-TTekSD23l18
+
 
 {
   "rating": 5,
