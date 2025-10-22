@@ -29,8 +29,8 @@ export interface DriverProfileEntity {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
-  driverServiceAreas: driverServiceAreaEntity[];
-  driverServiceTypes: driverServiceTypeEntity[];
+  driverServiceAreas: DriverServiceAreaEntity[];
+  driverServiceTypes: DriverServiceTypeEntity[];
 }
 
 export interface ConsumerProfileEntity {
@@ -44,13 +44,13 @@ export interface ConsumerProfileEntity {
   deletedAt: Date | null;
 }
 
-export interface driverServiceAreaEntity {
+export interface DriverServiceAreaEntity {
   id: string;
   driverProfileId: string;
   serviceArea: Area;
 }
 
-export interface driverServiceTypeEntity {
+export interface DriverServiceTypeEntity {
   id: string;
   driverProfileId: string;
   serviceType: MoveType;
