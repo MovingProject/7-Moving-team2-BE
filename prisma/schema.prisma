@@ -243,40 +243,42 @@ enum ActionSource {
 }
 
 model ChattingRoom {
-  id            String            @id @default(uuid())
-  consumerId    String
-  consumer      User              @relation("RoomsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  driverId      String
-  driver        User              @relation("RoomsByDriver", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  requestId     String
-  request       Request           @relation(fields: [requestId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  deletedAt     DateTime?
-  closedAt      DateTime?
-  quotations    Quotation[]
-  messages      ChattingMessage[]
-  notifications Notification[]
-
-  @@unique([requestId, driverId])
-  @@index([consumerId, createdAt])
-  @@index([driverId, createdAt])
+  id              String          @id @default(uuid())
+  consumerId      String
+  consumer        User            @relation("RoomsByConsumer", fields: [consumerId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  driverId        String
+  driver          User            @relation("RoomsByDriver", fields: [driverId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  requestId       String
+  request         Request         @relation(fields: [requestId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  nextSequence    Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
+  closedAt        DateTime?       
+  quotations      Quotation[]
+  messages        ChattingMessage[]
+  notifications   Notification[]
+  @@unique([requestId, driverId]) 
+  @@index([consumerId, createdAt]) 
+  @@index([driverId, createdAt])  
 }
 
 model ChattingMessage {
-  id               String            @id @default(uuid())
-  chattingRoomId   String
-  chattingRoom     ChattingRoom      @relation(fields: [chattingRoomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  senderId         String
-  sender           User              @relation(fields: [senderId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  messageType      MessageType
-  quotation        Quotation?
-  content          String?           @db.Text
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id             String        @id @default(uuid())
+  chattingRoomId String
+  chattingRoom   ChattingRoom  @relation(fields: [chattingRoomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  senderId       String
+  sender         User          @relation(fields: [senderId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  messageType    MessageType
+  quotation      Quotation?
+  content        String?        @db.Text
+  sequence       Int           
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   chatMessageReads ChatMessageRead[]
-
-  @@index([chattingRoomId, createdAt])
+  @@index([chattingRoomId, createdAt]) 
+  @@unique([chattingRoomId, sequence]) 
+  @@index([chattingRoomId, sequence])
 }
 
 model ChatMessageRead {
