@@ -6,8 +6,8 @@
 @host = http://localhost:4000
 
 # @name accessCookieName
-@cookie = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NDhhNjczOS1iOGRjLTRiYTMtYWUyYS0yOTQ4NDQzM2YzZTkiLCJqdGkiOiJjMTE4ZjgxOS1jYTYzLTQ3MzMtYTIzMi05YTU1ZmJiY2Y2NzkiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjA0MTU2NjYsImV4cCI6MTc2MDQxNjU2NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.gnOkLb-ObTtR26lspVqpw0GNXU8HWZrm1l8NE6-2eXQ;
-@driverId = 2e72d584-1cc5-46a8-bf12-8a156c86b59d
+@cookie = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQxOTAyNS1jNzJlLTQxYTgtYmM3Zi0yMWNkOGZhMzA3MzYiLCJqdGkiOiI0OGZiYWZjNS00Yjk0LTQ3YmItOWFkZS1mMTI2YmIzNjgyNDIiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjExMTcwNzMsImV4cCI6MTc2MTExNzk3MywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.CMZddAoyCHrXc8xztrRNDCZKCQCd9bvbBIayJBmVzR8;
+@driverId = 2b746e3c-cc3b-4276-b430-8f71d01d3b03
 
 # ========================================================
 # 1. 견적 요청 생성 (POST /requests)
@@ -18,7 +18,7 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "consumer7@test.com",
+  "email": "consumer@test.com",
   "password": "password123",
   "role": "CONSUMER"
 }
