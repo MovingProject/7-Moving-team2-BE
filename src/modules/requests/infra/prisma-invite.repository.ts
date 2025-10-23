@@ -13,11 +13,11 @@ export class PrismaInviteRepository implements IInviteRepository {
     const db = getDb(ctx, this.prisma);
 
     const rows = await db.$queryRaw<{ inserted: number }[]>`
-      INSERT INTO "Invite" ("requestId", "driverId")
-      VALUES (${requestId}, ${driverId})
-      ON CONFLICT ("requestId", "driverId") DO NOTHING
-      RETURNING 1 AS inserted
-    `;
+    INSERT INTO "Invite" ("id","requestId","driverId")
+    VALUES (gen_random_uuid(), ${requestId}, ${driverId})
+    ON CONFLICT ("requestId","driverId") DO NOTHING
+    RETURNING 1 AS inserted
+  `;
 
     return rows.length > 0;
   }
