@@ -7,8 +7,8 @@
 @moverPassword = moverPw123!
 
 # 테스트용 대상 드라이버 ID (DB에 실제 존재하는 DRIVER 사용자 ID)
-@driverId = 2e72d584-1cc5-46a8-bf12-8a156c86b59d
-@cookie = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJlNGI3ZS0zYjJhLTQ1ODMtYmMxMS02Yzc4ZWMzMDgzMzYiLCJqdGkiOiIwMDAyYTI1Yy02ZmEwLTQ3MzUtOTI4Yi0wNzMxZDA2MGY4NzQiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjAzMzg4MTEsImV4cCI6MTc2MDMzOTcxMSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.1wQMOXExJsEzxTyRT89Z52uendl1VHeR5Qi1jiduZvw;
+@driverId = 98a33478-72bf-454c-a87b-008587c8b37d
+@cookie = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQxOTAyNS1jNzJlLTQxYTgtYmM3Zi0yMWNkOGZhMzA3MzYiLCJqdGkiOiI4NDk4Zjg3Ni01NzgxLTQ4MGQtODVkMS1kZDA3MGU1NzVmNDIiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjEyMDUwNjcsImV4cCI6MTc2MTIwNTk2NywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.sK7Y6lYyzLo3gWIP8OxgaZNp27YUGnqh4gfN3bZ4YS4;
 
 ### 좋아요 테스트(comsumer -> driver)
 POST {{baseUrl}}/drivers/{{driverId}}/likes

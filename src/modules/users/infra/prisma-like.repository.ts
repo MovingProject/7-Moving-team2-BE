@@ -13,8 +13,8 @@ export class PrismaLikeRepository implements ILikeRepository {
     const db = getDb(ctx, this.prisma);
 
     const result = await db.$queryRaw<{ inserted: number }[]>`
-      INSERT INTO "Like" ("consumerId", "driverId")
-      VALUES (${consumerId}, ${driverId})
+      INSERT INTO "Like" ("id","consumerId", "driverId")
+      VALUES (gen_random_uuid(), ${consumerId}, ${driverId})
       ON CONFLICT ("consumerId", "driverId") DO NOTHING
       RETURNING 1 AS inserted
     `;
