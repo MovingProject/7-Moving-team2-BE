@@ -35,4 +35,12 @@ export class PrismaReviewRepository implements IReviewRepository {
     });
     return reviews;
   }
+
+  async findRatingStatsByDriverId(driverId: string) {
+    return this.prisma.review.groupBy({
+      by: ['rating'],
+      where: { driverId },
+      _count: { rating: true },
+    });
+  }
 }

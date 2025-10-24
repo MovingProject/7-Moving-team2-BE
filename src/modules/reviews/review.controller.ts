@@ -30,4 +30,11 @@ export class ReviewController {
     const { cursor, limit } = query;
     return this.reviewService.getDriverReviews(driversId, limit, cursor);
   }
+
+  @Get('/drivers/:driversId/rating')
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('CONSUMER')
+  async getDriverRatingDistribution(@Param('driverId') driverId: string) {
+    return this.reviewService.getDriverRatingDistribution(driverId);
+  }
 }
