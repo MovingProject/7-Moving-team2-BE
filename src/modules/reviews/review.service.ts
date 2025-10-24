@@ -52,4 +52,24 @@ export class ReviewService implements IReviewService {
       nextCursor: hasNextPage ? slicedReviews[slicedReviews.length - 1].id : null,
     };
   }
+
+  async getDriverRatingDistribution(driverId: string) {
+    const grouped = await this.reviewRepository.findRatingStatsByDriverId(driverId);
+
+    const total = grouped.reduce((acc, r) => acc + r._count.rating, 0);
+
+    const average = grouped.reduce((acc, r) => acc + r.rating * r._count.rating, 0) / (total || 1);
+
+    const ratings: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    grouped.forEach((r) => {
+      ratings[r.rating] = r._count.rating;
+    });
+
+    return {
+      driverId,
+      totalReviews: total,
+      averageRating: Number(average.toFixed(2)),
+      ratings,
+    };
+  }
 }
