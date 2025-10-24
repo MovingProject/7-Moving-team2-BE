@@ -21,4 +21,18 @@ export class PrismaReviewRepository implements IReviewRepository {
       where: { id: quotationId },
     });
   }
+
+  async findReviewsByDriverId(driverId: string, limit: number, cursor?: string) {
+    const reviews = await this.prisma.review.findMany({
+      where: { driverId },
+      orderBy: { createdAt: 'desc' },
+      take: limit + 1,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: {
+        consumer: { select: { name: true } },
+      },
+    });
+    return reviews;
+  }
 }
