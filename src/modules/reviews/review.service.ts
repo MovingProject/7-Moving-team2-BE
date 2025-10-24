@@ -5,6 +5,7 @@ import { readonly } from 'zod/v4';
 import type { IReviewRepository } from './interface/review-repository.interface';
 import { reviewDTO, reviewInput } from './dto/review.create.dto';
 import { BadRequestException, ForbiddenException } from '@/shared/exceptions';
+import { ReviewListResponseDto, ReviewResponseDto } from './dto/review.get.dto';
 
 @Injectable()
 export class ReviewService implements IReviewService {
@@ -32,5 +33,23 @@ export class ReviewService implements IReviewService {
     const reviewData: reviewInput = { ...input, driverId: quotation.driverId };
 
     return this.reviewRepository.createReview(reviewData);
+  }
+
+  async getDriverReviews(driverId: string, limit: number, cursor: string): Promise<ReviewListResponseDto> {
+    const reviews = await this.reviewRepository.findReviewsByDriverId(driverId, limit, cursor);
+    const hasNextPage = reviews.length > limit;
+    const slicedReviews = hasNextPage ? reviews.slice(0, limit) : reviews;
+
+    const reviewDtos: ReviewResponseDto[] = slicedReviews.map((r) => ({
+      id: r.id,
+      rating: r.rating,
+      content: r.content,
+      consumerName: r.consumer.name,
+      createdAt: r.createdAt.toISOString(),
+    }));
+    return {
+      reviews: reviewDtos,
+      nextCursor: hasNextPage ? slicedReviews[slicedReviews.length - 1].id : null,
+    };
   }
 }
