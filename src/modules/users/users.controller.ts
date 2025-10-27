@@ -27,7 +27,7 @@ export class UsersController {
         user.driverProfile.driverServiceAreas?.map((a) => a.serviceArea),
       );
     } else {
-      return { message: '프로필이 없습니다.' };
+      throw new NotFoundException('프로필이 없습니다.');
     }
   }
 
