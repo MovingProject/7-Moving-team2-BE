@@ -40,7 +40,7 @@ export class ReviewService implements IReviewService {
 
     const reviewData: reviewInput = { ...input, driverId: quotation.driverId };
 
-    return this.reviewRepository.createReview(reviewData);
+    return this.reviewRepository.createReviewWithCountIncrement(reviewData);
   }
 
   async getDriverReviews(driverId: string, limit: number, cursor: string): Promise<ReviewListResponseDto> {
