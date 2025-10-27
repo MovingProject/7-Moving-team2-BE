@@ -16,7 +16,8 @@ export class ReviewController {
   ) {}
 
   @Post()
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('CONSUMER')
   async createReview(@Body() dto: reviewDTO, @AuthUser() user: AccessTokenPayload) {
     return this.reviewService.createReview({
       ...dto,
