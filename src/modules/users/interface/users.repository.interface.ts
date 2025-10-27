@@ -1,7 +1,7 @@
 import { Area, MoveType, Prisma } from '@prisma/client';
 import { SignUpRequest } from '../../auth/dto/signup.request.dto';
 import { UpdateUserProfileDto } from '../dto/user.update.dto';
-
+import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 export type UserWithProfile = Prisma.UserGetPayload<{
   include: {
     driverProfile: true;
@@ -51,7 +51,7 @@ export type PartialUserProfile = {
 
 export interface IUserRepository {
   findByEmail(email: string): Promise<UserWithProfile | null>;
-  findById(id: string): Promise<UserWithFullProfile | null>;
+  findById(id: string, ctx?: TransactionContext): Promise<UserWithFullProfile | null>;
   createUser(signUpRequest: SignUpRequest, hashedPassword: string): Promise<UserWithProfile>;
   getProfileById(id: string): Promise<UserWithFullProfile | null>;
   updateProfile(id: string, dto: UpdateUserProfileDto): Promise<PartialUserProfile>;

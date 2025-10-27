@@ -5,6 +5,8 @@ import { Injectable } from '@nestjs/common';
 import { UpdateUserProfileDto } from '../dto/user.update.dto';
 import { UserWithFullProfile } from '../interface/users.repository.interface';
 import { Area, MoveType } from '@prisma/client';
+import { getDb } from '@/shared/prisma/get-db';
+import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
@@ -19,8 +21,10 @@ export class PrismaUserRepository implements IUserRepository {
       },
     });
   }
-  async findById(id: string): Promise<UserWithFullProfile | null> {
-    return await this.prisma.user.findUnique({
+  async findById(id: string, ctx?: TransactionContext): Promise<UserWithFullProfile | null> {
+    const db = getDb(ctx, this.prisma);
+
+    return await db.user.findUnique({
       where: { id, deletedAt: null },
       include: {
         driverProfile: {
@@ -33,6 +37,7 @@ export class PrismaUserRepository implements IUserRepository {
       },
     });
   }
+
   async createUser(signUpInput: SignUpRequest, hashedPassword: string): Promise<UserWithProfile> {
     const { email, name, phoneNumber, role } = signUpInput;
 

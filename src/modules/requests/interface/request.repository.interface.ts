@@ -24,6 +24,7 @@ export interface IRequestWithRelations extends PrismaRequest {
 }
 
 export interface IRequestRepository {
+  findPendingRequestById(requestId: string, ctx?: TransactionContext): Promise<RequestEntity | null>;
   findPendingByConsumerId(consumerId: string, ctx?: TransactionContext): Promise<RequestEntity | null>;
   createRequest(data: CreateRequestData): Promise<RequestEntity>;
   findInvitesByDriverId(driverId: string): Promise<ReceivedRequest[]>;
@@ -37,8 +38,11 @@ export interface IRequestRepository {
     AREA: number;
   }>;
   createDriverAction(tx: PrismaClient, data: DriverRequestActionDTO): Promise<DriverRequestAction>;
-  findById(requestId: string): Promise<(PrismaRequest & { consumer: User; invites: Invite[] }) | null>;
   findAllByConsumerId(consumerId: string): Promise<IRequestWithRelations[]>;
+  findById(
+    requestId: string,
+    ctx?: TransactionContext,
+  ): Promise<(PrismaRequest & { consumer: User; invites: Invite[] }) | null>;
 }
 
 export const REQUEST_REPOSITORY = 'IRequestRepository';
