@@ -45,6 +45,10 @@ export class ReviewService implements IReviewService {
 
   async getDriverReviews(driverId: string, limit: number, cursor: string): Promise<ReviewListResponseDto> {
     const reviews = await this.reviewRepository.findReviewsByDriverId(driverId, limit, cursor);
+    if (!reviews || reviews.length === 0) {
+      throw new NotFoundException('해당 드라이버에 대한 리뷰가 없습니다.');
+    }
+
     const hasNextPage = reviews.length > limit;
     const slicedReviews = hasNextPage ? reviews.slice(0, limit) : reviews;
 
@@ -63,6 +67,10 @@ export class ReviewService implements IReviewService {
 
   async getDriverRatingDistribution(driverId: string) {
     const grouped = await this.reviewRepository.findRatingStatsByDriverId(driverId);
+
+    if (!grouped || grouped.length === 0) {
+      throw new NotFoundException('해당 드라이버에 대한 리뷰가 없습니다.');
+    }
 
     const total = grouped.reduce((acc, r) => acc + r._count.rating, 0);
 
