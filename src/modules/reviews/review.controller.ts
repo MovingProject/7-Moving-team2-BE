@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Inject, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { REVIEW_SERVICE } from './interface/review-service.interface';
 import type { IReviewService } from './interface/review-service.interface';
-import type { reviewDTO, reviewInput } from './dto/review.create.dto';
+import type { reviewDto, reviewInput } from './dto/review.create.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
@@ -18,7 +18,7 @@ export class ReviewController {
   @Post()
   @UseGuards(AccessTokenGuard, RolesGuard)
   @RequireRoles('CONSUMER')
-  async createReview(@Body() dto: reviewDTO, @AuthUser() user: AccessTokenPayload) {
+  async createReview(@Body() dto: reviewDto, @AuthUser() user: AccessTokenPayload) {
     return this.reviewService.createReview({
       ...dto,
       consumerId: user.sub,
