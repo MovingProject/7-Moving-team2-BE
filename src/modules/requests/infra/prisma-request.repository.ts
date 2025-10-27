@@ -1,19 +1,27 @@
-import { Area, Prisma, PrismaClient, Request } from '@prisma/client';
-import { IRequestRepository } from '../interface/request.repository.interface';
-import { PrismaService } from '@/shared/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
 import { ConflictException } from '@/shared/exceptions';
-import { CreateRequestData, RequestEntity } from '../types';
-import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
 import { getDb } from '@/shared/prisma/get-db';
+import { PrismaService } from '@/shared/prisma/prisma.service';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
+import { Injectable } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
+import { type IRequestRepository } from '../interface/request.repository.interface';
+import { CreateRequestData, RequestEntity } from '../types';
 
 import { ReceivedRequestFilter } from '../dto/request-filter-post.dto';
-import { CreateDriverRequestActionInput, DriverRequestActionDTO } from '../dto/request-reject-request-received.dto';
+import { CreateDriverRequestActionInput } from '../dto/request-reject-request-received.dto';
 @Injectable()
 export class PrismaRequestRepository implements IRequestRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findPendingRequestById(requestId: string, ctx?: TransactionContext): Promise<RequestEntity | null> {
+    const db = getDb(ctx, this.prisma);
+    const row = await db.request.findFirst({
+      where: { id: requestId, requestStatus: 'PENDING' },
+      orderBy: { createdAt: 'desc' },
+    });
+    return row ?? null;
+  }
   async findPendingByConsumerId(consumerId: string, ctx?: TransactionContext): Promise<RequestEntity | null> {
     const db = getDb(ctx, this.prisma);
     const row = await db.request.findFirst({
@@ -211,8 +219,9 @@ export class PrismaRequestRepository implements IRequestRepository {
     });
   }
 
-  async findById(requestId: string) {
-    return this.prisma.request.findUnique({
+  async findById(requestId: string, ctx?: TransactionContext) {
+    const db = getDb(ctx, this.prisma);
+    return db.request.findUnique({
       where: { id: requestId, requestStatus: 'PENDING' },
       include: { consumer: true, invites: true },
     });
