@@ -76,4 +76,10 @@ export class RequestController {
   async requestList(@AuthUser() user: AccessTokenPayload) {
     return this.requestService.getConsumerRequests(user.sub);
   }
+  @Get('check')
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('CONSUMER')
+  async checkRequest(@AuthUser() user: AccessTokenPayload) {
+    return this.requestService.checkPendingRequest(user.sub);
+  }
 }

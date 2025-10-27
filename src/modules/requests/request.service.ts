@@ -22,6 +22,7 @@ import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
 import { DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
 import { PrismaClient } from '@prisma/client';
 import { RequestListDto } from './dto/request-list.dto';
+import { RequestCheckResponseDto } from './dto/request-check.dto';
 @Injectable()
 export class RequestService implements IRequestService {
   constructor(
@@ -229,6 +230,21 @@ export class RequestService implements IRequestService {
       return mappedRequests;
     } catch (error) {
       throw new InternalServerErrorException('요청 목록을 불러오는 중 오류가 발생했습니다.');
+    }
+  }
+  async checkPendingRequest(consumerId: string): Promise<RequestCheckResponseDto> {
+    if (!consumerId) {
+      throw new UnauthorizedException('로그인 정보가 유효하지 않습니다.');
+    }
+
+    try {
+      const pending = await this.requestRepository.findPendingByConsumerId(consumerId);
+
+      return {
+        pendingRequest: pending ? { id: pending.id } : null,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('견적 요청 상태 확인 중 오류가 발생했습니다.');
     }
   }
 }

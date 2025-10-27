@@ -43,6 +43,8 @@ export interface IRequestRepository {
     requestId: string,
     ctx?: TransactionContext,
   ): Promise<(PrismaRequest & { consumer: User; invites: Invite[] }) | null>;
+  findById(requestId: string): Promise<(PrismaRequest & { consumer: User; invites: Invite[] }) | null>;
+  findPendingByConsumerId(consumerId: string): Promise<{ id: string } | null>;
 }
 
 export const REQUEST_REPOSITORY = 'IRequestRepository';
