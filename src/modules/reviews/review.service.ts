@@ -32,7 +32,7 @@ export class ReviewService implements IReviewService {
       throw new ForbiddenException('본인의 견적에만 리뷰를 작성할 수 있습니다.');
     }
 
-    if (quotation.status !== 'CONCLUDED') {
+    if (quotation.status !== 'COMPLETED') {
       throw new UnprocessableEntityException('이사가 완료된 견적만 리뷰를 작성할 수 있습니다.');
     }
     const existing = await this.reviewRepository.findByQuotationId(input.quotationId);
