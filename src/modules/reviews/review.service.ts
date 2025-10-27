@@ -4,31 +4,39 @@ import { REVIEW_REPOSITORY } from './interface/review-repository.interface';
 import { readonly } from 'zod/v4';
 import type { IReviewRepository } from './interface/review-repository.interface';
 import { reviewDTO, reviewInput } from './dto/review.create.dto';
-import { BadRequestException, ForbiddenException } from '@/shared/exceptions';
 import { ReviewListResponseDto, ReviewResponseDto } from './dto/review.get.dto';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@/shared/exceptions';
+import { QUOTATION_REPOSITORY } from './interface/quotation-repository.interface';
+import type { IQuotationRepository } from './interface/quotation-repository.interface';
 
 @Injectable()
 export class ReviewService implements IReviewService {
   constructor(
     @Inject(REVIEW_REPOSITORY)
     private readonly reviewRepository: IReviewRepository,
+    @Inject(QUOTATION_REPOSITORY)
+    private readonly quotationRepository: IQuotationRepository,
   ) {}
 
   async createReview(input: reviewDTO & { consumerId: string }) {
-    const existing = await this.reviewRepository.findByQuotationId(input.quotationId);
-    if (existing) throw new BadRequestException('이미 리뷰가 존재합니다.');
-
-    const quotation = await this.reviewRepository.findQuotationById(input.quotationId);
-    if (!quotation) throw new BadRequestException('존재하지 않는 견적입니다.');
+    const quotation = await this.quotationRepository.findQuotationById(input.quotationId);
+    if (!quotation) throw new NotFoundException('존재하지 않는 견적입니다.');
 
     if (quotation.consumerId !== input.consumerId) {
       throw new ForbiddenException('본인의 견적에만 리뷰를 작성할 수 있습니다.');
     }
 
     if (quotation.status !== 'SELECTED') {
-      throw new BadRequestException('이사가 완료된 견적만 리뷰를 작성할 수 있습니다.');
+      throw new UnprocessableEntityException('이사가 완료된 견적만 리뷰를 작성할 수 있습니다.');
     }
-    //자꾸 까먹게되네 이게맞나?
+    const existing = await this.reviewRepository.findByQuotationId(input.quotationId);
+    if (existing) throw new ConflictException('이미 리뷰가 존재합니다.');
 
     const reviewData: reviewInput = { ...input, driverId: quotation.driverId };
 
