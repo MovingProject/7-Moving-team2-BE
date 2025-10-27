@@ -33,3 +33,9 @@ export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 export const DRIVER_SORT_TYPES = ['REVIEW_DESC', 'RATING_DESC', 'CAREER_DESC', 'CONFIRMED_DESC'] as const;
 
 export type DriverSortType = (typeof DRIVER_SORT_TYPES)[number];
+
+export const MESSAGE_TYPES = ['MESSAGE', 'QUOTATION'] as const;
+export type MessageType = (typeof MESSAGE_TYPES)[number];
+
+export const QUOTATION_STATUSES = ['SUBMITTED', 'REVISED', 'WITHDRAWN', 'SELECTED', 'EXPIRED'] as const;
+export type QuotationStatus = (typeof QUOTATION_STATUSES)[number];

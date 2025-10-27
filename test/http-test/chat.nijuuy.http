@@ -1,0 +1,68 @@
+### 환경 변수
+@baseUrl = http://localhost:4000
+@driverToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDk0OTNjOS1mYTQzLTQyYTItODExOS1jNDAwNDUwYjkxYTMiLCJqdGkiOiIyMTY3MmM2Ny0yMzlhLTQ1MzgtYWIxYi02NGQ4Nzk1ODJlNDgiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYxNTQwNTA4LCJleHAiOjE3NjE1NDE0MDgsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.pPGO8LCwxbz1SCPoRDzqdgxt1D6VUWyezi601ym5hXg;
+@consumerToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQxOTAyNS1jNzJlLTQxYTgtYmM3Zi0yMWNkOGZhMzA3MzYiLCJqdGkiOiI3YTc5OGRlOC0xYmY2LTRjMmQtOTVlZC00ZjMzODRkODBjOGMiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE1Mzk0MDcsImV4cCI6MTc2MTU0MDMwNywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.O4rbs8AQ2IlBXPBvUsd4wvY_bkSVmueQoo1utj9aRng;
+@pendingRequestId = 2fdfc942-00b1-4d16-89d4-bc4f1f0102e3
+@nonPendingRequestId = 2fdfc942-00b1-4d16-89d4-bc4f1f0102e3
+@validConsumerId = 469f89ad-02a2-4c54-800e-ee0073594338
+@otherConsumerId = 813567a5-b2e6-4c05-b35d-3e9e352cbbbb
+@notExistConsumerId = 7571e92b-f38b-4878-959c-f76ab9290ed8
+
+### 1) 정상: 드라이버가 PENDING 요청의 소비자에게 방 생성/조회 (201 기대)
+POST {{baseUrl}}/chatting-rooms
+Cookie: {{driverToken}}
+Content-Type: application/json
+
+{
+  "requestId": "{{pendingRequestId}}",
+  "consumerId": "{{validConsumerId}}"
+}
+
+### 2) 멱등 확인: 같은 페이로드 재호출해도 동일 roomId 반환 (201 기대)
+POST {{baseUrl}}/chatting-rooms
+Cookie: {{driverToken}}
+Content-Type: application/json
+
+{
+  "requestId": "{{pendingRequestId}}",
+  "consumerId": "{{validConsumerId}}"
+}
+
+### 3) 요청-소비자 불일치 (403 기대)
+POST {{baseUrl}}/chatting-rooms
+Cookie: {{driverToken}}
+Content-Type: application/json
+
+{
+  "requestId": "{{pendingRequestId}}",
+  "consumerId": "{{otherConsumerId}}"
+}
+
+### 4) 소비자 없음 (404 기대)
+POST {{baseUrl}}/chatting-rooms
+Cookie: {{driverToken}}
+Content-Type: application/json
+
+{
+  "requestId": "{{pendingRequestId}}",
+  "consumerId": "{{notExistConsumerId}}"
+}
+
+### 5) 인증 없음 (401 기대) - 토큰 헤더 제거
+POST {{baseUrl}}/chatting-rooms
+Content-Type: application/json
+
+{
+  "requestId": "{{pendingRequestId}}",
+  "consumerId": "{{validConsumerId}}"
+}
+
+### 6) 드라이버가 아닌 사용자(컨슈머 토큰) 호출 (403 기대: RolesGuard/RequireRoles('DRIVER'))
+POST {{baseUrl}}/chatting-rooms
+Cookie: {{consumerToken}}
+Content-Type: application/json
+
+{
+  "requestId": "{{pendingRequestId}}",
+  "consumerId": "{{validConsumerId}}"
+}

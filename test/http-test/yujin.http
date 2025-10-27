@@ -108,6 +108,16 @@ Content-Type: application/json
   "role": "CONSUMER"
 }
 
+###
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "driver@test.com",
+  "password": "password123",
+  "role": "DRIVER"
+}
+
 
 ### 2. 실패 케이스: 비밀번호 불일치 (401 Unauthorized 예상)
 POST {{host}}/auth/signin
