@@ -6,8 +6,13 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
   "email": "booknam@test.com",
   "password": "booknam123",
+=======
+  "email": "test123123@test.com",
+  "password": "password123",
+>>>>>>> 13c0ef5 (feat:진행중인 견적요청 유무확인 API 구현 #85)
   "role": "CONSUMER"
 }
 
@@ -150,3 +155,9 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQ
 GET {{host}}/requests/list
 Content-Type: application/json
 Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NGVjMGI3MS1lZjQ2LTRkMDktOTExZC1jNTVhOWYzNjA1N2YiLCJqdGkiOiJkMDgwYjRkYi1kNjFlLTQxODgtOTVjZS03YjA2NDBhODIxMzEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE2MTg3OTcsImV4cCI6MTc2MTYxOTY5NywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.33frwlQ8P5K559hyZSTq59EcbNWtQT2YIcUfWJ6KvyU
+
+
+### 견적 중복 요청 확인 API (고객)
+GET {{host}}/requests/check
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1M2Q1YzgxMS0zZDAyLTRhOWMtYTNlOS01NDljYzM4Nzc2NzIiLCJqdGkiOiJlNGI3OTNiMy0zNDkyLTRkNGYtYjllOS05ZDI1ZmUyYmMyNjkiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE1NTA3ODAsImV4cCI6MTc2MTU1MTY4MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.fJ9VkmYjSWBEQ6OLWygeF6ArsNBpYzYoM9lQgE4xrgI

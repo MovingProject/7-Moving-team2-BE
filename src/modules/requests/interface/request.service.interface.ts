@@ -5,6 +5,7 @@ import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
 import { ReceivedRequestFilter } from '../dto/request-filter-post.dto';
 import { DriverRequestActionDTO } from '../dto/request-reject-request-received.dto';
 import { RequestListDto } from '../dto/request-list.dto';
+import { RequestCheckResponseDto } from '../dto/request-check.dto';
 
 export interface InviteResult {
   invited: boolean;
@@ -25,6 +26,7 @@ export interface IRequestService {
   }>;
   rejectRequest(driverId: string, dto: DriverRequestActionDTO): Promise<DriverRequestAction>;
   getConsumerRequests(consumerId: string): Promise<RequestListDto[]>;
+  checkPendingRequest(consumerId: string): Promise<RequestCheckResponseDto>;
 }
 
 export const REQUEST_SERVICE = 'IRequestService';

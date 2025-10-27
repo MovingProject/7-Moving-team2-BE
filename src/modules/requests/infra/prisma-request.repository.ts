@@ -255,4 +255,5 @@ export class PrismaRequestRepository implements IRequestRepository {
       orderBy: { createdAt: 'desc' },
     });
   }
+
 }
