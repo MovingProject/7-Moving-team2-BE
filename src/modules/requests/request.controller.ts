@@ -69,4 +69,11 @@ export class RequestController {
   async rejectRequest(@Body() dto: DriverRequestActionDTO, @AuthUser() user: AccessTokenPayload) {
     return this.requestService.rejectRequest(user.sub, dto);
   }
+
+  @Get('check')
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('CONSUMER')
+  async checkRequest(@AuthUser() user: AccessTokenPayload) {
+    return this.requestService.checkPendingRequest(user.sub);
+  }
 }

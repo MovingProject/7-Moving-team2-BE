@@ -8,7 +8,7 @@ import {
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { type ITransactionRunner, TRANSACTION_RUNNER } from '@/shared/prisma/transaction-runner.interface';
 import { getAreaFromAddress } from '@/shared/utils/address.util';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { type IUserRepository, USER_REPOSITORY } from '../users/interface/users.repository.interface';
 import { CreateQuoteRequestBody } from './dto/create-quote-request.dto';
 import { type IInviteRepository, INVITE_REPOSITORY } from './interface/invite.repository.interface';
@@ -21,6 +21,7 @@ import { ReceivedRequestsResponseSchema, ReceivedRequest } from './dto/request-q
 import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
 import { DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
 import { PrismaClient } from '@prisma/client';
+import { RequestCheckResponseDto } from './dto/request-check.dto';
 @Injectable()
 export class RequestService implements IRequestService {
   constructor(
@@ -175,5 +176,23 @@ export class RequestService implements IRequestService {
 
       return this.requestRepository.createDriverAction(ctx.tx as PrismaClient, input);
     });
+  }
+
+  async checkPendingRequest(consumerId: string): Promise<RequestCheckResponseDto> {
+    if (!consumerId) {
+      throw new UnauthorizedException('로그인 정보가 유효하지 않습니다.');
+    }
+
+    try {
+      const pending = await this.requestRepository.findPendingByConsumerId(consumerId);
+
+
+      return {
+        pendingRequest: pending ? { id: pending.id } : null,
+      };
+      
+    } catch (error) {
+      throw new InternalServerErrorException('견적 요청 상태 확인 중 오류가 발생했습니다.');
+    }
   }
 }

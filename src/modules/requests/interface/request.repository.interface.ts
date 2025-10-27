@@ -20,6 +20,7 @@ export interface IRequestRepository {
   }>;
   createDriverAction(tx: PrismaClient, data: DriverRequestActionDTO): Promise<DriverRequestAction>;
   findById(requestId: string): Promise<(PrismaRequest & { consumer: User; invites: Invite[] }) | null>;
+  findPendingByConsumerId(consumerId: string): Promise<{ id: string } | null>;
 }
 
 export const REQUEST_REPOSITORY = 'IRequestRepository';

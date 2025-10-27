@@ -4,6 +4,7 @@ import { DriverRequestAction, Request } from '@prisma/client';
 import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
 import { ReceivedRequestFilter } from '../dto/request-filter-post.dto';
 import { DriverRequestActionDTO } from '../dto/request-reject-request-received.dto';
+import { RequestCheckResponseDto } from '../dto/request-check.dto';
 
 export interface InviteResult {
   invited: boolean;
@@ -23,6 +24,7 @@ export interface IRequestService {
     AREA: number;
   }>;
   rejectRequest(driverId: string, dto: DriverRequestActionDTO): Promise<DriverRequestAction>;
+  checkPendingRequest(consumerId: string): Promise<RequestCheckResponseDto>;
 }
 
 export const REQUEST_SERVICE = 'IRequestService';
