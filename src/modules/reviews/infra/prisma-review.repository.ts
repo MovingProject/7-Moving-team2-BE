@@ -12,6 +12,19 @@ export class PrismaReviewRepository implements IReviewRepository {
     return this.prisma.review.create({ data: input });
   }
 
+  async createReviewWithCountIncrement(input: reviewInput): Promise<Review> {
+    return this.prisma.$transaction(async (tx) => {
+      const review = await tx.review.create({ data: input });
+
+      await tx.driverProfile.update({
+        where: { userId: input.driverId },
+        data: { reviewCount: { increment: 1 } },
+      });
+
+      return review;
+    });
+  }
+
   async findByQuotationId(quotationId: string) {
     return this.prisma.review.findUnique({ where: { quotationId } });
   }
