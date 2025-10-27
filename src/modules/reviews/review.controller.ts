@@ -35,7 +35,7 @@ export class ReviewController {
   @Get('/drivers/:driversId/rating')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @RequireRoles('CONSUMER')
-  async getDriverRatingDistribution(@Param('driverId') driverId: string) {
+  async getDriverRatingDistribution(@Param('driversId') driverId: string) {
     return this.reviewService.getDriverRatingDistribution(driverId);
   }
 }
