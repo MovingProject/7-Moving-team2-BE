@@ -3,8 +3,8 @@ import { IReviewService } from './interface/review-service.interface';
 import { REVIEW_REPOSITORY } from './interface/review-repository.interface';
 import { readonly } from 'zod/v4';
 import type { IReviewRepository } from './interface/review-repository.interface';
-import { reviewDTO, reviewInput } from './dto/review.create.dto';
 import { ReviewListResponseDto, ReviewResponseDto } from './dto/review.get.dto';
+import { reviewDto, reviewInput } from './dto/review.create.dto';
 import {
   BadRequestException,
   ConflictException,
@@ -24,7 +24,7 @@ export class ReviewService implements IReviewService {
     private readonly quotationRepository: IQuotationRepository,
   ) {}
 
-  async createReview(input: reviewDTO & { consumerId: string }) {
+  async createReview(input: reviewDto & { consumerId: string }) {
     const quotation = await this.quotationRepository.findQuotationById(input.quotationId);
     if (!quotation) throw new NotFoundException('존재하지 않는 견적입니다.');
 
