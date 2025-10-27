@@ -6,5 +6,5 @@ export const reviewSchema = z.object({
   quotationId: z.string().uuid(),
 });
 
-export type reviewDTO = z.infer<typeof reviewSchema>;
-export type reviewInput = reviewDTO & { driverId: string; consumerId: string };
+export type reviewDto = z.infer<typeof reviewSchema>;
+export type reviewInput = reviewDto & { driverId: string; consumerId: string };
