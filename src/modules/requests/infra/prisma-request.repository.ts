@@ -217,4 +217,33 @@ export class PrismaRequestRepository implements IRequestRepository {
       include: { consumer: true, invites: true },
     });
   }
+
+  async findAllByConsumerId(consumerId: string) {
+    return this.prisma.request.findMany({
+      where: { consumerId },
+      include: {
+        invites: true,
+        quotations: {
+          include: {
+            driver: {
+              select: {
+                driverProfile: {
+                  select: {
+                    nickname: true,
+                    oneLiner: true,
+                    likeCount: true,
+                    reviewCount: true,
+                    rating: true,
+                    careerYears: true,
+                    confirmedCount: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }
