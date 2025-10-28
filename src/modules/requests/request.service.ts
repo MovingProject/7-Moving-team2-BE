@@ -8,7 +8,7 @@ import {
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { type ITransactionRunner, TRANSACTION_RUNNER } from '@/shared/prisma/transaction-runner.interface';
 import { getAreaFromAddress } from '@/shared/utils/address.util';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { type IUserRepository, USER_REPOSITORY } from '../users/interface/users.repository.interface';
 import { CreateQuoteRequestBody } from './dto/create-quote-request.dto';
 import { type IInviteRepository, INVITE_REPOSITORY } from './interface/invite.repository.interface';
@@ -186,41 +186,49 @@ export class RequestService implements IRequestService {
   }
 
   async getConsumerRequests(consumerId: string): Promise<RequestListDto[]> {
-    const requests = await this.requestRepository.findAllByConsumerId(consumerId);
+    try {
+      const requests = await this.requestRepository.findAllByConsumerId(consumerId);
 
-    const mappedRequests: RequestListDto[] = requests.map((req) => {
-      const quotations = req.quotations.map((q) => {
-        const driverProfile = q.driver.driverProfile;
+      if (!requests || requests.length === 0) {
+        throw new NotFoundException('조회 가능한 요청이 없습니다.');
+      }
+
+      const mappedRequests: RequestListDto[] = requests.map((req) => {
+        const quotations = req.quotations.map((q) => {
+          const driverProfile = q.driver.driverProfile;
+
+          return {
+            id: q.id,
+            driverNickname: driverProfile?.nickname ?? '미등록 기사',
+            price: q.price,
+            serviceType: q.serviceType,
+            isInvited: !!req.invites.find((i) => i.driverId === q.driverId),
+            driverProfile: {
+              nickname: driverProfile?.nickname ?? '',
+              oneLiner: driverProfile?.oneLiner ?? null,
+              likeCount: driverProfile?.likeCount ?? 0,
+              reviewCount: driverProfile?.reviewCount ?? 0,
+              rating: driverProfile?.rating ?? 0,
+              careerYears: driverProfile?.careerYears ?? 0,
+              confirmedCount: driverProfile?.confirmedCount ?? 0,
+            },
+          };
+        });
 
         return {
-          id: q.id,
-          driverNickname: driverProfile?.nickname ?? '미등록 기사',
-          price: q.price,
-          serviceType: q.serviceType,
-          isInvited: !!req.invites.find((i) => i.driverId === q.driverId),
-          driverProfile: {
-            nickname: driverProfile?.nickname ?? '',
-            oneLiner: driverProfile?.oneLiner ?? null,
-            likeCount: driverProfile?.likeCount ?? 0,
-            reviewCount: driverProfile?.reviewCount ?? 0,
-            rating: driverProfile?.rating ?? 0,
-            careerYears: driverProfile?.careerYears ?? 0,
-            confirmedCount: driverProfile?.confirmedCount ?? 0,
-          },
+          id: req.id,
+          departureAddress: req.departureAddress,
+          arrivalAddress: req.arrivalAddress,
+          createdAt: req.createdAt.toISOString(),
+          serviceType: req.serviceType,
+          moveAt: req.moveAt,
+          quotations,
         };
       });
 
-      return {
-        id: req.id,
-        departureAddress: req.departureAddress,
-        arrivalAddress: req.arrivalAddress,
-        createdAt: req.createdAt.toISOString(),
-        serviceType: req.serviceType,
-        moveAt: req.moveAt,
-        quotations,
-      };
-    });
-
-    return mappedRequests;
+      return mappedRequests;
+    } catch (error) {
+      throw new InternalServerErrorException('요청 목록을 불러오는 중 오류가 발생했습니다.');
+    }
   }
 }
