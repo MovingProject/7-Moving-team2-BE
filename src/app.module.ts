@@ -7,6 +7,7 @@ import { PrismaModule } from './shared/prisma/prisma.module';
 import { RequestModule } from './modules/requests/request.module';
 import { UsersModule } from './modules/users/users.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { QuotationModule } from './modules/quotations/quotation.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ChatModule } from './modules/chat/chat.module';
     RequestModule,
     UsersModule,
     ChatModule,
+    QuotationModule,
   ],
   controllers: [],
   providers: [],
