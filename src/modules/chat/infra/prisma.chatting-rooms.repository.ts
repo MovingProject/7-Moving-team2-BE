@@ -2,9 +2,18 @@ import { getDb } from '@/shared/prisma/get-db';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 import { IChattingRoomsRepository } from '../interface/chatting-rooms.repository.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PrismaChattingRoomsRepository implements IChattingRoomsRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  findById(roomId: string, ctx?: TransactionContext) {
+    const db = getDb(ctx, this.prisma);
+    return db.chattingRoom.findUnique({
+      where: { id: roomId },
+    });
+  }
 
   async createOrGetRoomByDriver(
     requestId: string,
