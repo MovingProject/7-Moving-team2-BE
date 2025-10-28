@@ -1,5 +1,6 @@
+import { MoveType, QuotationStatus } from '@prisma/client';
 import { MoveTypeSchema } from '@/shared/constant/enums.schema';
-import { QuotationStatus } from '@prisma/client';
+
 import z from 'zod';
 
 export const QuotationSummarySchema = z.object({
@@ -15,3 +16,16 @@ export const QuotationSummarySchema = z.object({
 });
 
 export type QuotationSummaryDto = z.infer<typeof QuotationSummarySchema>;
+export type QuotationWithRelations = {
+  id: string;
+  price: number;
+  status: QuotationStatus;
+  serviceType: MoveType;
+  consumer: { name: string };
+  request: {
+    moveAt: Date;
+    departureAddress: string;
+    arrivalAddress: string;
+    invites: { driverId: string }[];
+  };
+};
