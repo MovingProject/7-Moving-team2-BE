@@ -9,6 +9,7 @@ import { USER_REPOSITORY, type IUserRepository } from '../users/interface/users.
 import { ForbiddenException, NotFoundException } from '@/shared/exceptions';
 import { TRANSACTION_RUNNER, type ITransactionRunner } from '@/shared/prisma/transaction-runner.interface';
 import { type IRequestRepository, REQUEST_REPOSITORY } from '../requests/interface/request.repository.interface';
+
 @Injectable()
 export default class ChatService implements IChattingRoomsService {
   constructor(
