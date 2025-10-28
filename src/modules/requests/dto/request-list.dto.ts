@@ -29,3 +29,7 @@ export const RequestListSchema = z.object({
   moveAt: z.coerce.date(),
   quotations: z.array(QuotationSchema),
 });
+
+export type DriverProfileSummaryDto = z.infer<typeof DriverProfileSummarySchema>;
+export type QuotationDto = z.infer<typeof QuotationSchema>;
+export type RequestListDto = z.infer<typeof RequestListSchema>;
