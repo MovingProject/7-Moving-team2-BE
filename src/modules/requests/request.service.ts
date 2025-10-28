@@ -21,6 +21,7 @@ import { ReceivedRequestsResponseSchema, ReceivedRequest } from './dto/request-q
 import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
 import { DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
 import { PrismaClient } from '@prisma/client';
+import { RequestListDto } from './dto/request-list.dto';
 @Injectable()
 export class RequestService implements IRequestService {
   constructor(
@@ -182,5 +183,44 @@ export class RequestService implements IRequestService {
 
       return this.requestRepository.createDriverAction(ctx.tx as PrismaClient, input);
     });
+  }
+
+  async getConsumerRequests(consumerId: string): Promise<RequestListDto[]> {
+    const requests = await this.requestRepository.findAllByConsumerId(consumerId);
+
+    const mappedRequests: RequestListDto[] = requests.map((req) => {
+      const quotations = req.quotations.map((q) => {
+        const driverProfile = q.driver.driverProfile;
+
+        return {
+          id: q.id,
+          driverNickname: driverProfile?.nickname ?? '미등록 기사',
+          price: q.price,
+          serviceType: q.serviceType,
+          isInvited: !!req.invites.find((i) => i.driverId === q.driverId),
+          driverProfile: {
+            nickname: driverProfile?.nickname ?? '',
+            oneLiner: driverProfile?.oneLiner ?? null,
+            likeCount: driverProfile?.likeCount ?? 0,
+            reviewCount: driverProfile?.reviewCount ?? 0,
+            rating: driverProfile?.rating ?? 0,
+            careerYears: driverProfile?.careerYears ?? 0,
+            confirmedCount: driverProfile?.confirmedCount ?? 0,
+          },
+        };
+      });
+
+      return {
+        id: req.id,
+        departureAddress: req.departureAddress,
+        arrivalAddress: req.arrivalAddress,
+        createdAt: req.createdAt.toISOString(),
+        serviceType: req.serviceType,
+        moveAt: req.moveAt,
+        quotations,
+      };
+    });
+
+    return mappedRequests;
   }
 }
