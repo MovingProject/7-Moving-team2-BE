@@ -72,7 +72,7 @@ export class RequestController {
 
   @UseGuards(AccessTokenGuard, RolesGuard)
   @RequireRoles('CONSUMER')
-  @Get('requsetlist')
+  @Get('list')
   async requestList(@AuthUser() user: AccessTokenPayload) {
     return this.requestService.getConsumerRequests(user.sub);
   }
