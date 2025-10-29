@@ -240,8 +240,25 @@ export class RequestService implements IRequestService {
     try {
       const pending = await this.requestRepository.findPendingByConsumerId(consumerId);
 
+      if (!pending) {
+        return { pendingRequest: null };
+      }
+
       return {
-        pendingRequest: pending ? { id: pending.id } : null,
+        pendingRequest: {
+          id: pending.id,
+          serviceType: pending.serviceType,
+          moveAt: pending.moveAt.toISOString(),
+          departureAddress: pending.departureAddress,
+          departureFloor: pending.departureFloor,
+          departureElevator: pending.departureElevator,
+          departurePyeong: pending.departurePyeong,
+          arrivalAddress: pending.arrivalAddress,
+          arrivalFloor: pending.arrivalFloor,
+          arrivalElevator: pending.arrivalElevator,
+          arrivalPyeong: pending.arrivalPyeong,
+          additionalRequirements: pending.additionalRequirements ?? null,
+        },
       };
     } catch (error) {
       throw new InternalServerErrorException('견적 요청 상태 확인 중 오류가 발생했습니다.');
