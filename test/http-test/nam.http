@@ -161,3 +161,13 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1M2Q
 GET {{host}}/quotations
 Content-Type: application/json
 Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0ZDM1M2I4NC1jYWQyLTRmNzYtYTAxOS05OTVhZDhiNDEyMmIiLCJqdGkiOiJmMjBhODFjMC1jMDgwLTRjNTktOTExYy01M2U3NmIyZTFjOWEiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYxNjQzNTU1LCJleHAiOjE3NjE2NDQ0NTUsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.vJxk4hBLqOoNb3TlBpQX14ugTm6sy2H_WmewQiZuBGc
+
+
+
+### 날씨
+GET {{host}}/weather/current?city=Seoul
+Content-Type: application/json
+
+### 주간날씨
+GET {{host}}/weather/forecast?city=Seoul&days=5
+Content-Type: application/json
