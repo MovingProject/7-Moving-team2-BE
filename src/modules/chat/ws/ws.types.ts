@@ -1,4 +1,5 @@
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
+import type { MessageType } from '@/shared/constant/values';
 
 export type C2S = {
   'chat:join': (p: { roomId: string }) => void;
@@ -12,7 +13,25 @@ export type S2C = {
   'error:event': (p: { code: string; message: string }) => void;
   'chat:new': (p: {
     roomId: string;
-    msg: { id: string; idx: number; authorId: string; body: string; sentAt: string };
+    msg:
+      | {
+          id: string;
+          idx: number;
+          authorId: string;
+          messageType: 'MESSAGE';
+          body: string; // 메시지일 때만 존재
+          sentAt: string;
+          tempId: string;
+        }
+      | {
+          id: string;
+          idx: number;
+          authorId: string;
+          messageType: 'QUOTATION';
+          quotationId: string; // 견적일 때만 존재
+          sentAt: string;
+          tempId: string;
+        };
   }) => void;
 };
 

@@ -37,5 +37,5 @@ export type DriverSortType = (typeof DRIVER_SORT_TYPES)[number];
 export const MESSAGE_TYPES = ['MESSAGE', 'QUOTATION'] as const;
 export type MessageType = (typeof MESSAGE_TYPES)[number];
 
-export const QUOTATION_STATUSES = ['SUBMITTED', 'REVISED', 'WITHDRAWN', 'SELECTED', 'EXPIRED'] as const;
+export const QUOTATION_STATUSES = ['PENDING', 'CONCLUDED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'CANCELLED'] as const;
 export type QuotationStatus = (typeof QUOTATION_STATUSES)[number];

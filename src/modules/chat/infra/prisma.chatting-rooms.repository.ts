@@ -32,4 +32,14 @@ export class PrismaChattingRoomsRepository implements IChattingRoomsRepository {
 
     return { roomId: room.id };
   }
+
+  async incrementNextSequence(roomId: string, ctx?: TransactionContext): Promise<number> {
+    const db = getDb(ctx, this.prisma);
+    const room = await db.chattingRoom.update({
+      where: { id: roomId },
+      data: { nextSequence: { increment: 1 } },
+      select: { nextSequence: true },
+    });
+    return room.nextSequence;
+  }
 }
