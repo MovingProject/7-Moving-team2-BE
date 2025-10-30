@@ -20,7 +20,7 @@ export class OptionalAccessTokenGuard implements CanActivate {
     const token = req.cookies?.[tokenName] as string | undefined;
 
     if (!token) {
-      req.user = null;
+      req.user = undefined;
       return true;
     }
 

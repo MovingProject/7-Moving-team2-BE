@@ -6,6 +6,8 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Request } from 'express';
 
+import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
+
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
@@ -17,7 +19,8 @@ export class RolesGuard implements CanActivate {
     if (!allowed || allowed.length === 0) return true;
 
     const req = ctx.switchToHttp().getRequest<Request>();
-    const user = req.user;
+
+    const user = req.user as AccessTokenPayload | undefined;
 
     if (!user) {
       throw new UnauthorizedException('로그인이 필요합니다.');

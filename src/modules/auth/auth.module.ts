@@ -12,6 +12,7 @@ import { AUTH_SERVICE } from './interface/auth.service.interface';
 import { TOKEN_REPOSITORY } from './interface/token.repository.interface';
 import { CookieModule } from '@/shared/utils/cookie.module';
 import { CookiesService } from '@/shared/utils/cookies.service';
+import { GoogleStrategy } from './strategies/google.strategy';
 @Module({
   imports: [UsersModule, HashingModule, SharedJwtModule, CookieModule],
   controllers: [AuthController],
@@ -27,6 +28,8 @@ import { CookiesService } from '@/shared/utils/cookies.service';
     },
     RefreshTokenGuard,
     CookiesService,
+    GoogleStrategy,
+    AccessTokenGuard,
   ],
   exports: [AUTH_SERVICE],
 })

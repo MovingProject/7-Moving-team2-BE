@@ -1,5 +1,11 @@
 import { UserDtoFactory } from '@/modules/users/dto/user.response.dto';
-import { BadRequestException, ForbiddenException, NotFoundException, UnauthorizedException } from '@/shared/exceptions';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  UnauthorizedException,
+  ConflictException,
+} from '@/shared/exceptions';
 import { UserAlreadyExistsException } from '@/shared/exceptions/user.exception';
 import { HASHING_SERVICE, type IHashingService } from '@/shared/hashing/hashing.service.interface';
 import { JWT_SERVICE, type IJwtService } from '@/shared/jwt/jwt.service.interface';
@@ -8,12 +14,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { USER_REPOSITORY, type IUserRepository } from '../users/interface/users.repository.interface';
 import { SignInRequestDto } from './dto/signIn.request.dto';
 import { SignUpRequest } from './dto/signup.request.dto';
-import { IAuthService } from './interface/auth.service.interface';
+import { IAuthService, ISocialSignInPayload, SocialSignInResult } from './interface/auth.service.interface';
 import { TOKEN_REPOSITORY, type ITokenRepository } from './interface/token.repository.interface';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
 import { ConfigNotFoundException } from '@/shared/exceptions/config-not-found.exception';
 import { randomUUID } from 'crypto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -70,35 +77,7 @@ export class AuthService implements IAuthService {
       throw new ForbiddenException('해당 권한으로 로그인할 수 없습니다.');
     }
 
-    const jti = randomUUID();
-    const refreshTokenPayload: JwtPayload = { sub: existingUser.id, jti: jti };
-    const refreshToken = await this.jwtService.signRefreshToken(refreshTokenPayload);
-    const hashedRefreshToken = await this.hashingService.hash(refreshToken);
-
-    const raw = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
-    const maybeParsed: unknown = (ms as unknown as (v: string | number, opts?: { long?: boolean }) => string | number)(
-      raw,
-    );
-    if (typeof maybeParsed !== 'number') {
-      throw new ConfigNotFoundException(`JWT_REFRESH_EXPIRES_IN 형식이 잘못됨: ${raw}`);
-    }
-    const jwtRefreshExpiresInMs: number = maybeParsed;
-
-    const expiresAt = new Date(Date.now() + jwtRefreshExpiresInMs);
-
-    const storedRerfreshToken = await this.tokenRepository.saveRefreshToken(
-      existingUser.id,
-      hashedRefreshToken,
-      jti,
-      expiresAt,
-    );
-
-    const accessTokenPayload: AccessTokenPayload = {
-      sub: existingUser.id,
-      jti: storedRerfreshToken.jti,
-      role: existingUser.role,
-    };
-    const accessToken = await this.jwtService.signAccessToken(accessTokenPayload);
+    const { accessToken, refreshToken } = await this._generateTokens(existingUser);
 
     return {
       accessToken,
@@ -164,6 +143,81 @@ export class AuthService implements IAuthService {
     }
     const role = user.role;
     const accessToken = await this.jwtService.signAccessToken({ sub, jti: newJti, role });
+
+    return { accessToken, refreshToken };
+  }
+
+  async socialSignIn(payload: ISocialSignInPayload): Promise<SocialSignInResult> {
+    const { provider, providerId, email, role } = payload;
+
+    // 이메일로 유저를 먼저 찾음
+    const userByEmail = await this.userRepository.findByEmail(email);
+
+    if (userByEmail) {
+      // 이메일이 존재할 경우 역할(role)이 일치하는지 확인
+      if (userByEmail.role !== role) {
+        throw new ForbiddenException(
+          `해당 이메일은 이미 ${userByEmail.role}(으)로 가입되어 있습니다. ${role}(으)로 로그인할 수 없습니다.`,
+        );
+      }
+
+      // 이미 다른 소셜 계정과 연동되었는지 확인
+      if (userByEmail.providerId && userByEmail.providerId !== providerId) {
+        throw new ConflictException(`해당 이메일은 이미 다른 ${userByEmail.provider} 계정과 연동되어 있습니다.`);
+      }
+
+      // 소셜 계정을 연동(provider, providerId 업데이트
+      const user = await this.userRepository.updateUserProvider(userByEmail.id, provider, providerId);
+
+      // 토큰을 발급하고 'login' 타입을 반환
+      const { accessToken, refreshToken } = await this._generateTokens(user);
+      return {
+        type: 'login',
+        data: {
+          accessToken,
+          refreshToken,
+          user: UserDtoFactory.toSignInResponseDto(user),
+        },
+      };
+    } else {
+      // 이메일이 존재하지 않을 경우 (신규 가입)
+      return {
+        type: 'register',
+        data: payload,
+      };
+    }
+  }
+
+  private async _generateTokens(user: User): Promise<{ accessToken: string; refreshToken: string }> {
+    const jti = randomUUID();
+    const refreshTokenPayload: JwtPayload = { sub: user.id, jti: jti };
+    const refreshToken = await this.jwtService.signRefreshToken(refreshTokenPayload);
+    const hashedRefreshToken = await this.hashingService.hash(refreshToken);
+
+    const raw = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
+
+    const maybeParsed: unknown = (ms as unknown as (v: string | number, opts?: { long?: boolean }) => string | number)(
+      raw,
+    );
+    if (typeof maybeParsed !== 'number') {
+      throw new ConfigNotFoundException(`JWT_REFRESH_EXPIRES_IN 형식이 잘못됨: ${raw}`);
+    }
+    const jwtRefreshExpiresInMs: number = maybeParsed;
+    const expiresAt = new Date(Date.now() + jwtRefreshExpiresInMs);
+
+    const storedRerfreshToken = await this.tokenRepository.saveRefreshToken(
+      user.id,
+      hashedRefreshToken,
+      jti,
+      expiresAt,
+    );
+
+    const accessTokenPayload: AccessTokenPayload = {
+      sub: user.id,
+      jti: storedRerfreshToken.jti,
+      role: user.role,
+    };
+    const accessToken = await this.jwtService.signAccessToken(accessTokenPayload);
 
     return { accessToken, refreshToken };
   }

@@ -1,9 +1,21 @@
 import type { AccessTokenPayload, JwtPayload } from '@/shared/jwt/jwt.payload.schema';
 import { ZodValidationPipe } from '@/shared/pipes/zod-validation.pipe';
 import { CookiesService } from '@/shared/utils/cookies.service';
-import { Body, Controller, HttpCode, HttpStatus, Inject, Post, Res, UseGuards, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Post,
+  Res,
+  UseGuards,
+  UsePipes,
+  Get,
+  Req,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { AuthUser } from './decorators/auth-user.decorator';
 import { RefreshPayload } from './decorators/refresh-payload.decorator';
 import { RefreshRaw } from './decorators/refresh-raw.decorator';
@@ -11,7 +23,10 @@ import { SignInRequestDto, signInSchema } from './dto/signIn.request.dto';
 import { SignUpRequestDto, signUpSchema } from './dto/signup.request.dto';
 import { AccessTokenGuard } from './guards/accessToken.guard';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import { AUTH_SERVICE, type IAuthService } from './interface/auth.service.interface';
+import { AUTH_SERVICE, type IAuthService, type SocialSignInResult } from './interface/auth.service.interface';
+import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
+import { Role } from '@prisma/client';
 
 @ApiTags('인증 (Auth)')
 @Controller('auth')
@@ -19,6 +34,7 @@ export class AuthController {
   constructor(
     @Inject(AUTH_SERVICE) private readonly authService: IAuthService,
     private readonly cookiesService: CookiesService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('signUp')
@@ -64,5 +80,27 @@ export class AuthController {
     const { accessToken, refreshToken } = await this.authService.refreshToken(refresh, refreshRaw);
     this.cookiesService.setAuthCookies(res, accessToken, refreshToken);
     return { message: '토큰 재발급 성공' };
+  }
+
+  // ====== Google OAuth ======
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() _req: Request) {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+    const socialResult = req.user as SocialSignInResult;
+
+    // 타입에 따라 분기
+    if (socialResult.type === 'login') {
+      const { accessToken, refreshToken, user } = socialResult.data;
+      this.cookiesService.setAuthCookies(res, accessToken, refreshToken);
+      res.json(user);
+    } else {
+      const { ...profile } = socialResult.data;
+      const params = new URLSearchParams(profile as any).toString();
+    }
   }
 }
