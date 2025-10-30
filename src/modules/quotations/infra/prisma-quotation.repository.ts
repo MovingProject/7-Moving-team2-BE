@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { getDb } from '@/shared/prisma/get-db';
 import { PrismaService } from '@/shared/prisma/prisma.service';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
-import { QuotationStatus } from '@prisma/client';
+import { Quotation, QuotationStatus } from '@prisma/client';
 import { QuotationWithRelations } from '../dto/quotation-list.dto';
 import { CreateQuotationInput, IQuotationRepository } from '../interface/quotation.repository.interface';
 
@@ -34,5 +34,23 @@ export class PrismaQuotationRepository implements IQuotationRepository {
       data: input,
     });
     return quotation;
+  }
+
+  async acceptQuotation(id: string): Promise<Quotation> {
+    return this.prisma.quotation.update({
+      where: { id },
+      data: {
+        status: QuotationStatus.CONCLUDED,
+        selectedAt: new Date(),
+      },
+    });
+  }
+
+  async rejectOtherQuotations(requestId: string, excludeQuotationId: string): Promise<void> {
+    await this.prisma.quotation.updateMany({
+      where: { requestId, id: { not: excludeQuotationId } },
+      data: { status: QuotationStatus.REJECTED },
+    });
+    return;
   }
 }
