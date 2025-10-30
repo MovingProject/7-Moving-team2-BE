@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import type { IQuotationRepository } from '../interface/quotation.repository.interface';
+
+import { getDb } from '@/shared/prisma/get-db';
 import { PrismaService } from '@/shared/prisma/prisma.service';
-import { Quotation, QuotationStatus } from '@prisma/client';
+import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
+import { QuotationStatus } from '@prisma/client';
 import { QuotationWithRelations } from '../dto/quotation-list.dto';
+import { CreateQuotationInput, IQuotationRepository } from '../interface/quotation.repository.interface';
 
 @Injectable()
 export class PrismaQuotationRepository implements IQuotationRepository {
@@ -23,5 +26,13 @@ export class PrismaQuotationRepository implements IQuotationRepository {
         },
       },
     });
+  }
+
+  async create(input: CreateQuotationInput, ctx?: TransactionContext) {
+    const db = getDb(ctx, this.prisma);
+    const quotation = await db.quotation.create({
+      data: input,
+    });
+    return quotation;
   }
 }
