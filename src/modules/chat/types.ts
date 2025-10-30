@@ -23,3 +23,14 @@ export type ChattingMessageEntity = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type ChattingMessageRecord = {
+  id: string;
+  chattingRoomId: string;
+  senderId: string;
+  messageType: MessageType;
+  content: string | null;
+  sequence: number;
+  createdAt: Date;
+  updatedAt: Date;
+};

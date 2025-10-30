@@ -10,6 +10,7 @@ export interface IChattingRoomsRepository {
   ): Promise<{ roomId: string }>;
 
   findById(roomId: string, ctx?: TransactionContext): Promise<ChattingRoomEntity | null>;
+  incrementNextSequence(roomId: string, ctx?: TransactionContext): Promise<number>;
 }
 
 export const CHATTING_ROOMS_REPOSITORY = 'IChattingRoomsRepository';
