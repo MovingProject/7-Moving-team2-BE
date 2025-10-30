@@ -6,8 +6,8 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "test123123@test.com",
-  "password": "password123",
+  "email": "booknam@test.com",
+  "password": "booknam123",
   "role": "CONSUMER"
 }
 
@@ -149,8 +149,7 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQ
 ### 소비자 견적 요청 전체 조회
 GET {{host}}/requests/list
 Content-Type: application/json
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NGVjMGI3MS1lZjQ2LTRkMDktOTExZC1jNTVhOWYzNjA1N2YiLCJqdGkiOiJkMDgwYjRkYi1kNjFlLTQxODgtOTVjZS03YjA2NDBhODIxMzEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE2MTg3OTcsImV4cCI6MTc2MTYxOTY5NywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.33frwlQ8P5K559hyZSTq59EcbNWtQT2YIcUfWJ6KvyU
-
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NGVjMGI3MS1lZjQ2LTRkMDktOTExZC1jNTVhOWYzNjA1N2YiLCJqdGkiOiIyYWRlNjg0Ny02MGVkLTRhNzAtYmRmOS05Yzg0ZmFkOTkyMzMiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE4MDQ4MTYsImV4cCI6MTc2MTgwNTcxNiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.__yd2JbVMM-u3Sj2jr5yrZF3X7nJv-OH5Q4As6w-X8M
 
 ### 견적 중복 요청 확인 API (고객)
 GET {{host}}/requests/check
@@ -160,8 +159,7 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1M2Q
 ### 드라이버 견적 전체 조회
 GET {{host}}/quotations
 Content-Type: application/json
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0ZDM1M2I4NC1jYWQyLTRmNzYtYTAxOS05OTVhZDhiNDEyMmIiLCJqdGkiOiJmMjBhODFjMC1jMDgwLTRjNTktOTExYy01M2U3NmIyZTFjOWEiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYxNjQzNTU1LCJleHAiOjE3NjE2NDQ0NTUsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.vJxk4hBLqOoNb3TlBpQX14ugTm6sy2H_WmewQiZuBGc
-
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0ZDM1M2I4NC1jYWQyLTRmNzYtYTAxOS05OTVhZDhiNDEyMmIiLCJqdGkiOiJlMTg2ZGE0Mi0yMTRiLTRmMDgtYTExMi0wNjE5MWIyODQxNjQiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYxODA0NTc3LCJleHAiOjE3NjE4MDU0NzcsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.U6Qx5gmjk_WBvJJD7DzpdF3dwXNCdWidxvzVxJExKOE
 
 
 ### 날씨
