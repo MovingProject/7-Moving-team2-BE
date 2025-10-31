@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { QuotationService } from './quotation.service';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
@@ -19,5 +19,17 @@ export class QuotationController {
     @Query('status') status?: QuotationStatus[],
   ) {
     return this.quotationService.findDriverQuotationsByStatus(user.sub, status);
+  }
+
+  @Post(':quotationId/accept')
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('CONSUMER')
+  @HttpCode(HttpStatus.OK)
+  async acceptQuotation(@Param('quotationId') quotationId: string, @AuthUser() user: AccessTokenPayload) {
+    const result = await this.quotationService.acceptQuotation(quotationId, user.sub);
+    return {
+      success: true,
+      data: result,
+    };
   }
 }

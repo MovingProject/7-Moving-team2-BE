@@ -29,3 +29,6 @@ export type QuotationWithRelations = {
     invites: { driverId: string }[];
   };
 };
+export type QuotationWithRelationsPlusId = QuotationWithRelations & {
+  request: QuotationWithRelations['request'] & { id: string };
+};
