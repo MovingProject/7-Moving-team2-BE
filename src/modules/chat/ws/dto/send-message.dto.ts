@@ -1,5 +1,4 @@
 import { MoveTypeSchema } from '@/shared/constant/enums.schema';
-import { createZodDto } from '@anatine/zod-nestjs';
 import { z } from 'zod';
 
 export const SEND_LIMITS = {

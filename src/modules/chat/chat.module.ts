@@ -21,6 +21,8 @@ import { ChatRoomWsService } from './ws/room.service';
 import { QUOTATION_REPOSITORY } from '../quotations/interface/quotation.repository.interface';
 import { PrismaQuotationRepository } from '../quotations/infra/prisma-quotation.repository';
 import { PrismaChattingMessagesRepository } from './infra/prisma.chatting-message.repository';
+import { CHATTING_MESSAGES_READ_REPOSITORY } from './interface/chatting-messages-read.repository.interface';
+import { PrismaChattingMessagesReadRepository } from './infra/prisma.chatting-messages-read.repository';
 
 @Module({
   imports: [JwtModule, CookieModule, PrismaModule],
@@ -37,6 +39,7 @@ import { PrismaChattingMessagesRepository } from './infra/prisma.chatting-messag
     { provide: TRANSACTION_RUNNER, useClass: PrismaTransactionRunner },
     { provide: CHATTING_MESSAGES_REPOSITORY, useClass: PrismaChattingMessagesRepository },
     { provide: QUOTATION_REPOSITORY, useClass: PrismaQuotationRepository },
+    { provide: CHATTING_MESSAGES_READ_REPOSITORY, useClass: PrismaChattingMessagesReadRepository },
   ],
   exports: [ChatGateway],
 })

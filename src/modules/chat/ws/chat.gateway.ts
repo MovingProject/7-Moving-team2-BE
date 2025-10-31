@@ -16,6 +16,7 @@ import { ChatRoomWsService } from './room.service';
 import { fail } from './ws.ack';
 import { WS_EVENTS } from './ws.events';
 import { type WsServer, type WsSocket } from './ws.types';
+import { chatReadBodySchema } from './dto/chat-read.dto';
 
 @WebSocketGateway({ cors: { origin: true, credentials: true } })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -63,6 +64,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error(`chat:send failed: ${String((e as Error).message ?? e)}`);
       const tempId = parsed?.data?.tempId ?? undefined;
       return fail('MESSAGE_SEND_FAILED', undefined, { tempId });
+    }
+  }
+
+  @SubscribeMessage(WS_EVENTS.CHAT_READ)
+  handleChatRead(@ConnectedSocket() client: WsSocket, @MessageBody() body: unknown) {
+    const parsed = chatReadBodySchema.safeParse(body);
+    if (!parsed.success) return fail('VALIDATION_FAILED', '읽은 메시지 정보 형식이 올바르지 않습니다.');
+
+    try {
+      return this.msgWs.readMessage(client, parsed.data);
+    } catch {
+      return fail('READ_INTERNAL_ERROR', '일시적인 오류입니다.');
     }
   }
 }

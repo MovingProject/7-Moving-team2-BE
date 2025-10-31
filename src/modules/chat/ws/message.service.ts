@@ -18,6 +18,9 @@ import type { SendMessageBody } from './dto/send-message.dto';
 import { ok, fail } from './ws.ack';
 import type { WsSocket } from './ws.types';
 import { WS_EVENTS } from './ws.events';
+import { type IChattingMessagesReadRepository } from '../interface/chatting-messages-read.repository.interface';
+import { CHATTING_MESSAGES_READ_REPOSITORY } from '../interface/chatting-messages-read.repository.interface';
+import { ChatReadBody } from './dto/chat-read.dto';
 
 @Injectable()
 export class ChatMessageWsService {
@@ -27,7 +30,8 @@ export class ChatMessageWsService {
     @Inject(TRANSACTION_RUNNER) private readonly tx: ITransactionRunner,
     @Inject(CHATTING_ROOMS_REPOSITORY) private readonly roomsRepo: IChattingRoomsRepository,
     @Inject(CHATTING_MESSAGES_REPOSITORY) private readonly msgsRepo: IChattingMessagesRepository,
-    @Inject(QUOTATION_REPOSITORY) private readonly quotationRepo: IQuotationRepository, // 견적 생성용
+    @Inject(QUOTATION_REPOSITORY) private readonly quotationRepo: IQuotationRepository,
+    @Inject(CHATTING_MESSAGES_READ_REPOSITORY) private readonly msgsReadRepo: IChattingMessagesReadRepository,
   ) {}
 
   async sendMessage(client: WsSocket, input: SendMessageBody) {
@@ -114,5 +118,34 @@ export class ChatMessageWsService {
     }
 
     return ok({ delivered: true, id: result.message.id, idx: result.message.sequence });
+  }
+
+  async readMessage(client: WsSocket, input: ChatReadBody) {
+    const user = client.data.user;
+    if (!user) return fail('AUTH_REQUIRED', '로그인이 필요합니다.');
+
+    const message = await this.msgsRepo.findById(input.lastReadMessageId);
+    if (!message) {
+      return fail('MESSAGE_NOT_FOUND', '메시지를 찾을 수 없습니다.');
+    }
+
+    const room = await this.roomsRepo.findById(message.chattingRoomId);
+    if (!room) {
+      return fail('ROOM_NOT_FOUND', '대화방을 찾을 수 없습니다.');
+    }
+
+    const isParticipant = room.consumerId === user.id || room.driverId === user.id;
+    if (!isParticipant) {
+      return fail('READ_DENIED', '이 채팅방의 메시지가 아닙니다.');
+    }
+
+    await this.msgsReadRepo.upsertRead(message.id, user.id);
+
+    // TODO: 상대방에게 읽음 이벤트 보내기
+
+    return ok({
+      messageId: message.id,
+      roomId: room.id,
+    });
   }
 }
