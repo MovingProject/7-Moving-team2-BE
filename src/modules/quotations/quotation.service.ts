@@ -14,34 +14,30 @@ export class QuotationService {
   ) {}
 
   async findDriverQuotationsByStatus(driverId: string, statuses?: QuotationStatus[]): Promise<QuotationSummaryDto[]> {
-    try {
-      const targetStatuses =
-        statuses && statuses.length > 0
-          ? statuses
-          : [QuotationStatus.PENDING, QuotationStatus.CONCLUDED, QuotationStatus.COMPLETED];
-      const quotations = await this.quotationRepository.findDriverQuotations(driverId, targetStatuses);
-      if (!quotations || quotations.length === 0) {
-        throw new NotFoundException('보낸 견적서가 없습니다.');
-      }
-
-      const mappedQuotations = quotations.map((q) => {
-        const r = q.request;
-        return {
-          id: q.id,
-          consumerName: q.consumer.name,
-          moveAt: r.moveAt,
-          departureAddress: r.departureAddress,
-          arrivalAddress: r.arrivalAddress,
-          price: q.price,
-          serviceType: q.serviceType,
-          isInvited: r.invites.some((i) => i.driverId === driverId),
-          quotationStatus: q.status,
-        };
-      });
-
-      return mappedQuotations;
-    } catch (error) {
-      throw new InternalServerException('견적 조회 중 오류가 발생했습니다.');
+    const targetStatuses =
+      statuses && statuses.length > 0
+        ? statuses
+        : [QuotationStatus.PENDING, QuotationStatus.CONCLUDED, QuotationStatus.COMPLETED];
+    const quotations = await this.quotationRepository.findDriverQuotations(driverId, targetStatuses);
+    if (!quotations || quotations.length === 0) {
+      throw new NotFoundException('보낸 견적서가 없습니다.');
     }
+
+    const mappedQuotations = quotations.map((q) => {
+      const r = q.request;
+      return {
+        id: q.id,
+        consumerName: q.consumer.name,
+        moveAt: r.moveAt,
+        departureAddress: r.departureAddress,
+        arrivalAddress: r.arrivalAddress,
+        price: q.price,
+        serviceType: q.serviceType,
+        isInvited: r.invites.some((i) => i.driverId === driverId),
+        quotationStatus: q.status,
+      };
+    });
+
+    return mappedQuotations;
   }
 }
