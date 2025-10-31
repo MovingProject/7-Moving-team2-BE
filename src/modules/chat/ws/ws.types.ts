@@ -1,5 +1,4 @@
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
-import type { MessageType } from '@/shared/constant/values';
 
 export type C2S = {
   'chat:join': (p: { roomId: string }) => void;
