@@ -1,16 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { QUOTATION_REPOSITORY } from './interface/quotation.repository.interface';
 import type { IQuotationRepository } from './interface/quotation.repository.interface';
-import { QuotationStatus } from '@prisma/client';
+import { Prisma, QuotationStatus, RequestStatus } from '@prisma/client';
 import { QuotationSummaryDto } from './dto/quotation-list.dto';
 import { InternalServerException } from '@/shared/exceptions/internal-server-error.exception';
-import { NotFoundException } from '@/shared/exceptions';
+import { BadRequestException, NotFoundException } from '@/shared/exceptions';
+import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runner';
 
 @Injectable()
 export class QuotationService {
   constructor(
     @Inject(QUOTATION_REPOSITORY)
     private readonly quotationRepository: IQuotationRepository,
+    private readonly transactionRunner: PrismaTransactionRunner,
   ) {}
 
   async findDriverQuotationsByStatus(driverId: string, statuses?: QuotationStatus[]): Promise<QuotationSummaryDto[]> {
@@ -39,5 +41,26 @@ export class QuotationService {
     });
 
     return mappedQuotations;
+  }
+
+  async acceptQuotation(quotationId: string, consumerId: string) {
+    const quotation = await this.quotationRepository.findById(quotationId);
+    if (!quotation) throw new NotFoundException('존재하지 않는 견적입니다.');
+
+    if (quotation.status !== 'PENDING') throw new BadRequestException('이미 처리된 견적입니다.');
+
+    return this.transactionRunner.run(async (ctx) => {
+      const tx = ctx.tx as Prisma.TransactionClient;
+      const accepted = await this.quotationRepository.acceptQuotation(quotationId);
+
+      await tx.request.update({
+        where: { id: quotation.request.id },
+        data: { requestStatus: 'CONCLUDED', concludedAt: new Date() },
+      });
+
+      await this.quotationRepository.rejectOtherQuotations(quotation.request.id, quotationId);
+
+      return accepted;
+    });
   }
 }

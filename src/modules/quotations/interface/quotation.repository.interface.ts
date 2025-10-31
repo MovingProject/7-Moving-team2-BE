@@ -1,7 +1,7 @@
 import { MoveType } from '@/shared/constant/values';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 import { Quotation, QuotationStatus } from '@prisma/client';
-import { QuotationWithRelations } from '../dto/quotation-list.dto';
+import { QuotationWithRelations, QuotationWithRelationsPlusId } from '../dto/quotation-list.dto';
 import { QuotationEntity } from '../types';
 
 export type CreateQuotationInput = {
@@ -30,6 +30,7 @@ export interface IQuotationRepository {
   create(input: CreateQuotationInput, ctx?: TransactionContext): Promise<QuotationEntity>;
   acceptQuotation(id: string): Promise<Quotation>;
   rejectOtherQuotations(requestId: string, excludeQuotationId: string): Promise<void>;
+  findById(id: string): Promise<QuotationWithRelationsPlusId | null>;
 }
 
 export const QUOTATION_REPOSITORY = 'IQuotationRepository';
