@@ -7,10 +7,10 @@ const driverProfileSchema = z.object({
   careerYears: z.coerce.number().int().optional(),
   oneLiner: z.string().optional(),
   description: z.string().optional(),
+  image: z.string().optional(),
   rating: z.number().optional(),
 
   driverServiceAreas: z.union([z.array(z.nativeEnum(Area)), z.array(z.string())]).optional(),
-
   driverServiceTypes: z.union([z.array(z.nativeEnum(MoveType)), z.array(z.string())]).optional(),
 });
 

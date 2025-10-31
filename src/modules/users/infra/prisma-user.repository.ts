@@ -97,6 +97,7 @@ export class PrismaUserRepository implements IUserRepository {
             careerYears: dp.careerYears ?? '0',
             oneLiner: dp.oneLiner ?? '',
             description: dp.description ?? '',
+            image: dp.image ?? null,
             ...(dp.rating !== undefined ? { rating: dp.rating } : {}),
           },
           update: {
@@ -105,6 +106,7 @@ export class PrismaUserRepository implements IUserRepository {
             ...(dp.oneLiner !== undefined ? { oneLiner: dp.oneLiner } : {}),
             ...(dp.description !== undefined ? { description: dp.description } : {}),
             ...(dp.rating !== undefined ? { rating: dp.rating } : {}),
+            ...(dp.image !== undefined ? { image: dp.image } : {}),
           },
         },
       };
