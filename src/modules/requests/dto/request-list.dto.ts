@@ -1,4 +1,5 @@
 import { MoveTypeSchema } from '@/shared/constant/enums.schema';
+import { RequestStatus } from '@prisma/client';
 import z from 'zod';
 
 const DriverProfileSummarySchema = z.object({
@@ -25,6 +26,8 @@ export const RequestListSchema = z.object({
   departureAddress: z.coerce.string(),
   arrivalAddress: z.coerce.string(),
   createdAt: z.string().datetime(),
+  requestStatus: z.nativeEnum(RequestStatus),
+  additionalRequirements: z.string().nullable(),
   serviceType: MoveTypeSchema,
   moveAt: z.coerce.date(),
   quotations: z.array(QuotationSchema),

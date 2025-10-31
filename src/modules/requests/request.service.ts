@@ -220,6 +220,8 @@ export class RequestService implements IRequestService {
         departureAddress: req.departureAddress,
         arrivalAddress: req.arrivalAddress,
         createdAt: req.createdAt.toISOString(),
+        requestStatus: req.requestStatus,
+        additionalRequirements: req.additionalRequirements ?? null,
         serviceType: req.serviceType,
         moveAt: req.moveAt,
         quotations,
