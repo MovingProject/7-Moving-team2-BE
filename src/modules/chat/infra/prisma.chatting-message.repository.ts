@@ -19,4 +19,14 @@ export class PrismaChattingMessagesRepository implements IChattingMessagesReposi
     });
     return message;
   }
+
+  findById(messageId: string, ctx?: TransactionContext) {
+    const db = getDb(ctx, this.prisma);
+    return db.chattingMessage.findUnique({
+      where: { id: messageId },
+      include: {
+        quotation: true,
+      },
+    });
+  }
 }
