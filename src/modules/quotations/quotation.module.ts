@@ -7,6 +7,7 @@ import { PrismaQuotationRepository } from './infra/prisma-quotation.repository';
 import { UsersModule } from '../users/users.module';
 import { PrismaModule } from '@/shared/prisma/prisma.module';
 import { CookieModule } from '@/shared/utils/cookie.module';
+import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runner';
 
 @Module({
   imports: [UsersModule, PrismaModule, CookieModule],
@@ -14,6 +15,7 @@ import { CookieModule } from '@/shared/utils/cookie.module';
   providers: [
     PrismaService,
     QuotationService,
+    PrismaTransactionRunner,
     {
       provide: QUOTATION_REPOSITORY,
       useClass: PrismaQuotationRepository,
