@@ -27,11 +27,13 @@ export class EditDriverProfileDto extends BaseUserDto {
   description: string;
   tel: string;
   nickname: string;
+  image?: string;
 }
 export class EditConsumerProfileDto extends BaseUserDto {
   region: Area;
   service: MoveType;
   tel: string;
+  image?: string;
 }
 
 export class UserDtoFactory {
@@ -59,15 +61,16 @@ export class UserDtoFactory {
     return dto;
   }
 
-  static toEditConsumerProfileDto(user: User, consumberProfile: ConsumerProfile): EditConsumerProfileDto {
+  static toEditConsumerProfileDto(user: User, consumerProfile: ConsumerProfile): EditConsumerProfileDto {
     const dto = new EditConsumerProfileDto();
 
     dto.id = user.id;
     dto.name = user.name;
     dto.email = user.email;
     dto.tel = user.phoneNumber;
-    dto.service = consumberProfile.serviceType;
-    dto.region = consumberProfile.areas;
+    dto.service = consumerProfile.serviceType;
+    dto.region = consumerProfile.areas;
+    dto.image = consumerProfile.image ?? undefined;
 
     return dto;
   }
@@ -90,6 +93,7 @@ export class UserDtoFactory {
     dto.experience = driverProfile.careerYears;
     dto.tel = user.phoneNumber;
     dto.nickname = driverProfile.nickname;
+    dto.image = driverProfile.image ?? undefined;
 
     return dto;
   }
