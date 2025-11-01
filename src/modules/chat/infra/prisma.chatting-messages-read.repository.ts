@@ -20,6 +20,7 @@ export class PrismaChattingMessagesReadRepository implements IChattingMessagesRe
         },
       },
       update: {
+        readAt: new Date(),
         messageId,
       },
       create: {
