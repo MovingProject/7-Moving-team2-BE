@@ -1,6 +1,6 @@
 ### 환경 변수
 @baseUrl = http://localhost:4000
-@driverToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDk0OTNjOS1mYTQzLTQyYTItODExOS1jNDAwNDUwYjkxYTMiLCJqdGkiOiIyMTY3MmM2Ny0yMzlhLTQ1MzgtYWIxYi02NGQ4Nzk1ODJlNDgiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYxNTQwNTA4LCJleHAiOjE3NjE1NDE0MDgsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.pPGO8LCwxbz1SCPoRDzqdgxt1D6VUWyezi601ym5hXg;
+@driverToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDk0OTNjOS1mYTQzLTQyYTItODExOS1jNDAwNDUwYjkxYTMiLCJqdGkiOiI1ZTljM2EwNS1mY2IxLTQ3MmYtYjk3NS0zMWFlNDVhZGFiYWYiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYxOTg4MTM3LCJleHAiOjE3NjE5ODkwMzcsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.cutzwLfkUmD5sx6rJswMiUpGF6zx-STPG-KG3m13ipQ;
 @consumerToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQxOTAyNS1jNzJlLTQxYTgtYmM3Zi0yMWNkOGZhMzA3MzYiLCJqdGkiOiI3YTc5OGRlOC0xYmY2LTRjMmQtOTVlZC00ZjMzODRkODBjOGMiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE1Mzk0MDcsImV4cCI6MTc2MTU0MDMwNywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.O4rbs8AQ2IlBXPBvUsd4wvY_bkSVmueQoo1utj9aRng;
 @pendingRequestId = 2fdfc942-00b1-4d16-89d4-bc4f1f0102e3
 @nonPendingRequestId = 2fdfc942-00b1-4d16-89d4-bc4f1f0102e3
@@ -66,3 +66,39 @@ Content-Type: application/json
   "requestId": "{{pendingRequestId}}",
   "consumerId": "{{validConsumerId}}"
 }
+
+@roomId = 2d88c434-d9aa-4cf6-b7af-270247b48e8e
+@nextCursor = eyJsaWtlZEF0IjoiMjAyNS0xMC0yMVQxNTo1Njo0My4wMDBaIiwiaWQiOiIyZDg4YzQzNC1kOWFhLTRjZjYtYjdhZi0yNzAyNDdiNDhlOGUifQ==
+@otherRoomId = 2d88c434-d9aa-4cf6-b7af-270247b48e8e
+### 📌 1. 채팅방 메시지 1페이지 조회 (cursor 없음)
+GET http://localhost:4000/chatting-rooms/{{roomId}}/messages?limit=30
+Cookie: access_token={{driverToken}}
+Accept: application/json
+
+###
+
+### 📌 2. 채팅방 메시지 1페이지 조회 (limit 10)
+GET http://localhost:4000/chatting-rooms/{{roomId}}/messages?limit=10
+Cookie: access_token={{driverToken}}
+Accept: application/json
+
+###
+
+### 📌 3. 2페이지 조회 (앞에서 받은 nextCursor 사용)
+GET http://localhost:4000/chatting-rooms/{{roomId}}/messages?cursor={{nextCursor}}&limit=10
+Cookie: access_token={{driverToken}}}
+Accept: application/json
+
+###
+
+### 📌 4. 권한 없는 사용자가 조회 (테스트용)
+GET http://localhost:4000/chatting-rooms/{{otherRoomId}}/messages
+Cookie: access_token={{driverToken}}
+Accept: application/json
+
+###
+
+### 📌 5. 잘못된 cursor로 조회 (에러 응답 확인)
+GET http://localhost:4000/chatting-rooms/{{roomId}}/messages?cursor=invalid-base64
+Cookie: access_token={{driverToken}}
+Accept: application/json
