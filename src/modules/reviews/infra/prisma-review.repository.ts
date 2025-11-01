@@ -36,10 +36,11 @@ export class PrismaReviewRepository implements IReviewRepository {
   }
 
   async findReviewsByDriverId(driverId: string, limit: number, cursor?: string) {
+    const take = Number(limit) || 10;
     const reviews = await this.prisma.review.findMany({
       where: { driverId },
       orderBy: { createdAt: 'desc' },
-      take: limit + 1,
+      take: take + 1,
       skip: cursor ? 1 : 0,
       cursor: cursor ? { id: cursor } : undefined,
       include: {
