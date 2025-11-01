@@ -4,7 +4,7 @@ import type { IQuotationRepository } from './interface/quotation.repository.inte
 import { Prisma, QuotationStatus, RequestStatus } from '@prisma/client';
 import { QuotationSummaryDto } from './dto/quotation-list.dto';
 import { InternalServerException } from '@/shared/exceptions/internal-server-error.exception';
-import { BadRequestException, NotFoundException } from '@/shared/exceptions';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@/shared/exceptions';
 import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runner';
 
 @Injectable()
@@ -46,19 +46,23 @@ export class QuotationService {
   async acceptQuotation(quotationId: string, consumerId: string) {
     const quotation = await this.quotationRepository.findById(quotationId);
     if (!quotation) throw new NotFoundException('존재하지 않는 견적입니다.');
+    if (quotation.consumer?.id !== consumerId) {
+      throw new ForbiddenException('본인의 견적만 수락할 수 있습니다.');
+    }
 
     if (quotation.status !== 'PENDING') throw new BadRequestException('이미 처리된 견적입니다.');
 
     return this.transactionRunner.run(async (ctx) => {
       const tx = ctx.tx as Prisma.TransactionClient;
-      const accepted = await this.quotationRepository.acceptQuotation(quotationId);
+
+      const accepted = await this.quotationRepository.acceptQuotation(quotationId, ctx);
 
       await tx.request.update({
         where: { id: quotation.request.id },
         data: { requestStatus: 'CONCLUDED', concludedAt: new Date() },
       });
 
-      await this.quotationRepository.rejectOtherQuotations(quotation.request.id, quotationId);
+      await this.quotationRepository.rejectOtherQuotations(quotation.request.id, quotationId, ctx);
 
       return accepted;
     });
