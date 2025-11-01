@@ -15,7 +15,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     return this.prisma.quotation.findMany({
       where: { driverId, status: { in: statuses } },
       include: {
-        consumer: { select: { name: true } },
+        consumer: { select: { id: true, name: true } },
         request: {
           select: {
             moveAt: true,
@@ -36,8 +36,9 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     return quotation;
   }
 
-  async acceptQuotation(id: string): Promise<Quotation> {
-    return this.prisma.quotation.update({
+  async acceptQuotation(id: string, ctx?: TransactionContext): Promise<Quotation> {
+    const db = getDb(ctx, this.prisma);
+    return db.quotation.update({
       where: { id },
       data: {
         status: QuotationStatus.CONCLUDED,
@@ -46,12 +47,12 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     });
   }
 
-  async rejectOtherQuotations(requestId: string, excludeQuotationId: string): Promise<void> {
-    await this.prisma.quotation.updateMany({
+  async rejectOtherQuotations(requestId: string, excludeQuotationId: string, ctx?: TransactionContext): Promise<void> {
+    const db = getDb(ctx, this.prisma);
+    await db.quotation.updateMany({
       where: { requestId, id: { not: excludeQuotationId } },
       data: { status: QuotationStatus.REJECTED },
     });
-    return;
   }
 
   async findById(id: string): Promise<QuotationWithRelationsPlusId | null> {
@@ -62,7 +63,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
         price: true,
         serviceType: true,
         status: true,
-        consumer: { select: { name: true } },
+        consumer: { select: { id: true, name: true } },
         request: {
           select: {
             id: true,

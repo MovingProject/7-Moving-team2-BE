@@ -170,3 +170,20 @@ Content-Type: application/json
 ### 주간날씨
 GET {{host}}/weather/forecast?city=Seoul&days=5
 Content-Type: application/json
+
+### 견적 수락 테스트
+POST {{host}}/quotations/be7186a1-ac7d-4c18-8939-2d7a63e16d14/accept
+Content-Type: application/json
+Cookie: __Host-access_token=
+
+
+
+### 고객로그인
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "nowter@test.com",
+  "password": "password ",
+  "role": "CONSUMER"
+}
