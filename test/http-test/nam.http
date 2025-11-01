@@ -174,7 +174,7 @@ Content-Type: application/json
 ### 견적 수락 테스트
 POST {{host}}/quotations/be7186a1-ac7d-4c18-8939-2d7a63e16d14/accept
 Content-Type: application/json
-Cookie: __Host-access_token=
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OWRkODg1ZC1iYjVjLTQ5ZTQtODk5ZC04NTkwOGNjM2EzOTgiLCJqdGkiOiJlYTFiMTNiNC0wNGFiLTQ0OTQtYWVkNC03MjcyMWJiYzNhMzEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE5OTk3NDgsImV4cCI6MTc2MjAwMDY0OCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.4rXvu8yd7YcseTK0H4RjX8xO7xSFA-DjLXwVL7_mrks
 
 
 
@@ -184,6 +184,39 @@ Content-Type: application/json
 
 {
   "email": "nowter@test.com",
-  "password": "password ",
+  "password": "nowter123",
   "role": "CONSUMER"
 }
+
+### 견적 수락 테스트
+POST {{host}}/reviews
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OWRkODg1ZC1iYjVjLTQ5ZTQtODk5ZC04NTkwOGNjM2EzOTgiLCJqdGkiOiIzYzBjZDIwYi01Mzk0LTQyMWEtOTU0OS1iOTZmMGQ2NjYzYjgiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjIwMDAzOTYsImV4cCI6MTc2MjAwMTI5NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.-AOSD2J43otN_vTsxHC1ZZyeFWKxCgP_97qrj7Sovq8
+
+{
+  "quotationId": "be7186a1-ac7d-4c18-8939-2d7a63e16d14",
+  "content": "이사 너무 잘해주셨어요!",
+  "rating": 5
+}
+
+
+### 기사 리뷰 목록 조회
+GET {{host}}/reviews/drivers/c09493c9-fa43-42a2-8119-c400450b91a3
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OWRkODg1ZC1iYjVjLTQ5ZTQtODk5ZC04NTkwOGNjM2EzOTgiLCJqdGkiOiI0NDMxNTMxNC1mNjU3LTQ3MGMtYTA4NC03MTQ2ZTQwZDA4YTUiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjIwMDA3NjAsImV4cCI6MTc2MjAwMTY2MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.Nc3HP0z-shZNHFSqGOda-RU9zrwb68YMk5VPfocVmd4
+
+### 드라이버 로그인
+
+POST {{host}}/auth/signin
+Content-Type: application/json
+
+{
+  "email": "driver@test.com",
+  "password": "password123",
+  "role": "DRIVER"
+}
+
+### 기사 리뷰별점 목록 조회
+GET {{host}}/reviews/drivers/c09493c9-fa43-42a2-8119-c400450b91a3/rating
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OWRkODg1ZC1iYjVjLTQ5ZTQtODk5ZC04NTkwOGNjM2EzOTgiLCJqdGkiOiI0NDMxNTMxNC1mNjU3LTQ3MGMtYTA4NC03MTQ2ZTQwZDA4YTUiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjIwMDA3NjAsImV4cCI6MTc2MjAwMTY2MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.Nc3HP0z-shZNHFSqGOda-RU9zrwb68YMk5VPfocVmd4
