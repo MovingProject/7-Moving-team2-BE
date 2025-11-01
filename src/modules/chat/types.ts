@@ -34,3 +34,9 @@ export type ChattingMessageRecord = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type ChatMessageReadEntity = {
+  messageId: string;
+  userId: string;
+  readAt: Date;
+};

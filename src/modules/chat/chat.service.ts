@@ -1,14 +1,24 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@/shared/exceptions';
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
+import { TRANSACTION_RUNNER, type ITransactionRunner } from '@/shared/prisma/transaction-runner.interface';
+import { decodeChatCursor, encodeChatCursor } from '@/shared/utils/chatting.cursor';
+import { Inject, Injectable } from '@nestjs/common';
+import { REQUEST_REPOSITORY, type IRequestRepository } from '../requests/interface/request.repository.interface';
+import { USER_REPOSITORY, type IUserRepository } from '../users/interface/users.repository.interface';
+import {
+  CHATTING_MESSAGES_READ_REPOSITORY,
+  type IChattingMessagesReadRepository,
+} from './interface/chatting-messages-read.repository.interface';
+import {
+  CHATTING_MESSAGES_REPOSITORY,
+  type IChattingMessagesRepository,
+} from './interface/chatting-messages.repository.interface';
 import {
   CHATTING_ROOMS_REPOSITORY,
   type IChattingRoomsRepository,
 } from './interface/chatting-rooms.repository.interface';
-import { IChattingRoomsService } from './interface/chatting-rooms.service.interface';
-import { USER_REPOSITORY, type IUserRepository } from '../users/interface/users.repository.interface';
-import { ForbiddenException, NotFoundException } from '@/shared/exceptions';
-import { TRANSACTION_RUNNER, type ITransactionRunner } from '@/shared/prisma/transaction-runner.interface';
-import { type IRequestRepository, REQUEST_REPOSITORY } from '../requests/interface/request.repository.interface';
+import { IChattingRoomsService, ChattingMessageView } from './interface/chatting-rooms.service.interface';
+import { ChattingMessageEntity } from './types';
 
 @Injectable()
 export default class ChatService implements IChattingRoomsService {
@@ -21,6 +31,10 @@ export default class ChatService implements IChattingRoomsService {
     private readonly transactionRunner: ITransactionRunner,
     @Inject(REQUEST_REPOSITORY)
     private readonly requestRepository: IRequestRepository,
+    @Inject(CHATTING_MESSAGES_REPOSITORY)
+    private readonly messagesRepository: IChattingMessagesRepository,
+    @Inject(CHATTING_MESSAGES_READ_REPOSITORY)
+    private readonly readRepository: IChattingMessagesReadRepository,
   ) {}
 
   async createOrGetRoomByDriver(input: { requestId: string; consumerId: string }, user: AccessTokenPayload) {
@@ -61,5 +75,65 @@ export default class ChatService implements IChattingRoomsService {
 
       return result;
     });
+  }
+
+  async getMessages(input: { roomId: string; cursor: string; limit: number }, user: AccessTokenPayload) {
+    const { roomId, cursor, limit = 30 } = input;
+    const userId = user.sub;
+
+    // 1) 방 존재 여부 확인
+    const room = await this.chattingRoomsRepository.findById(roomId);
+    if (!room) {
+      throw new NotFoundException('채팅방을 찾을 수 없습니다.');
+    }
+
+    // 2) 참여자 여부 확인
+    const isParticipant = room.consumerId === userId || room.driverId === userId;
+    if (!isParticipant) {
+      throw new ForbiddenException('해당 채팅방의 참여자만 메시지를 조회할 수 있습니다.');
+    }
+
+    // 3) 메시지 조회 (cursor 기반)
+    //    - limit + 1 로 가져와서 hasNext 판단
+    const decoded = cursor ? decodeChatCursor(cursor) : undefined;
+    const rawMessages = await this.messagesRepository.findByRoomId(roomId, limit + 1, decoded);
+
+    // 5) 다음 페이지 여부/목록 자르기
+    const hasNext = rawMessages.length > limit;
+    const messages = hasNext ? rawMessages.slice(0, limit) : rawMessages;
+
+    // 6) nextCursor 계산 (sequence 기반으로 다시 인코딩)
+    const last = messages[messages.length - 1];
+    const nextCursor = hasNext ? encodeChatCursor({ sequence: last.sequence }) : null;
+
+    // 7) 읽음 정보 가져오기
+    const lastRead = await this.readRepository.findLastReadByUser(roomId, userId);
+    const lastReadMessageId = lastRead ? lastRead.messageId : null;
+
+    // 8) 최종 응답
+    return {
+      roomId,
+      messages: messages.map((m) => this.toEntityWithMine(m, userId)),
+      pageInfo: {
+        hasNext,
+        nextCursor,
+      },
+      lastReadMessageId,
+    };
+  }
+
+  private toEntityWithMine(raw: ChattingMessageEntity, userId: string): ChattingMessageView {
+    return {
+      id: raw.id,
+      chattingRoomId: raw.chattingRoomId,
+      senderId: raw.senderId,
+      content: raw.content,
+      messageType: raw.messageType,
+      sequence: raw.sequence,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      quotation: raw.quotation ?? null,
+      isMine: raw.senderId === userId,
+    };
   }
 }
