@@ -28,6 +28,6 @@ import { CookiesService } from '@/shared/utils/cookies.service';
     RefreshTokenGuard,
     CookiesService,
   ],
-  exports: [AUTH_SERVICE],
+  exports: [AUTH_SERVICE, CookiesService],
 })
 export class AuthModule {}
