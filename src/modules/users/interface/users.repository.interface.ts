@@ -1,12 +1,14 @@
-import { Area, MoveType, Prisma } from '@prisma/client';
+import { Area, MoveType, Prisma, User } from '@prisma/client'; 
 import { SignUpRequest } from '../../auth/dto/signup.request.dto';
 import { UpdateUserProfileDto } from '../dto/user.update.dto';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
+import { Request } from 'express'; 
+
 export type UserWithProfile = Prisma.UserGetPayload<{
   include: {
     driverProfile: true;
     consumerProfile: true;
-  };
+  }; 
 }>;
 
 export type UserWithFullProfile = Prisma.UserGetPayload<{
@@ -55,6 +57,12 @@ export interface IUserRepository {
   createUser(signUpRequest: SignUpRequest, hashedPassword: string): Promise<UserWithProfile>;
   getProfileById(id: string): Promise<UserWithFullProfile | null>;
   updateProfile(id: string, dto: UpdateUserProfileDto): Promise<PartialUserProfile>;
+  updateUserProvider(
+    id: string,
+    provider: string,
+    providerId: string,
+  ): Promise<UserWithProfile>;
 }
 
 export const USER_REPOSITORY = 'IUserRepository';
+

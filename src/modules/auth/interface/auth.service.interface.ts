@@ -3,7 +3,7 @@ import { AccessTokenPayload, JwtPayload } from '@/shared/jwt/jwt.payload.schema'
 import { SignInRequest } from '../dto/signIn.request.dto';
 import { SignUpRequest } from '../dto/signup.request.dto';
 import { UserDtoFactory } from '../../users/dto/user.response.dto';
-import { User, Role } from '@prisma/client';
+import { User } from '@prisma/client';
 
 export interface SignInResponse {
   accessToken: string;
@@ -35,15 +35,13 @@ export interface SocialProfileDto {
 export type SocialSignInDto = SocialProfileDto;
 
 export interface ISocialSignInPayload {
-  provider: 'google'; // 또는 'kakao', 'naver' 등
+  provider: 'google';
   providerId: string;
   email: string;
   name: string;
   image: string | null;
-  role: Role; // DRIVER 또는 CONSUMER
 }
 
-// ★ 2. socialSignIn 메서드가 반환하는 타입
 export type SocialSignInResult =
   | {
       type: 'login';
@@ -54,7 +52,7 @@ export type SocialSignInResult =
       };
     }
   | {
-      type: 'register';
+      type: 'signup';
       data: ISocialSignInPayload;
     };
 

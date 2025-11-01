@@ -5,8 +5,6 @@ import { Injectable } from '@nestjs/common';
 import { UpdateUserProfileDto } from '../dto/user.update.dto';
 import { UserWithFullProfile } from '../interface/users.repository.interface';
 import { Area, MoveType } from '@prisma/client';
-import { getDb } from '@/shared/prisma/get-db';
-import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
@@ -21,10 +19,8 @@ export class PrismaUserRepository implements IUserRepository {
       },
     });
   }
-  async findById(id: string, ctx?: TransactionContext): Promise<UserWithFullProfile | null> {
-    const db = getDb(ctx, this.prisma);
-
-    return await db.user.findUnique({
+  async findById(id: string): Promise<UserWithFullProfile | null> {
+    return await this.prisma.user.findUnique({
       where: { id, deletedAt: null },
       include: {
         driverProfile: {
@@ -37,7 +33,6 @@ export class PrismaUserRepository implements IUserRepository {
       },
     });
   }
-
   async createUser(signUpInput: SignUpRequest, hashedPassword: string): Promise<UserWithProfile> {
     const { email, name, phoneNumber, role } = signUpInput;
 
@@ -48,6 +43,53 @@ export class PrismaUserRepository implements IUserRepository {
         name,
         phoneNumber,
         role,
+      },
+      include: {
+        driverProfile: true,
+        consumerProfile: true,
+      },
+    });
+  }
+
+  async findByProviderId(provider: string, providerId: string): Promise<UserWithProfile | null> {
+    return await this.prisma.user.findUnique({
+      where: {
+        provider_providerId: {
+          provider,
+          providerId,
+        },
+      },
+      include: {
+        driverProfile: true,
+        consumerProfile: true,
+      },
+    });
+  }
+
+  async updateUserProvider(userId: string, provider: string, providerId: string): Promise<UserWithProfile> {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        provider,
+        providerId,
+      },
+      include: {
+        driverProfile: true,
+        consumerProfile: true,
+      },
+    });
+  }
+
+  async createSocialUser(profile: SocialProfile): Promise<UserWithProfile> {
+    const { email, name, provider, providerId } = profile;
+    return await this.prisma.user.create({
+      data: {
+        email,
+        name,
+        provider,
+        providerId,
+        phoneNumber: 'SOCIAL_LOGIN_PENDING',
+        role: 'CONSUMER', //가입시 롤리 없으므로 기본적으로 소비자로 설정해둠
       },
       include: {
         driverProfile: true,
@@ -214,3 +256,10 @@ export class PrismaUserRepository implements IUserRepository {
     return updated;
   }
 }
+
+export type SocialProfile = {
+  provider: string;
+  providerId: string;
+  email: string;
+  name: string;
+};

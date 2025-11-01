@@ -31,4 +31,11 @@ export const validationSchema = z.object({
   REFRESH_COOKIE_PREFIX: z.string().optional(),
   REFRESH_COOKIE_DOMAIN: z.string().optional(),
   BCRYPT_SALT_ROUNDS: z.coerce.number().default(10),
+
+  //구글로그인
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  GOOGLE_CALLBACK_URL: z.string().url(),
+
+  FRONTEND_SIGNUP_URL: z.string().url(),
 });

@@ -148,25 +148,18 @@ export class AuthService implements IAuthService {
   }
 
   async socialSignIn(payload: ISocialSignInPayload): Promise<SocialSignInResult> {
-    const { provider, providerId, email, role } = payload;
+    const { provider, providerId, email } = payload;
 
     // 이메일로 유저를 먼저 찾음
     const userByEmail = await this.userRepository.findByEmail(email);
 
     if (userByEmail) {
-      // 이메일이 존재할 경우 역할(role)이 일치하는지 확인
-      if (userByEmail.role !== role) {
-        throw new ForbiddenException(
-          `해당 이메일은 이미 ${userByEmail.role}(으)로 가입되어 있습니다. ${role}(으)로 로그인할 수 없습니다.`,
-        );
+      // 이메일이 존재할 경우, provider가 다른지 확인
+      if (userByEmail.provider && userByEmail.provider !== provider) {
+        throw new ConflictException(`해당 이메일은 이미 ${userByEmail.provider}(으)로 가입되어 있습니다.`);
       }
 
-      // 이미 다른 소셜 계정과 연동되었는지 확인
-      if (userByEmail.providerId && userByEmail.providerId !== providerId) {
-        throw new ConflictException(`해당 이메일은 이미 다른 ${userByEmail.provider} 계정과 연동되어 있습니다.`);
-      }
-
-      // 소셜 계정을 연동(provider, providerId 업데이트
+      // 소셜 계정을 연동(provider, providerId) 업데이트(로컬 가입 유저를 소셜 연동시키거나, 기존 소셜 유저 정보 업데이트)
       const user = await this.userRepository.updateUserProvider(userByEmail.id, provider, providerId);
 
       // 토큰을 발급하고 'login' 타입을 반환
@@ -182,7 +175,7 @@ export class AuthService implements IAuthService {
     } else {
       // 이메일이 존재하지 않을 경우 (신규 가입)
       return {
-        type: 'register',
+        type: 'signup',
         data: payload,
       };
     }

@@ -1,1 +1,1 @@
-export const timeStringRegex = /^\d+[smhdwy]$/;
+export const timeStringRegex = /^(?:\d+)(?:ms|s|m|h|d|w|y)$/i;
