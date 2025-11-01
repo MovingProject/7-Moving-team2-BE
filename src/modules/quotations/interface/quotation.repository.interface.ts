@@ -28,8 +28,8 @@ export type CreateQuotationInput = {
 export interface IQuotationRepository {
   findDriverQuotations(driverId: string, statuses: QuotationStatus[]): Promise<QuotationWithRelations[]>;
   create(input: CreateQuotationInput, ctx?: TransactionContext): Promise<QuotationEntity>;
-  acceptQuotation(id: string): Promise<Quotation>;
-  rejectOtherQuotations(requestId: string, excludeQuotationId: string): Promise<void>;
+  acceptQuotation(id: string, ctx?: TransactionContext): Promise<Quotation>;
+  rejectOtherQuotations(requestId: string, excludeQuotationId: string, ctx?: TransactionContext): Promise<void>;
   findById(id: string): Promise<QuotationWithRelationsPlusId | null>;
 }
 

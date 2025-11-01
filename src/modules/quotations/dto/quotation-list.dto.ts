@@ -21,7 +21,7 @@ export type QuotationWithRelations = {
   price: number;
   status: QuotationStatus;
   serviceType: MoveType;
-  consumer: { name: string };
+  consumer: { id: string; name: string };
   request: {
     moveAt: Date;
     departureAddress: string;
