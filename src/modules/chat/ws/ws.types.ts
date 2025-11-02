@@ -1,4 +1,5 @@
 import type { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
+import { NotificationType } from '@/shared/constant/values';
 
 export type C2S = {
   'chat:join': (p: { roomId: string }) => void;
@@ -6,7 +7,6 @@ export type C2S = {
   'chat:read': (p: { roomId: string; lastReadIdx: number }) => void;
 };
 
-// Client to Server (서버 -> 클라이언트로 보내는 이벤트 시그니처)
 export type S2C = {
   'conn:ok': (p: { userId: string; role: 'CONSUMER' | 'DRIVER' }) => void;
   'error:event': (p: { code: string; message: string }) => void;
@@ -32,7 +32,27 @@ export type S2C = {
           tempId: string;
         };
   }) => void;
+  'notify:connected': (p: { userId: string; message: string }) => void;
+  'notify:new': (p: {
+    id: string;
+    receiverId: string;
+    senderId?: string | null;
+    content: string;
+    notificationType: NotificationType;
+    createdAt: string;
+    readAt?: string | null;
+    requestId?: string | null;
+    quotationId?: string | null;
+    chattingRoomId?: string | null;
+    reviewId?: string | null;
+  }) => void;
 };
+
+export const NOTI_EVENTS = {
+  CONNECTED: 'notify:connected',
+  NEW: 'notify:new',
+  PING: 'notify:ping',
+} as const;
 
 // Internal Server Event (서버 내부에서 사용하는 이벤트 시그니처)
 export type ISE = Record<string, never>;
