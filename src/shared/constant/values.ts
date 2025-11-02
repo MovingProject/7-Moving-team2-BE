@@ -39,3 +39,17 @@ export type MessageType = (typeof MESSAGE_TYPES)[number];
 
 export const QUOTATION_STATUSES = ['PENDING', 'CONCLUDED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'CANCELLED'] as const;
 export type QuotationStatus = (typeof QUOTATION_STATUSES)[number];
+
+export const NOTIFICATION_TYPES = [
+  'NEW_QUOTATION',
+  'QUOTATION_ACCEPTED',
+  'NEW_MESSAGE',
+  'REVIEW_RECEIVED',
+  'INVITE_RECEIVED',
+  'INVITE_CANCELLED',
+  'REQUEST_CONCLUDED',
+  'REQUEST_COMPLETED',
+  'REQUEST_EXPIRED',
+  'MOVE_DAY_REMINDER',
+] as const;
+export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

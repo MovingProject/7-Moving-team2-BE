@@ -10,6 +10,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { QuotationModule } from './modules/quotations/quotation.module';
 import { WeatherModule } from './modules/weather/weather.module';
 import { ReviewModule } from './modules/reviews/review.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ReviewModule } from './modules/reviews/review.module';
     QuotationModule,
     WeatherModule,
     ReviewModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [],
