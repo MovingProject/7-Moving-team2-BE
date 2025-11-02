@@ -1,10 +1,11 @@
 import { BadRequestException, ForbiddenException, NotFoundException } from '@/shared/exceptions';
 import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runner';
 import { Inject, Injectable } from '@nestjs/common';
-import { Prisma, QuotationStatus } from '@prisma/client';
+import { QuotationStatus } from '@prisma/client';
 import { QuotationSummaryDto } from './dto/quotation-list.dto';
 import type { IQuotationRepository } from './interface/quotation.repository.interface';
 import { QUOTATION_REPOSITORY } from './interface/quotation.repository.interface';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class QuotationService {
