@@ -12,11 +12,18 @@ import { AUTH_SERVICE } from './interface/auth.service.interface';
 import { TOKEN_REPOSITORY } from './interface/token.repository.interface';
 import { CookieModule } from '@/shared/utils/cookie.module';
 import { CookiesService } from '@/shared/utils/cookies.service';
+import { NaverStrategy } from './strategies/naver.strategy';
+import { KakaoStrategy } from './strategies/kakao.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runner';
 @Module({
   imports: [UsersModule, HashingModule, SharedJwtModule, CookieModule],
   controllers: [AuthController],
   providers: [
     AccessTokenGuard,
+    GoogleStrategy,
+    KakaoStrategy,
+    NaverStrategy,
     {
       provide: AUTH_SERVICE,
       useClass: AuthService,
@@ -27,6 +34,7 @@ import { CookiesService } from '@/shared/utils/cookies.service';
     },
     RefreshTokenGuard,
     CookiesService,
+    PrismaTransactionRunner,
   ],
   exports: [AUTH_SERVICE, CookiesService],
 })
