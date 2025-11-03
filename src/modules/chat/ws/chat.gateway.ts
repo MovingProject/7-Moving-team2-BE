@@ -8,6 +8,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
+import { chatReadBodySchema } from './dto/chat-read.dto';
 import { joinRoomBodySchema } from './dto/join-room.dto';
 import { sendMessageBodySchema } from './dto/send-message.dto';
 import { ChatMessageWsService } from './message.service';
@@ -16,7 +17,6 @@ import { ChatRoomWsService } from './room.service';
 import { fail } from './ws.ack';
 import { WS_EVENTS } from './ws.events';
 import { type WsServer, type WsSocket } from './ws.types';
-import { chatReadBodySchema } from './dto/chat-read.dto';
 
 @WebSocketGateway({ cors: { origin: true, credentials: true } })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
