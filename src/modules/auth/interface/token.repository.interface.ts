@@ -1,3 +1,5 @@
+import { TransactionContext } from "@/shared/prisma/transaction-runner.interface";
+
 export interface RefreshTokenEntity {
   id: string;
   jti: string;
@@ -9,7 +11,13 @@ export interface RefreshTokenEntity {
 }
 
 export interface ITokenRepository {
-  saveRefreshToken(userId: string, tokenHash: string, jti: string, expiresAt: Date): Promise<RefreshTokenEntity>;
+  saveRefreshToken(
+    userId: string,
+    tokenHash: string,
+    jti: string,
+    expiresAt: Date,
+    ctx?: TransactionContext,
+  ): Promise<RefreshTokenEntity>;
 
   findTokenByHash(tokenHash: string): Promise<RefreshTokenEntity | null>;
 
