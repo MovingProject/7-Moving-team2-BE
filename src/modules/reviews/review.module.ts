@@ -7,10 +7,11 @@ import { REVIEW_REPOSITORY } from './interface/review-repository.interface';
 import { PrismaReviewRepository } from './infra/prisma-review.repository';
 import { PrismaQuotationRepository } from './infra/prisma-quotation.repository';
 import { QUOTATION_REPOSITORY } from './interface/quotation-repository.interface';
+import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule],
+  imports: [PrismaModule, UsersModule, AuthModule],
   controllers: [ReviewController],
   providers: [
     {
