@@ -56,4 +56,23 @@ export class PrismaChattingMessagesReadRepository implements IChattingMessagesRe
 
     return row as ChatMessageReadEntity | null;
   }
+
+  async countUnreadByRooms(meId: string, roomIds: string[]): Promise<Map<string, number>> {
+    if (roomIds.length === 0) return new Map();
+
+    const rows = await this.prisma.$queryRaw<{ chatting_room_id: string; unread: bigint }[]>`
+      SELECT m."chattingRoomId" AS chatting_room_id, COUNT(*)::bigint AS unread
+      FROM "ChattingMessage" m
+      LEFT JOIN "ChatMessageRead" r
+        ON r."messageId" = m."id" AND r."userId" = ${meId}
+      WHERE m."chattingRoomId" = ANY(${roomIds})
+        AND m."senderId" <> ${meId}
+        AND r."messageId" IS NULL
+      GROUP BY m."chattingRoomId"
+    `;
+
+    const map = new Map<string, number>();
+    for (const row of rows) map.set(row.chatting_room_id, Number(row.unread));
+    return map;
+  }
 }

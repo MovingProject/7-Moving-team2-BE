@@ -1,6 +1,6 @@
 ### 환경 변수
 @baseUrl = http://localhost:4000
-@driverToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDk0OTNjOS1mYTQzLTQyYTItODExOS1jNDAwNDUwYjkxYTMiLCJqdGkiOiI1ZTljM2EwNS1mY2IxLTQ3MmYtYjk3NS0zMWFlNDVhZGFiYWYiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYxOTg4MTM3LCJleHAiOjE3NjE5ODkwMzcsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.cutzwLfkUmD5sx6rJswMiUpGF6zx-STPG-KG3m13ipQ;
+@driverToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDk0OTNjOS1mYTQzLTQyYTItODExOS1jNDAwNDUwYjkxYTMiLCJqdGkiOiIyNTdjMjdjNi00YTI5LTQ3MzEtYTI3MS0zODNlMDEyMmEyNDAiLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzYyMTU5MjI2LCJleHAiOjE3NjIxNjAxMjYsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJ9.Wwvm4XTSuq1WSiz96qOcgd6oAFPVjvi-Joa5qWosPr4; Max-Age=900;
 @consumerToken = access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQxOTAyNS1jNzJlLTQxYTgtYmM3Zi0yMWNkOGZhMzA3MzYiLCJqdGkiOiI3YTc5OGRlOC0xYmY2LTRjMmQtOTVlZC00ZjMzODRkODBjOGMiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE1Mzk0MDcsImV4cCI6MTc2MTU0MDMwNywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.O4rbs8AQ2IlBXPBvUsd4wvY_bkSVmueQoo1utj9aRng;
 @pendingRequestId = 2fdfc942-00b1-4d16-89d4-bc4f1f0102e3
 @nonPendingRequestId = 2fdfc942-00b1-4d16-89d4-bc4f1f0102e3
@@ -102,3 +102,33 @@ Accept: application/json
 GET http://localhost:4000/chatting-rooms/{{roomId}}/messages?cursor=invalid-base64
 Cookie: access_token={{driverToken}}
 Accept: application/json
+
+### ============================================================
+### 1) 내 채팅방 목록 조회 (Bearer) — unreadCount 확인
+### ============================================================
+GET {{baseUrl}}/chatting-rooms/my
+Cookie: access_token={{driverToken}}
+
+### ============================================================
+### 2) 내 채팅방 목록 조회 (Cookie) — unreadCount 확인
+### ============================================================
+GET {{baseUrl}}/chatting-rooms/my
+Cookie: access_token={{driverToken}}
+
+
+### ============================================================
+### 3) 인증 없이 호출 (401 기대)
+### ============================================================
+GET {{baseUrl}}/chatting-rooms/my
+
+
+### ============================================================
+### (선택) 특정 방 메시지 목록 조회로 육안 검증
+###  - 아래 roomId에 위 1) 응답에서 받은 값 넣고 확인
+###  - unreadCount > 0 이면 여기 목록에서
+###    senderId != 내 아이디 && 읽음기록 없는 메시지 수와 맞는지 비교
+### ============================================================
+@roomId = REPLACE_ME_ROOM_ID
+
+GET {{baseUrl}}/chatting-rooms/{{roomId}}/messages
+Cookie: access_token={{driverToken}}

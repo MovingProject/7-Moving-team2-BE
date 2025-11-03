@@ -17,7 +17,13 @@ import {
   CHATTING_ROOMS_REPOSITORY,
   type IChattingRoomsRepository,
 } from './interface/chatting-rooms.repository.interface';
-import { IChattingRoomsService, ChattingMessageView } from './interface/chatting-rooms.service.interface';
+import {
+  IChattingRoomsService,
+  ChattingMessageView,
+  ChatRoomListItem,
+  OtherUserBrief,
+  LastMessageBrief,
+} from './interface/chatting-rooms.service.interface';
 import { ChattingMessageEntity } from './types';
 
 @Injectable()
@@ -74,6 +80,44 @@ export default class ChatService implements IChattingRoomsService {
       const result = await this.chattingRoomsRepository.createOrGetRoomByDriver(requestId, consumerId, driver.id, ctx);
 
       return result;
+    });
+  }
+
+  async getMyRooms(user: AccessTokenPayload) {
+    const meId = user.sub;
+    const rooms = await this.chattingRoomsRepository.findJoinableByUser(meId);
+    const roomIds = rooms.map((r) => r.id);
+    const unreadMap = await this.readRepository.countUnreadByRooms(meId, roomIds);
+
+    return rooms.map<ChatRoomListItem>((r) => {
+      const iAmConsumer = r.consumer.id === meId;
+      const otherRaw = iAmConsumer ? r.driver : r.consumer;
+
+      const other: OtherUserBrief = {
+        userId: otherRaw.id,
+        role: otherRaw.role,
+        name: otherRaw.name, // users.name
+        displayName: otherRaw.role === 'DRIVER' ? (otherRaw.nickname ?? otherRaw.name) : otherRaw.name,
+        avatarUrl: otherRaw.avatarUrl ?? null,
+      };
+
+      const lastMessage: LastMessageBrief | null = r.lastMessage
+        ? {
+            id: r.lastMessage.id,
+            type: r.lastMessage.type,
+            content: r.lastMessage.content,
+            createdAt: r.lastMessage.createdAt.toISOString(),
+          }
+        : null;
+
+      return {
+        roomId: r.id,
+        other,
+        lastMessage,
+        unreadCount: unreadMap.get(r.id) ?? 0,
+        updatedAt: r.updatedAt.toISOString(),
+        closed: !!r.closedAt,
+      };
     });
   }
 
