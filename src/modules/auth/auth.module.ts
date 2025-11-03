@@ -36,6 +36,6 @@ import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runn
     CookiesService,
     PrismaTransactionRunner,
   ],
-  exports: [AUTH_SERVICE, CookiesService],
+  exports: [AUTH_SERVICE, CookiesService, AccessTokenGuard],
 })
 export class AuthModule {}
