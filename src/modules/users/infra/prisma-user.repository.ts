@@ -7,6 +7,7 @@ import { UserWithFullProfile } from '../interface/users.repository.interface';
 import { Area, MoveType } from '@prisma/client';
 import { getDb } from '@/shared/prisma/get-db';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
+import { CreateSocialUserDto } from '../dto/social-user.create.dto';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
@@ -214,5 +215,50 @@ export class PrismaUserRepository implements IUserRepository {
     });
 
     return updated;
+  }
+
+  async createSocialUser(data: CreateSocialUserDto, ctx?: TransactionContext): Promise<UserWithProfile> {
+    const db = getDb(ctx, this.prisma);
+    console.log('user폴더 유저레포 createSocialUser role :  ', data.role);
+    return db.user.create({
+      data: {
+        email: data.email ?? `${data.providerId}@${data.provider}.temp`,
+        name: data.name ?? '신규 사용자',
+        phoneNumber: '',
+        role: data.role ?? 'CONSUMER',
+        passwordHash: null,
+        provider: data.provider,
+        providerId: data.providerId,
+      },
+      include: {
+        driverProfile: true,
+        consumerProfile: true,
+      },
+    });
+  }
+  async findByProvider(
+    provider: string,
+    providerId: string,
+    ctx?: TransactionContext,
+  ): Promise<UserWithProfile | null> {
+    const db = getDb(ctx, this.prisma);
+    return db.user.findUnique({
+      where: { provider_providerId: { provider, providerId } },
+      include: { driverProfile: true, consumerProfile: true },
+    });
+  }
+
+  async updateProvider(
+    userId: string,
+    provider: string,
+    providerId: string,
+    ctx?: TransactionContext,
+  ): Promise<UserWithProfile> {
+    const db = getDb(ctx, this.prisma);
+    return db.user.update({
+      where: { id: userId },
+      data: { provider, providerId },
+      include: { driverProfile: true, consumerProfile: true },
+    });
   }
 }

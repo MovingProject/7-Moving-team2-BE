@@ -19,6 +19,12 @@ export interface IAuthService {
   signIn(signInInput: SignInRequest): Promise<SignInResponse>;
   signOut(user: AccessTokenPayload): Promise<void>;
   refreshToken(refresh: JwtPayload, refreshRaw: string): Promise<RefreshResponse>;
+  socialSignIn(oauthUser: {
+    provider: string;
+    providerId: string;
+    email?: string | null;
+    name?: string | null;
+  }): Promise<SignInResponse>;
 }
 
 export const AUTH_SERVICE = 'IAuthService';

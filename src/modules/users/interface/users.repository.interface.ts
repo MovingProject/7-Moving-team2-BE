@@ -2,6 +2,7 @@ import { Area, MoveType, Prisma } from '@prisma/client';
 import { SignUpRequest } from '../../auth/dto/signup.request.dto';
 import { UpdateUserProfileDto } from '../dto/user.update.dto';
 import { TransactionContext } from '@/shared/prisma/transaction-runner.interface';
+import { CreateSocialUserDto } from '../dto/social-user.create.dto';
 export type UserWithProfile = Prisma.UserGetPayload<{
   include: {
     driverProfile: true;
@@ -55,6 +56,14 @@ export interface IUserRepository {
   createUser(signUpRequest: SignUpRequest, hashedPassword: string): Promise<UserWithProfile>;
   getProfileById(id: string): Promise<UserWithFullProfile | null>;
   updateProfile(id: string, dto: UpdateUserProfileDto): Promise<PartialUserProfile>;
+  findByProvider(provider: string, providerId: string, ctx?: TransactionContext): Promise<UserWithProfile | null>;
+  updateProvider(
+    userId: string,
+    provider: string,
+    providerId: string,
+    ctx?: TransactionContext,
+  ): Promise<UserWithProfile>;
+  createSocialUser(data: CreateSocialUserDto, ctx?: TransactionContext): Promise<UserWithProfile>;
 }
 
 export const USER_REPOSITORY = 'IUserRepository';

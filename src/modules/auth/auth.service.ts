@@ -11,9 +11,10 @@ import { SignUpRequest } from './dto/signup.request.dto';
 import { IAuthService } from './interface/auth.service.interface';
 import { TOKEN_REPOSITORY, type ITokenRepository } from './interface/token.repository.interface';
 import { ConfigService } from '@nestjs/config';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import { ConfigNotFoundException } from '@/shared/exceptions/config-not-found.exception';
 import { randomUUID } from 'crypto';
+import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runner';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -31,6 +32,7 @@ export class AuthService implements IAuthService {
     private readonly tokenRepository: ITokenRepository,
 
     private readonly configService: ConfigService,
+    private readonly transactionRunner: PrismaTransactionRunner,
   ) {}
 
   async signUp(signUpRequest: SignUpRequest) {
@@ -166,5 +168,74 @@ export class AuthService implements IAuthService {
     const accessToken = await this.jwtService.signAccessToken({ sub, jti: newJti, role });
 
     return { accessToken, refreshToken };
+  }
+
+  async socialSignIn(oauthUser: {
+    provider: string;
+    providerId: string;
+    email?: string | null;
+    name?: string | null;
+    role?: 'CONSUMER' | 'DRIVER';
+  }) {
+    return this.transactionRunner.run(async (tx) => {
+      const { provider, providerId, email, name, role } = oauthUser;
+
+      // 1️⃣ provider + providerId 로 기존 소셜 유저 찾기
+      let user = await this.userRepository.findByProvider(provider, providerId, tx);
+
+      // 2️⃣ 이메일 기반 기존 유저 확인
+      if (!user && email) {
+        const existing = await this.userRepository.findByEmail(email);
+        if (existing) {
+          user = await this.userRepository.updateProvider(existing.id, provider, providerId, tx);
+        }
+      }
+
+      console.log('🚀 socialSignIn 받은 role:', oauthUser.role);
+      // 3️⃣ 신규 소셜 유저 생성
+      if (!user) {
+        user = await this.userRepository.createSocialUser(
+          { provider, providerId, email, name, role: oauthUser.role },
+          tx,
+        );
+      }
+
+      if (!user) {
+        throw new BadRequestException('유저 정보를 생성할 수 없습니다.');
+      }
+
+      // 4️⃣ JWT 발급 및 RefreshToken 저장
+      const jti = randomUUID();
+      const refreshPayload: JwtPayload = { sub: user.id, jti };
+      const refreshToken = await this.jwtService.signRefreshToken(refreshPayload);
+      const hashedRefresh = await this.hashingService.hash(refreshToken);
+
+      const raw = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
+      const parsed = ms(raw as StringValue); //해결안됨 걍써봤는데 사라짐 추후수정필요할듯?
+      if (typeof parsed !== 'number') {
+        throw new ConfigNotFoundException(`JWT_REFRESH_EXPIRES_IN 형식이 잘못됨: ${raw}`);
+      }
+      const jwtRefreshExpiresInMs = parsed;
+
+      if (typeof jwtRefreshExpiresInMs !== 'number') {
+        throw new ConfigNotFoundException(`JWT_REFRESH_EXPIRES_IN 형식이 잘못됨: ${raw}`);
+      }
+
+      const expiresAt = new Date(Date.now() + jwtRefreshExpiresInMs);
+      await this.tokenRepository.saveRefreshToken(user.id, hashedRefresh, jti, expiresAt, tx);
+
+      const accessPayload: AccessTokenPayload = {
+        sub: user.id,
+        jti,
+        role: user.role,
+      };
+      const accessToken = await this.jwtService.signAccessToken(accessPayload);
+
+      return {
+        accessToken,
+        refreshToken,
+        user: UserDtoFactory.toSignInResponseDto(user),
+      };
+    });
   }
 }
