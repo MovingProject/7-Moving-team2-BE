@@ -1,5 +1,6 @@
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { ChattingMessageEntity } from '../types';
+import { MessageType } from '@/shared/constant/values';
 
 export type ChattingMessageView = ChattingMessageEntity & {
   isMine: boolean;
@@ -15,6 +16,30 @@ export interface GetChatMessagesResponse {
   lastReadMessageId?: string | null;
 }
 
+export type OtherUserBrief = {
+  userId: string;
+  role: 'CONSUMER' | 'DRIVER';
+  name: string;
+  displayName: string;
+  avatarUrl?: string | null;
+};
+
+export type LastMessageBrief = {
+  id: string;
+  type: MessageType;
+  content: string | null;
+  createdAt: string;
+};
+
+export type ChatRoomListItem = {
+  roomId: string;
+  other: OtherUserBrief;
+  lastMessage: LastMessageBrief | null;
+  unreadCount: number;
+  updatedAt: string;
+  closed: boolean;
+};
+
 export interface IChattingRoomsService {
   createOrGetRoomByDriver(
     input: {
@@ -23,7 +48,7 @@ export interface IChattingRoomsService {
     },
     user: AccessTokenPayload,
   ): Promise<{ roomId: string }>;
-
+  getMyRooms(user: AccessTokenPayload): Promise<ChatRoomListItem[]>;
   getMessages(
     input: { roomId: string; cursor?: string; limit: number },
     user: AccessTokenPayload,
