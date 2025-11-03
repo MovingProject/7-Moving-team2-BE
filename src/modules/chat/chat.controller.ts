@@ -39,6 +39,17 @@ export class ChattingRoomsController {
     return result;
   }
 
+  @Get('/my')
+  @ApiTags('ChattingRooms')
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('DRIVER', 'CONSUMER')
+  @ApiOperation({ summary: '내 채팅방 목록 조회' })
+  @ApiResponse({ status: 200, description: '내 채팅방 목록 조회 성공' })
+  async getMyRooms(@AuthUser() user: AccessTokenPayload) {
+    const result = await this.roomsService.getMyRooms(user);
+    return result;
+  }
+
   @Get(':roomId/messages')
   @UseGuards(AccessTokenGuard)
   @ApiTags('ChattingRooms')
