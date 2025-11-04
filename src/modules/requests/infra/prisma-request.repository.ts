@@ -90,6 +90,7 @@ export class PrismaRequestRepository implements IRequestRepository {
     });
     return requests.map((req) => ({
       id: req.id,
+      consumerId: req.consumerId,
       consumerName: req.consumer.name,
       moveAt: req.moveAt,
       departureAddress: req.departureAddress,
@@ -164,6 +165,7 @@ export class PrismaRequestRepository implements IRequestRepository {
     // DTO 변환
     return requests.map((req) => ({
       id: req.id,
+      consumerId: req.consumerId,
       consumerName: req.consumer.name,
       moveAt: req.moveAt,
       departureAddress: req.departureAddress,
