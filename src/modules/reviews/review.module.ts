@@ -9,11 +9,13 @@ import { PrismaQuotationRepository } from './infra/prisma-quotation.repository';
 import { QUOTATION_REPOSITORY } from './interface/quotation-repository.interface';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
+import { NotificationService } from '../notification/notification.service';
 
 @Module({
   imports: [PrismaModule, UsersModule, AuthModule],
   controllers: [ReviewController],
   providers: [
+    NotificationService,
     {
       provide: REVIEW_SERVICE,
       useClass: ReviewService,
