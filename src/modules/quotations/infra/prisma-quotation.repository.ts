@@ -76,4 +76,19 @@ export class PrismaQuotationRepository implements IQuotationRepository {
       },
     });
   }
+
+  async findUncompletedAfterNow() {
+    return this.prisma.quotation.findMany({
+      where: {
+        status: { notIn: [QuotationStatus.COMPLETED, QuotationStatus.CANCELLED] },
+        moveAt: { gt: new Date() },
+      },
+    });
+  }
+  async updateStatus(id: string, status: QuotationStatus): Promise<Quotation> {
+    return this.prisma.quotation.update({
+      where: { id },
+      data: { status },
+    });
+  }
 }

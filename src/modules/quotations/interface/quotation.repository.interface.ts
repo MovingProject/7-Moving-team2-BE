@@ -31,6 +31,8 @@ export interface IQuotationRepository {
   acceptQuotation(id: string, ctx?: TransactionContext): Promise<Quotation>;
   rejectOtherQuotations(requestId: string, excludeQuotationId: string, ctx?: TransactionContext): Promise<void>;
   findById(id: string): Promise<QuotationWithRelationsPlusId | null>;
+  updateStatus(id: string, status: QuotationStatus): Promise<Quotation>;
+  findUncompletedAfterNow(): Promise<Quotation[]>;
 }
 
 export const QUOTATION_REPOSITORY = 'IQuotationRepository';
