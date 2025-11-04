@@ -1,18 +1,18 @@
+import { PrismaModule } from '@/shared/prisma/prisma.module';
+import { CookiesService } from '@/shared/utils/cookies.service';
 import { Module } from '@nestjs/common';
+import { NotificationModule } from '../notification/notification.module';
+import { UsersModule } from '../users/users.module';
+import { PrismaInviteRepository } from './infra/prisma-invite.repository';
+import { PrismaRequestRepository } from './infra/prisma-request.repository';
+import { INVITE_REPOSITORY } from './interface/invite.repository.interface';
+import { REQUEST_REPOSITORY } from './interface/request.repository.interface';
+import { REQUEST_SERVICE } from './interface/request.service.interface';
 import { RequestController } from './request.controller';
 import { RequestService } from './request.service';
-import { PrismaRequestRepository } from './infra/prisma-request.repository';
-import { REQUEST_SERVICE } from './interface/request.service.interface';
-import { REQUEST_REPOSITORY } from './interface/request.repository.interface';
-import { UsersModule } from '../users/users.module';
-import { CookiesService } from '@/shared/utils/cookies.service';
-import { PrismaModule } from '@/shared/prisma/prisma.module';
-import { PrismaInviteRepository } from './infra/prisma-invite.repository';
-import { INVITE_REPOSITORY } from './interface/invite.repository.interface';
-import { NotificationService } from '../notification/notification.service';
 
 @Module({
-  imports: [UsersModule, PrismaModule],
+  imports: [UsersModule, PrismaModule, NotificationModule],
   controllers: [RequestController],
   providers: [
     {
@@ -28,7 +28,6 @@ import { NotificationService } from '../notification/notification.service';
       useClass: PrismaInviteRepository,
     },
     CookiesService,
-    NotificationService,
   ],
   exports: [REQUEST_SERVICE],
 })

@@ -1,21 +1,20 @@
-import { Module } from '@nestjs/common';
-import { ReviewController } from './review.controller';
-import { REVIEW_SERVICE } from './interface/review-service.interface';
-import { ReviewService } from './review.service';
 import { PrismaModule } from '@/shared/prisma/prisma.module';
-import { REVIEW_REPOSITORY } from './interface/review-repository.interface';
-import { PrismaReviewRepository } from './infra/prisma-review.repository';
-import { PrismaQuotationRepository } from './infra/prisma-quotation.repository';
-import { QUOTATION_REPOSITORY } from './interface/quotation-repository.interface';
-import { UsersModule } from '../users/users.module';
+import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
-import { NotificationService } from '../notification/notification.service';
+import { NotificationModule } from '../notification/notification.module';
+import { UsersModule } from '../users/users.module';
+import { PrismaQuotationRepository } from './infra/prisma-quotation.repository';
+import { PrismaReviewRepository } from './infra/prisma-review.repository';
+import { QUOTATION_REPOSITORY } from './interface/quotation-repository.interface';
+import { REVIEW_REPOSITORY } from './interface/review-repository.interface';
+import { REVIEW_SERVICE } from './interface/review-service.interface';
+import { ReviewController } from './review.controller';
+import { ReviewService } from './review.service';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule],
+  imports: [PrismaModule, UsersModule, AuthModule, NotificationModule],
   controllers: [ReviewController],
   providers: [
-    NotificationService,
     {
       provide: REVIEW_SERVICE,
       useClass: ReviewService,
