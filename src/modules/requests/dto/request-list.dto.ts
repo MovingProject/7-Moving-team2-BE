@@ -10,7 +10,7 @@ const DriverProfileSummarySchema = z.object({
   rating: z.number(), // 평균 평점
   careerYears: z.number().int(), // 경력 (년)
   confirmedCount: z.number().int(), // 완료 건수
-  image: z.string().url().nullable(),
+  image: z.string().nullable(),
 });
 
 const QuotationSchema = z.object({
