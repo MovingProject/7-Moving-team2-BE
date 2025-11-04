@@ -96,7 +96,10 @@ export class AuthController {
   async googleAuthCallback(@Req() req: OAuthRequest, @Res({ passthrough: true }) res: Response) {
     const { accessToken, refreshToken, user } = req.user;
     this.cookiesService.setAuthCookies(res, accessToken, refreshToken);
-    return user;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const userData = encodeURIComponent(JSON.stringify(user));
+
+    return res.redirect(`${frontendUrl}/auth/google/callback?user=${userData}`);
   }
 
   // 🚀 [소셜 로그인 - Kakao]
