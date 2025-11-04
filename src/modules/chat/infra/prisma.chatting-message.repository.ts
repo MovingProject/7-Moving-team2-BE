@@ -47,7 +47,7 @@ export class PrismaChattingMessagesRepository implements IChattingMessagesReposi
           chattingRoomId: roomId,
         },
         orderBy: {
-          sequence: 'asc',
+          sequence: 'desc', // 최신 메시지부터 가져오기 (limit=30이면 최신 30개)
         },
         cursor: cursor
           ? {
@@ -61,7 +61,8 @@ export class PrismaChattingMessagesRepository implements IChattingMessagesReposi
         take,
       });
 
-      return rows as ChattingMessageEntity[];
+      // DESC로 가져왔으므로 다시 역순으로 뒤집어서 오래된 것부터 최신 순서로 반환
+      return rows.reverse() as ChattingMessageEntity[];
     } catch {
       throw new InternalServerException('채팅 메시지를 조회하는 중 오류가 발생했습니다.');
     }
