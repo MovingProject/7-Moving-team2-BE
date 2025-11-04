@@ -12,17 +12,26 @@ import { QUOTATION_REPOSITORY } from './interface/quotation-repository.interface
 import type { IReviewRepository } from './interface/review-repository.interface';
 import { REVIEW_REPOSITORY } from './interface/review-repository.interface';
 import { IReviewService } from './interface/review-service.interface';
+import { NotificationService } from '../notification/notification.service';
+import type { IUserRepository } from '../users/interface/users.repository.interface';
+import { USER_REPOSITORY } from '../users/interface/users.repository.interface';
 
 @Injectable()
 export class ReviewService implements IReviewService {
   constructor(
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
     @Inject(REVIEW_REPOSITORY)
     private readonly reviewRepository: IReviewRepository,
     @Inject(QUOTATION_REPOSITORY)
     private readonly quotationRepository: IQuotationRepository,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async createReview(input: reviewDto & { consumerId: string }) {
+    const consumer = await this.userRepository.findById(input.consumerId);
+    if (!consumer) throw new NotFoundException('존재하지 않는 소비자입니다.');
+
     const quotation = await this.quotationRepository.findQuotationById(input.quotationId);
     if (!quotation) throw new NotFoundException('존재하지 않는 견적입니다.');
 
@@ -38,9 +47,17 @@ export class ReviewService implements IReviewService {
 
     const reviewData: reviewInput = { ...input, driverId: quotation.driverId };
 
-    const review = await this.reviewRepository.createReviewWithCountIncrement(reviewData);
+    const createdReview = await this.reviewRepository.createReviewWithCountIncrement(reviewData);
+    await this.notificationService.createNotification({
+      receiverId: quotation.driverId,
+      senderId: input.consumerId,
+      notificationType: 'REVIEW_RECEIVED',
+      content: ` ${consumer.name ?? '고객'}님이 새로운 리뷰를 남겼습니다.`,
+      quotationId: quotation.id,
+      reviewId: createdReview.id,
+    });
 
-    return review;
+    return createdReview;
   }
 
   async getDriverReviews(driverId: string, limit: number, cursor: string): Promise<ReviewListResponseDto> {
