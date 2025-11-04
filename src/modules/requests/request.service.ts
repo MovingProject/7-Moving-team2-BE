@@ -175,6 +175,15 @@ export class RequestService implements IRequestService {
 
   async rejectRequest(driverId: string, dto: DriverRequestActionDTO) {
     return this.transactionRunner.run(async (ctx) => {
+      const existingDriver = await this.userRepository.findById(driverId);
+
+      if (!existingDriver) throw new NotFoundException('기사를 찾을 수 없습니다.');
+
+      if (existingDriver.role !== 'DRIVER') throw new ForbiddenException('기사만 요청을 반려할 수 있습니다.');
+
+      if (!existingDriver.driverProfile)
+        throw new ForbiddenException('기사 프로필이 완성되지 않아 요청을 반려할 수 없습니다.');
+
       const request = await this.requestRepository.findById(dto.requestId);
 
       if (!request) throw new NotFoundException('요청을 찾을수가 없습니다.');
@@ -182,15 +191,26 @@ export class RequestService implements IRequestService {
       if (request.requestStatus !== 'PENDING') {
         throw new ConflictException('이미 완료되었거나 취소된 요청은 반려할 수 없습니다.');
       }
+      const isInvited = request.invites.some((i) => i.driverId === driverId);
 
       const input = {
         ...dto,
         driverId,
         state: 'REJECTED',
-        source: request.invites.some((i) => i.driverId === driverId) ? 'INVITED' : 'GENERAL',
+        source: isInvited ? 'INVITED' : 'GENERAL',
       };
 
-      return this.requestRepository.createDriverAction(ctx.tx as PrismaClient, input);
+      const action = await this.requestRepository.createDriverAction(ctx.tx as PrismaClient, input);
+      if (isInvited) {
+        await this.notificationService.createNotification({
+          receiverId: request.consumerId,
+          senderId: driverId,
+          notificationType: 'INVITE_CANCELLED',
+          content: `${existingDriver.driverProfile.nickname ?? '기사'}님이 지정 견적 요청을 반려했습니다.`,
+          requestId: request.id,
+        });
+      }
+      return action;
     });
   }
 
