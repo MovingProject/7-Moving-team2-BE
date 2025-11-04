@@ -1,6 +1,6 @@
 import { Review } from '@prisma/client';
+import { reviewDto } from '../dto/review.create.dto';
 import { ReviewListResponseDto } from '../dto/review.get.dto';
-import { reviewDto, reviewInput } from '../dto/review.create.dto';
 
 export interface IReviewService {
   createReview(input: reviewDto & { consumerId: string }): Promise<Review>;
@@ -11,7 +11,6 @@ export interface IReviewService {
     averageRating: number;
     ratings: Record<number, number>;
   }>;
-
 }
 
 export const REVIEW_SERVICE = 'IReviewService';
