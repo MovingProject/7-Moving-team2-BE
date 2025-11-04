@@ -24,6 +24,17 @@ export class QuotationController {
     return this.quotationService.findDriverQuotationsByStatus(user.sub, status);
   }
 
+  @Get('consumer/quotations')
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @RequireRoles('CONSUMER')
+  async findConsumerQuotations(@AuthUser() user: AccessTokenPayload) {
+    const quotations = await this.quotationService.findConsumerQuotations(user.sub);
+    return {
+      success: true,
+      data: quotations,
+    };
+  }
+
   @Post(':quotationId/accept')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @RequireRoles('CONSUMER')

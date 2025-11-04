@@ -8,6 +8,7 @@ import { QUOTATION_REPOSITORY } from './interface/quotation.repository.interface
 import { Prisma } from '@prisma/client';
 import { UpdateQuotationStatusDto } from './dto/quotation-status.dto';
 import { scheduleQuotationCompletionJob } from './infra/quotation.scheduler';
+import { QuotationWithReviewDto } from './dto/consumer-quotation.dto';
 
 @Injectable()
 export class QuotationService {
@@ -43,6 +44,42 @@ export class QuotationService {
     });
 
     return mappedQuotations;
+  }
+
+  async findConsumerQuotations(consumerId: string): Promise<QuotationWithReviewDto[]> {
+    const quotations = await this.quotationRepository.findConsumerQuotations(consumerId, [
+      QuotationStatus.CONCLUDED,
+      QuotationStatus.COMPLETED,
+    ]);
+
+    return quotations.map((q) => ({
+      quotationId: q.id,
+      driverId: q.driver.id,
+      driverName: q.driver.name,
+      driverNickname: q.driver.driverProfile?.nickname || q.driver.name,
+      driverImage: q.driver.driverProfile?.image || null,
+      driverReviewCount: q.driver.driverProfile?.reviewCount || 0,
+      driverRating: q.driver.driverProfile?.rating || 0,
+      driverCareerYears: q.driver.driverProfile?.careerYears || 0,
+      driverConfirmedCount: q.driver.driverProfile?.confirmedCount || 0,
+      requestId: q.request.id,
+      serviceType: Array.isArray(q.request.serviceType) ? q.request.serviceType : [q.request.serviceType],
+      departureAddress: q.request.departureAddress,
+      arrivalAddress: q.request.arrivalAddress,
+      price: q.price,
+      quotationStatus: q.status,
+      moveAt: q.request.moveAt,
+      createdAt: q.createdAt,
+      hasReview: !!q.review,
+      review: q.review
+        ? {
+            id: q.review.id,
+            rating: q.review.rating,
+            content: q.review.content,
+            createdAt: q.review.createdAt,
+          }
+        : null,
+    }));
   }
 
   async acceptQuotation(quotationId: string, consumerId: string) {

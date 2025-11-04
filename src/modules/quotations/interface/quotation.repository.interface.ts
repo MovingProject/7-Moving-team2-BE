@@ -27,6 +27,7 @@ export type CreateQuotationInput = {
 };
 export interface IQuotationRepository {
   findDriverQuotations(driverId: string, statuses: QuotationStatus[]): Promise<QuotationWithRelations[]>;
+  findConsumerQuotations(consumerId: string, statuses: QuotationStatus[]): Promise<any[]>;
   create(input: CreateQuotationInput, ctx?: TransactionContext): Promise<QuotationEntity>;
   acceptQuotation(id: string, ctx?: TransactionContext): Promise<Quotation>;
   rejectOtherQuotations(requestId: string, excludeQuotationId: string, ctx?: TransactionContext): Promise<void>;
