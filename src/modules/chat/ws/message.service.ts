@@ -21,6 +21,8 @@ import { WS_EVENTS } from './ws.events';
 import { type IChattingMessagesReadRepository } from '../interface/chatting-messages-read.repository.interface';
 import { CHATTING_MESSAGES_READ_REPOSITORY } from '../interface/chatting-messages-read.repository.interface';
 import { ChatReadBody } from './dto/chat-read.dto';
+import { NotificationService } from '@/modules/notification/notification.service';
+import { BadRequestException } from '@shared/exceptions/bad-request.exception';
 
 @Injectable()
 export class ChatMessageWsService {
@@ -32,6 +34,7 @@ export class ChatMessageWsService {
     @Inject(CHATTING_MESSAGES_REPOSITORY) private readonly msgsRepo: IChattingMessagesRepository,
     @Inject(QUOTATION_REPOSITORY) private readonly quotationRepo: IQuotationRepository,
     @Inject(CHATTING_MESSAGES_READ_REPOSITORY) private readonly msgsReadRepo: IChattingMessagesReadRepository,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async sendMessage(client: WsSocket, input: SendMessageBody) {
@@ -44,80 +47,109 @@ export class ChatMessageWsService {
     if (room.consumerId !== user.id && room.driverId !== user.id) {
       return fail('SEND_DENIED', '이 방에 참여할 수 없습니다.');
     }
+    try {
+      const result = await this.tx.run(async (ctx) => {
+        const nextIdx = await this.roomsRepo.incrementNextSequence(room.id, ctx);
 
-    const result = await this.tx.run(async (ctx) => {
-      const nextIdx = await this.roomsRepo.incrementNextSequence(room.id, ctx);
-      const createInput: CreateChattingMessageInput = {
-        chattingRoomId: room.id,
-        senderId: user.id,
-        messageType: input.messageType,
-        sequence: nextIdx,
-        content: input.messageType === 'MESSAGE' ? input.content : null,
-      };
-      const savedMessage = await this.msgsRepo.create(createInput, ctx);
+        if (nextIdx === 1 && input.messageType !== 'QUOTATION') {
+          throw new BadRequestException('FIRST_MESSAGE_MUST_BE_QUOTATION');
+        }
 
-      if (input.messageType === 'QUOTATION') {
-        const quotationInput: CreateQuotationInput = {
-          consumerId: room.consumerId,
-          driverId: room.driverId,
+        const createInput: CreateChattingMessageInput = {
           chattingRoomId: room.id,
-          requestId: room.requestId,
-          serviceType: input.quotation.serviceType,
-          moveAt: input.quotation.moveAt,
-          departureAddress: input.quotation.departureAddress,
-          departureFloor: input.quotation.departureFloor,
-          departurePyeong: input.quotation.departurePyeong,
-          departureElevator: input.quotation.departureElevator,
-          arrivalAddress: input.quotation.arrivalAddress,
-          arrivalFloor: input.quotation.arrivalFloor,
-          arrivalPyeong: input.quotation.arrivalPyeong,
-          arrivalElevator: input.quotation.arrivalElevator,
-          additionalRequirements: input.quotation.additionalRequirements ?? null,
-          price: input.quotation.price,
-          previousQuotationId: input.quotation.previousQuotationId ?? null,
-          validUntil: input.quotation.validUntil ?? null,
-          chattingMessageId: savedMessage.id,
+          senderId: user.id,
+          messageType: input.messageType,
+          sequence: nextIdx,
+          content: input.messageType === 'MESSAGE' ? input.content : null,
         };
 
-        const newQuotation = await this.quotationRepo.create(quotationInput, ctx);
-        return { message: savedMessage, quotation: newQuotation };
+        const savedMessage = await this.msgsRepo.create(createInput, ctx);
+
+        if (input.messageType === 'QUOTATION') {
+          const quotationInput: CreateQuotationInput = {
+            consumerId: room.consumerId,
+            driverId: room.driverId,
+            chattingRoomId: room.id,
+            requestId: room.requestId,
+            serviceType: input.quotation.serviceType,
+            moveAt: input.quotation.moveAt,
+            departureAddress: input.quotation.departureAddress,
+            departureFloor: input.quotation.departureFloor,
+            departurePyeong: input.quotation.departurePyeong,
+            departureElevator: input.quotation.departureElevator,
+            arrivalAddress: input.quotation.arrivalAddress,
+            arrivalFloor: input.quotation.arrivalFloor,
+            arrivalPyeong: input.quotation.arrivalPyeong,
+            arrivalElevator: input.quotation.arrivalElevator,
+            additionalRequirements: input.quotation.additionalRequirements ?? null,
+            price: input.quotation.price,
+            previousQuotationId: input.quotation.previousQuotationId ?? null,
+            validUntil: input.quotation.validUntil ?? null,
+            chattingMessageId: savedMessage.id,
+          };
+
+          const newQuotation = await this.quotationRepo.create(quotationInput, ctx);
+          return { message: savedMessage, quotation: newQuotation, isFirst: nextIdx === 1 };
+        }
+
+        return { message: savedMessage, quotation: null, isFirst: nextIdx === 1 };
+      });
+
+      if (result.isFirst && user.id === room.driverId) {
+        await this.notificationService.createNotification({
+          receiverId: room.consumerId,
+          senderId: user.id,
+          notificationType: 'NEW_MESSAGE',
+          content: '기사님과의 채팅이 시작되었습니다.',
+          chattingRoomId: room.id,
+          requestId: room.requestId,
+          quotationId: result.quotation?.id ?? undefined,
+        });
       }
-      return { message: savedMessage };
-    });
 
-    if (result.message.messageType === 'MESSAGE') {
-      const payload = {
-        roomId: room.id,
-        msg: {
-          id: result.message.id,
-          idx: result.message.sequence,
-          authorId: result.message.senderId,
-          messageType: 'MESSAGE' as const,
-          body: result.message.content!,
-          sentAt: result.message.createdAt.toISOString(),
+      if (result.message.messageType === 'MESSAGE') {
+        const payload = {
+          roomId: room.id,
+          msg: {
+            id: result.message.id,
+            idx: result.message.sequence,
+            authorId: result.message.senderId,
+            messageType: 'MESSAGE' as const,
+            body: result.message.content!,
+            sentAt: result.message.createdAt.toISOString(),
+            tempId: input.tempId,
+          },
+        };
+        client.to(`room:${room.id}`).emit(WS_EVENTS.CHAT_NEW, payload);
+        client.emit(WS_EVENTS.CHAT_NEW, payload);
+      } else {
+        const payload = {
+          roomId: room.id,
+          msg: {
+            id: result.message.id,
+            idx: result.message.sequence,
+            authorId: result.message.senderId,
+            messageType: 'QUOTATION' as const,
+            quotationId: result.quotation!.id,
+            sentAt: result.message.createdAt.toISOString(),
+            tempId: input.tempId,
+          },
+        };
+        client.to(`room:${room.id}`).emit(WS_EVENTS.CHAT_NEW, payload);
+        client.emit(WS_EVENTS.CHAT_NEW, payload);
+      }
+
+      return ok({ delivered: true, id: result.message.id, idx: result.message.sequence });
+    } catch (e) {
+      if (e instanceof BadRequestException && e.message === 'FIRST_MESSAGE_MUST_BE_QUOTATION') {
+        return fail('FIRST_MESSAGE_MUST_BE_QUOTATION', '첫 메시지는 견적(QUOTATION)으로만 보낼 수 있습니다.', {
           tempId: input.tempId,
-        },
-      };
-      client.to(`room:${room.id}`).emit(WS_EVENTS.CHAT_NEW, payload);
-      client.emit(WS_EVENTS.CHAT_NEW, payload);
-    } else {
-      const payload = {
-        roomId: room.id,
-        msg: {
-          id: result.message.id,
-          idx: result.message.sequence,
-          authorId: result.message.senderId,
-          messageType: 'QUOTATION' as const,
-          quotationId: result.quotation!.id,
-          sentAt: result.message.createdAt.toISOString(),
-          tempId: input.tempId,
-        },
-      };
-      client.to(`room:${room.id}`).emit(WS_EVENTS.CHAT_NEW, payload);
-      client.emit(WS_EVENTS.CHAT_NEW, payload);
+        });
+      }
+
+      this.logger.error(`chat:send failed: ${String((e as Error).message ?? e)}`);
+      return fail('MESSAGE_SEND_FAILED', undefined, { tempId: input.tempId });
     }
-
-    return ok({ delivered: true, id: result.message.id, idx: result.message.sequence });
   }
 
   async readMessage(client: WsSocket, input: ChatReadBody) {
