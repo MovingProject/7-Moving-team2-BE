@@ -28,6 +28,53 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     });
   }
 
+  async findConsumerQuotations(consumerId: string, statuses: QuotationStatus[]) {
+    return this.prisma.quotation.findMany({
+      where: {
+        consumerId,
+        status: { in: statuses },
+      },
+      include: {
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            driverProfile: {
+              select: {
+                nickname: true,
+                image: true,
+                reviewCount: true,
+                rating: true,
+                careerYears: true,
+                confirmedCount: true,
+              },
+            },
+          },
+        },
+        request: {
+          select: {
+            id: true,
+            serviceType: true,
+            departureAddress: true,
+            arrivalAddress: true,
+            moveAt: true,
+          },
+        },
+        review: {
+          select: {
+            id: true,
+            rating: true,
+            content: true,
+            createdAt: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   async create(input: CreateQuotationInput, ctx?: TransactionContext) {
     const db = getDb(ctx, this.prisma);
     const quotation = await db.quotation.create({
