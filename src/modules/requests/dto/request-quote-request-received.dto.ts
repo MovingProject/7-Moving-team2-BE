@@ -6,6 +6,7 @@ import { MoveType } from '@prisma/client';
  */
 export const ReceivedRequestSchema = z.object({
   id: z.string().uuid(),
+  consumerId: z.string().uuid(),
   consumerName: z.string(),
   moveAt: z.coerce.date(),
   departureAddress: z.string(),
