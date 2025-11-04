@@ -47,6 +47,7 @@ export class RequestController {
   ) {
     return this.requestService.inviteToRequest(param.driverId, user);
   }
+
   @Post('received/search')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @RequireRoles('DRIVER')

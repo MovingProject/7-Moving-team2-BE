@@ -16,6 +16,7 @@ import { type IRequestRepository, REQUEST_REPOSITORY } from './interface/request
 import { InviteResult, type IRequestService } from './interface/request.service.interface';
 import { CreateRequestData } from './types';
 import { PrismaClient, Quotation } from '@prisma/client';
+import { NotificationService } from '../notification/notification.service';
 import { RequestCheckResponseDto } from './dto/request-check.dto';
 import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
 import { RequestListDto } from './dto/request-list.dto';
@@ -33,6 +34,7 @@ export class RequestService implements IRequestService {
     private readonly transactionRunner: ITransactionRunner,
     @Inject(INVITE_REPOSITORY)
     private readonly inviteRepository: IInviteRepository,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async createQuoteRequest(dto: CreateQuoteRequestBody, user: AccessTokenPayload) {
@@ -102,7 +104,7 @@ export class RequestService implements IRequestService {
     }
 
     if (existingDriver.role !== 'DRIVER') {
-      throw new ForbiddenException('CONSUMER에게 견적을 보낼 수 없습니다.');
+      throw new ForbiddenException('CONSUMER는 견적을 보낼 수 없습니다.');
     }
 
     if (!existingDriver.driverProfile) {
@@ -146,6 +148,13 @@ export class RequestService implements IRequestService {
         throw new ConflictException('지정견적 요청 수를 초과하여 더 이상 지정 요청을 할 수 없습니다.');
       }
 
+      await this.notificationService.createNotification({
+        receiverId: existingDriver.id,
+        senderId: existingUser.id,
+        notificationType: 'INVITE_RECEIVED',
+        content: `${existingUser.name ?? '고객'}님이 지정 견적을 요청했어요.`,
+        requestId: pendingRequest.id,
+      });
       return { invited: true, alreadyExisted: false };
     });
 

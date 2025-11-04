@@ -9,6 +9,7 @@ import { CookiesService } from '@/shared/utils/cookies.service';
 import { PrismaModule } from '@/shared/prisma/prisma.module';
 import { PrismaInviteRepository } from './infra/prisma-invite.repository';
 import { INVITE_REPOSITORY } from './interface/invite.repository.interface';
+import { NotificationService } from '../notification/notification.service';
 
 @Module({
   imports: [UsersModule, PrismaModule],
@@ -27,6 +28,7 @@ import { INVITE_REPOSITORY } from './interface/invite.repository.interface';
       useClass: PrismaInviteRepository,
     },
     CookiesService,
+    NotificationService,
   ],
   exports: [REQUEST_SERVICE],
 })
