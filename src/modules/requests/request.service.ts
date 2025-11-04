@@ -20,7 +20,7 @@ import { InviteResult } from './interface/request.service.interface';
 import { ReceivedRequestsResponseSchema, ReceivedRequest } from './dto/request-quote-request-received.dto';
 import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
 import { DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Quotation } from '@prisma/client';
 import { RequestListDto } from './dto/request-list.dto';
 import { RequestCheckResponseDto } from './dto/request-check.dto';
 @Injectable()
@@ -196,13 +196,17 @@ export class RequestService implements IRequestService {
     const mappedRequests: RequestListDto[] = requests.map((req) => {
       const quotations = req.quotations.map((q) => {
         const driverProfile = q.driver.driverProfile;
+        const withLiked = q as Quotation & { isLiked?: boolean };
 
         return {
-          id: q.id,
+          id: withLiked.id,
           driverNickname: driverProfile?.nickname ?? '미등록 기사',
-          price: q.price,
-          serviceType: q.serviceType,
-          isInvited: !!req.invites.find((i) => i.driverId === q.driverId),
+          price: withLiked.price,
+          status: withLiked.status,
+          chattingRoomId: withLiked.chattingRoomId,
+          serviceType: withLiked.serviceType,
+          isLiked: withLiked.isLiked ?? false,
+          isInvited: !!req.invites.find((i) => i.driverId === withLiked.driverId),
           driverProfile: {
             nickname: driverProfile?.nickname ?? '',
             oneLiner: driverProfile?.oneLiner ?? null,
@@ -211,6 +215,7 @@ export class RequestService implements IRequestService {
             rating: driverProfile?.rating ?? 0,
             careerYears: driverProfile?.careerYears ?? 0,
             confirmedCount: driverProfile?.confirmedCount ?? 0,
+            image: driverProfile?.image ?? null,
           },
         };
       });
@@ -220,10 +225,10 @@ export class RequestService implements IRequestService {
         departureAddress: req.departureAddress,
         arrivalAddress: req.arrivalAddress,
         createdAt: req.createdAt.toISOString(),
-        requestStatus: req.requestStatus,
-        additionalRequirements: req.additionalRequirements ?? null,
         serviceType: req.serviceType,
         moveAt: req.moveAt,
+        requestStatus: req.requestStatus,
+        additionalRequirements: req.additionalRequirements ?? null,
         quotations,
       };
     });

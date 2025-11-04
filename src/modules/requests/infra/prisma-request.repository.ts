@@ -228,7 +228,8 @@ export class PrismaRequestRepository implements IRequestRepository {
   }
 
   async findAllByConsumerId(consumerId: string) {
-    return this.prisma.request.findMany({
+    // 1️⃣ Request + Quotation + DriverProfile 조회
+    const requests = await this.prisma.request.findMany({
       where: { consumerId },
       include: {
         invites: true,
@@ -236,6 +237,7 @@ export class PrismaRequestRepository implements IRequestRepository {
           include: {
             driver: {
               select: {
+                id: true,
                 driverProfile: {
                   select: {
                     nickname: true,
@@ -245,6 +247,7 @@ export class PrismaRequestRepository implements IRequestRepository {
                     rating: true,
                     careerYears: true,
                     confirmedCount: true,
+                    image: true,
                   },
                 },
               },
@@ -254,5 +257,28 @@ export class PrismaRequestRepository implements IRequestRepository {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    const driverIds = Array.from(new Set(requests.flatMap((req) => req.quotations.map((q) => q.driverId))));
+
+    if (driverIds.length === 0) return requests;
+
+    const likes = await this.prisma.like.findMany({
+      where: {
+        consumerId,
+        driverId: { in: driverIds },
+      },
+      select: { driverId: true },
+    });
+
+    const likedDriverSet = new Set(likes.map((l) => l.driverId));
+    const enrichedRequests = requests.map((req) => ({
+      ...req,
+      quotations: req.quotations.map((q) => ({
+        ...q,
+        isLiked: likedDriverSet.has(q.driverId),
+      })),
+    }));
+
+    return enrichedRequests;
   }
 }
