@@ -143,12 +143,13 @@ export default class ChatService implements IChattingRoomsService {
     const rawMessages = await this.messagesRepository.findByRoomId(roomId, limit + 1, decoded);
 
     // 5) 다음 페이지 여부/목록 자르기
+    // Repository에서 DESC로 가져온 후 reverse()하므로: [오래된...최신]
+    // hasNext가 true면 맨 앞(가장 오래된) 1개를 제거
     const hasNext = rawMessages.length > limit;
-    const messages = hasNext ? rawMessages.slice(0, limit) : rawMessages;
+    const messages = hasNext ? rawMessages.slice(1) : rawMessages;
 
-    // 6) nextCursor 계산 (sequence 기반으로 다시 인코딩)
-    const last = messages[messages.length - 1];
-    const nextCursor = hasNext ? encodeChatCursor({ sequence: last.sequence }) : null;
+    // 6) nextCursor 계산 (가장 오래된 메시지의 sequence 사용)
+    const nextCursor = hasNext && messages.length > 0 ? encodeChatCursor({ sequence: messages[0].sequence }) : null;
 
     // 7) 읽음 정보 가져오기
     const lastRead = await this.readRepository.findLastReadByUser(roomId, userId);
