@@ -1,6 +1,6 @@
 import { type AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { ZodValidationPipe } from '@/shared/pipes/zod-validation.pipe';
-import { Body, Controller, Get, Inject, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
@@ -8,8 +8,8 @@ import { DriverIdParamDto, driverIdParamSchema } from '../users/dto/driverIdPara
 import { CreateQuoteRequestBodyDto, createQuoteRequestBodySchema } from './dto/create-quote-request.dto';
 import { type IRequestService, REQUEST_SERVICE } from './interface/request.service.interface';
 
-import { RolesGuard } from '../auth/guards/role.guard';
 import { RequireRoles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/role.guard';
 import { type ReceivedRequestFilter } from './dto/request-filter-post.dto';
 import { type DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
 @ApiTags('견적 요청 (Request)')
@@ -31,8 +31,8 @@ export class RequestController {
   @Get('received')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @RequireRoles('DRIVER')
-  async getReceivedRequests(@Req() req) {
-    const driverId = req.user.sub;
+  async getReceivedRequests(@AuthUser() user: AccessTokenPayload) {
+    const driverId = user.sub;
     return this.requestService.findReceivedByDriverId(driverId);
   }
 
@@ -50,16 +50,16 @@ export class RequestController {
   @Post('received/search')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @RequireRoles('DRIVER')
-  async filterReceivedRequests(@Req() req, @Body() filter: ReceivedRequestFilter) {
-    const driverId = req.user.sub;
+  async filterReceivedRequests(@AuthUser() user: AccessTokenPayload, @Body() filter: ReceivedRequestFilter) {
+    const driverId = user.sub;
     console.log('filter received(컨트롤):', filter);
     return this.requestService.filterReceivedRequests(driverId, filter);
   }
 
   @UseGuards(AccessTokenGuard)
   @Get('count')
-  async getCounts(@Req() req: any) {
-    const driverId = req.user.sub; // 로그인한 기사 ID
+  async getCounts(@AuthUser() user: AccessTokenPayload) {
+    const driverId = user.sub;
     return this.requestService.countRequests(driverId);
   }
 

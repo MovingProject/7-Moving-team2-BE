@@ -8,21 +8,20 @@ import {
 import { AccessTokenPayload } from '@/shared/jwt/jwt.payload.schema';
 import { type ITransactionRunner, TRANSACTION_RUNNER } from '@/shared/prisma/transaction-runner.interface';
 import { getAreaFromAddress } from '@/shared/utils/address.util';
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { type IUserRepository, USER_REPOSITORY } from '../users/interface/users.repository.interface';
 import { CreateQuoteRequestBody } from './dto/create-quote-request.dto';
 import { type IInviteRepository, INVITE_REPOSITORY } from './interface/invite.repository.interface';
 import { type IRequestRepository, REQUEST_REPOSITORY } from './interface/request.repository.interface';
-import { type IRequestService } from './interface/request.service.interface';
+import { InviteResult, type IRequestService } from './interface/request.service.interface';
 import { CreateRequestData } from './types';
-import { InviteResult } from './interface/request.service.interface';
-
-import { ReceivedRequestsResponseSchema, ReceivedRequest } from './dto/request-quote-request-received.dto';
-import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
-import { DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
 import { PrismaClient, Quotation } from '@prisma/client';
-import { RequestListDto } from './dto/request-list.dto';
 import { RequestCheckResponseDto } from './dto/request-check.dto';
+import { ReceivedRequestFilter } from './dto/request-filter-post.dto';
+import { RequestListDto } from './dto/request-list.dto';
+import { ReceivedRequestsResponseSchema } from './dto/request-quote-request-received.dto';
+import { DriverRequestActionDTO } from './dto/request-reject-request-received.dto';
+
 @Injectable()
 export class RequestService implements IRequestService {
   constructor(
@@ -215,7 +214,7 @@ export class RequestService implements IRequestService {
             rating: driverProfile?.rating ?? 0,
             careerYears: driverProfile?.careerYears ?? 0,
             confirmedCount: driverProfile?.confirmedCount ?? 0,
-            image: driverProfile?.image ?? null,
+            image: (driverProfile?.image ?? null) as string | null,
           },
         };
       });
