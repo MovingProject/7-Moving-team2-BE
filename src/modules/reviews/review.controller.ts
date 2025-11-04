@@ -26,6 +26,7 @@ export class ReviewController {
       consumerId: user.sub,
     });
   }
+
   @Get(`/drivers/:driverId`)
   async getDriverReviews(@Param(`driverId`) driverId: string, @Query() query: GetReviewsQueryDto) {
     const { cursor, limit } = getReviewsQuerySchema.parse(query);
