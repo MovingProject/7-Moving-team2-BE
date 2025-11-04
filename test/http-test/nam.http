@@ -173,9 +173,9 @@ GET {{host}}/weather/forecast?city=Seoul&days=5
 Content-Type: application/json
 
 ### 견적 수락 테스트
-POST {{host}}/quotations/be7186a1-ac7d-4c18-8939-2d7a63e16d14/accept
+POST {{host}}/quotations/56c8bd2b-fe44-4db8-b44a-beb67ea6e571/accept
 Content-Type: application/json
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OWRkODg1ZC1iYjVjLTQ5ZTQtODk5ZC04NTkwOGNjM2EzOTgiLCJqdGkiOiJlYTFiMTNiNC0wNGFiLTQ0OTQtYWVkNC03MjcyMWJiYzNhMzEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE5OTk3NDgsImV4cCI6MTc2MjAwMDY0OCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.4rXvu8yd7YcseTK0H4RjX8xO7xSFA-DjLXwVL7_mrks
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OWI5MmVmOS1lZmMxLTQ1ZWUtOWU2Mi0zYjM5YzIxNzIyNDEiLCJqdGkiOiJiZTgxNDc0ZC1jNTQzLTRhY2YtYTIwNi1lYWY2MWY5NDc3NGEiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjIyMzM0OTIsImV4cCI6MTc2MjIzNDM5MiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.97iFWxJGMmx0TBpPYe6X-g9SwRx4aQejXY4RH8SSq98
 
 
 
@@ -184,8 +184,8 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "nowter@test.com",
-  "password": "nowter123",
+  "email": "gotest8@test.com",
+  "password": "12345678",
   "role": "CONSUMER"
 }
 
@@ -221,3 +221,23 @@ Content-Type: application/json
 GET {{host}}/reviews/drivers/c09493c9-fa43-42a2-8119-c400450b91a3/rating
 Content-Type: application/json
 Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OWRkODg1ZC1iYjVjLTQ5ZTQtODk5ZC04NTkwOGNjM2EzOTgiLCJqdGkiOiI0NDMxNTMxNC1mNjU3LTQ3MGMtYTA4NC03MTQ2ZTQwZDA4YTUiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjIwMDA3NjAsImV4cCI6MTc2MjAwMTY2MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.Nc3HP0z-shZNHFSqGOda-RU9zrwb68YMk5VPfocVmd4
+
+
+
+### 🧾 견적 자동완료 스케줄 등록 테스트
+POST {{host}}/quotations/complete/schedule
+Content-Type: application/json
+
+{
+  "quotationId": "192ebb5b-88b9-4bd8-a8a1-62dbd8249900",
+  "moveAt": "2025-10-30T00:00:00.000Z"
+}
+
+### 3분 뒤 자동 완료 테스트
+POST {{host}}/quotations/complete/schedule
+Content-Type: application/json
+
+{
+  "quotationId": "4957faf1-40f1-4be8-833c-9bb8deb28b85",
+  "moveAt": "2025-11-04T13:48:00+09:00"
+}
