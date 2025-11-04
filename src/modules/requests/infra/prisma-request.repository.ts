@@ -81,6 +81,12 @@ export class PrismaRequestRepository implements IRequestRepository {
             OR: [{ departureArea: { in: serviceArea } }, { arrivalArea: { in: serviceArea } }],
           },
         ],
+        driverRequestActions: {
+          none: {
+            driverId: driverId,
+            state: 'REJECTED',
+          },
+        },
       },
       include: {
         consumer: { select: { name: true } },
@@ -153,6 +159,12 @@ export class PrismaRequestRepository implements IRequestRepository {
               name: { contains: filter.consumerName, mode: 'insensitive' },
             }
           : undefined,
+        driverRequestActions: {
+          none: {
+            driverId: driverId,
+            state: 'REJECTED',
+          },
+        },
       },
       include: {
         consumer: { select: { name: true } },
