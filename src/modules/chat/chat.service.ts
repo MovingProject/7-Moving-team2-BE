@@ -112,6 +112,7 @@ export default class ChatService implements IChattingRoomsService {
 
       return {
         roomId: r.id,
+        requestId: r.requestId, // 추가: 견적 보내기 위해 필요
         other,
         lastMessage,
         unreadCount: unreadMap.get(r.id) ?? 0,
@@ -158,6 +159,7 @@ export default class ChatService implements IChattingRoomsService {
     // 8) 최종 응답
     return {
       roomId,
+      requestId: room.requestId, // 견적 요청 ID 추가
       messages: messages.map((m) => this.toEntityWithMine(m, userId)),
       pageInfo: {
         hasNext,

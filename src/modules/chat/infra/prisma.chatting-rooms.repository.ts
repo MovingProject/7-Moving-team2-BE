@@ -95,6 +95,7 @@ export class PrismaChattingRoomsRepository implements IChattingRoomsRepository {
       const m = r.messages[0];
       return {
         id: r.id,
+        requestId: r.requestId, // 이사 요청 ID 추가
         consumer: toParticipant(r.consumer),
         driver: toParticipant(r.driver),
         updatedAt: r.updatedAt,
