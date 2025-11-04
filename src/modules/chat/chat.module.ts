@@ -24,9 +24,13 @@ import { PrismaChattingMessagesRepository } from './infra/prisma.chatting-messag
 import { CHATTING_MESSAGES_READ_REPOSITORY } from './interface/chatting-messages-read.repository.interface';
 import { PrismaChattingMessagesReadRepository } from './infra/prisma.chatting-messages-read.repository';
 import { NotificationService } from '../notification/notification.service';
+import { NotificationModule } from '../notification/notification.module';
+import { NOTIFICATION_REPOSITORY } from '../notification/interface/notification.repository.interface';
+import { PrismaNotificationRepository } from '../notification/infra/prisma-notification.repository';
+import { NotificationGateway } from '../notification/ws/notification.gateway';
 
 @Module({
-  imports: [JwtModule, CookieModule, PrismaModule],
+  imports: [JwtModule, CookieModule, PrismaModule, NotificationModule],
   controllers: [ChattingRoomsController],
   providers: [
     ChatGateway,
@@ -42,6 +46,8 @@ import { NotificationService } from '../notification/notification.service';
     { provide: CHATTING_MESSAGES_REPOSITORY, useClass: PrismaChattingMessagesRepository },
     { provide: QUOTATION_REPOSITORY, useClass: PrismaQuotationRepository },
     { provide: CHATTING_MESSAGES_READ_REPOSITORY, useClass: PrismaChattingMessagesReadRepository },
+    { provide: NOTIFICATION_REPOSITORY, useClass: PrismaNotificationRepository },
+    NotificationGateway,
   ],
   exports: [ChatGateway],
 })
