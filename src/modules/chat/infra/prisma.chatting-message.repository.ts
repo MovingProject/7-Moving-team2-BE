@@ -59,6 +59,9 @@ export class PrismaChattingMessagesRepository implements IChattingMessagesReposi
           : undefined,
         skip: cursor ? 1 : 0,
         take,
+        include: {
+          quotation: true, // 견적 데이터 포함
+        },
       });
 
       // DESC로 가져왔으므로 다시 역순으로 뒤집어서 오래된 것부터 최신 순서로 반환
