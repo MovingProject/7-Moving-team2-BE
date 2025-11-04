@@ -6,8 +6,8 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "gotest6@test.com",
-  "password": "12345678",
+  "email": "nowter@test.com",
+  "password": "nowter123",
   "role": "CONSUMER"
 }
 
@@ -149,7 +149,8 @@ Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNmQ
 ### 소비자 견적 요청 전체 조회
 GET {{host}}/requests/list
 Content-Type: application/json
-Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYWVjY2IzNy1iMmM0LTQxNzUtOGQ3YS0wZmM1ZTJlODhmOWIiLCJqdGkiOiI4YjJlMzdmMS1mYzBjLTQzNjYtYmQ1ZC00ZTIzNjNiNjY1MGYiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjE4OTA0NDEsImV4cCI6MTc2MTg5MTM0MSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.gvs0EDWPX25tsq9xcMSwVnHVaiv96DcsJVaVmJ6JSOw
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OWRkODg1ZC1iYjVjLTQ5ZTQtODk5ZC04NTkwOGNjM2EzOTgiLCJqdGkiOiJlYTFhY2IzZi1hZTg5LTQ2ZTAtOWMwYi0yZjY5YzlmZDc5MzUiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjIyMjMxNTEsImV4cCI6MTc2MjIyNDA1MSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.LkSaaRnClPKeLv_XUkA6MbizQzyAnJ8tfl6SUYAvqE0
+
 
 ### 견적 중복 요청 확인 API (고객)
 GET {{host}}/requests/check
