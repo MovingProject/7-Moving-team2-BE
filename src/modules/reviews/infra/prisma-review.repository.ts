@@ -16,9 +16,22 @@ export class PrismaReviewRepository implements IReviewRepository {
     return this.prisma.$transaction(async (tx) => {
       const review = await tx.review.create({ data: input });
 
+      const grouped = await tx.review.groupBy({
+        by: ['rating'],
+        where: { driverId: input.driverId },
+        _count: { rating: true },
+      });
+
+      const total = grouped.reduce((acc, r) => acc + r._count.rating, 0);
+      const average = grouped.reduce((acc, r) => acc + r.rating * r._count.rating, 0) / (total || 1);
+
+      // DriverProfile 갱신
       await tx.driverProfile.update({
         where: { userId: input.driverId },
-        data: { reviewCount: { increment: 1 } },
+        data: {
+          reviewCount: total,
+          rating: Number(average.toFixed(2)),
+        },
       });
 
       return review;
@@ -55,6 +68,16 @@ export class PrismaReviewRepository implements IReviewRepository {
       by: ['rating'],
       where: { driverId },
       _count: { rating: true },
+    });
+  }
+
+  async updateDriverRatingAndCount(driverId: string, avgRating: number, totalReviews: number): Promise<void> {
+    await this.prisma.driverProfile.update({
+      where: { userId: driverId },
+      data: {
+        rating: Number(avgRating.toFixed(2)),
+        reviewCount: totalReviews,
+      },
     });
   }
 }
