@@ -27,6 +27,7 @@ export interface IRequestService {
   rejectRequest(driverId: string, dto: DriverRequestActionDTO): Promise<DriverRequestAction>;
   getConsumerRequests(consumerId: string): Promise<RequestListDto[]>;
   checkPendingRequest(consumerId: string): Promise<RequestCheckResponseDto>;
+  getRequestById(requestId: string): Promise<Request>;
 }
 
 export const REQUEST_SERVICE = 'IRequestService';

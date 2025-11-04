@@ -8,6 +8,7 @@ export type ChattingMessageView = ChattingMessageEntity & {
 
 export interface GetChatMessagesResponse {
   roomId: string;
+  requestId: string; // 견적 요청 ID (견적 보내기에 필요)
   messages: ChattingMessageView[];
   pageInfo: {
     hasNext: boolean;
@@ -33,6 +34,7 @@ export type LastMessageBrief = {
 
 export type ChatRoomListItem = {
   roomId: string;
+  requestId: string; // 이사 요청 ID (견적 보내기에 필요)
   other: OtherUserBrief;
   lastMessage: LastMessageBrief | null;
   unreadCount: number;

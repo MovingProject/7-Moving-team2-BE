@@ -19,6 +19,7 @@ export type LastMessageAggregate = {
 
 export type RoomAggregate = {
   id: string;
+  requestId: string; // 이사 요청 ID
   consumer: RoomParticipant;
   driver: RoomParticipant;
   updatedAt: Date;
