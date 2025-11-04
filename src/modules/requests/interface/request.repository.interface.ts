@@ -17,6 +17,7 @@ export interface IRequestWithRelations extends PrismaRequest {
         rating: number;
         careerYears: number;
         confirmedCount: number;
+        image: string | null;
       } | null;
     };
   })[];

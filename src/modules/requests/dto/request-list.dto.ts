@@ -1,5 +1,5 @@
-import { MoveTypeSchema } from '@/shared/constant/enums.schema';
 import { RequestStatus } from '@prisma/client';
+import { MoveTypeSchema, QuotationStatusSchema } from '@/shared/constant/enums.schema';
 import z from 'zod';
 
 const DriverProfileSummarySchema = z.object({
@@ -10,15 +10,19 @@ const DriverProfileSummarySchema = z.object({
   rating: z.number(), // 평균 평점
   careerYears: z.number().int(), // 경력 (년)
   confirmedCount: z.number().int(), // 완료 건수
+  image: z.string().url().nullable(),
 });
 
 const QuotationSchema = z.object({
   id: z.string().uuid(),
   driverNickname: z.string(),
   price: z.number(),
+  status: QuotationStatusSchema,
+  chattingRoomId: z.string().uuid(),
   serviceType: MoveTypeSchema,
   driverProfile: DriverProfileSummarySchema,
   isInvited: z.boolean(),
+  isLiked: z.boolean(),
 });
 
 export const RequestListSchema = z.object({
