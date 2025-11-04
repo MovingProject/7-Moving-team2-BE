@@ -23,6 +23,7 @@ import { PrismaQuotationRepository } from '../quotations/infra/prisma-quotation.
 import { PrismaChattingMessagesRepository } from './infra/prisma.chatting-message.repository';
 import { CHATTING_MESSAGES_READ_REPOSITORY } from './interface/chatting-messages-read.repository.interface';
 import { PrismaChattingMessagesReadRepository } from './infra/prisma.chatting-messages-read.repository';
+import { NotificationService } from '../notification/notification.service';
 
 @Module({
   imports: [JwtModule, CookieModule, PrismaModule],
@@ -32,6 +33,7 @@ import { PrismaChattingMessagesReadRepository } from './infra/prisma.chatting-me
     PresenceService,
     ChatRoomWsService,
     ChatMessageWsService,
+    NotificationService,
     { provide: CHATTING_ROOMS_SERVICE, useClass: ChatService },
     { provide: CHATTING_ROOMS_REPOSITORY, useClass: PrismaChattingRoomsRepository },
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
