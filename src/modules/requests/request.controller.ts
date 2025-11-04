@@ -82,4 +82,12 @@ export class RequestController {
   async checkRequest(@AuthUser() user: AccessTokenPayload) {
     return this.requestService.checkPendingRequest(user.sub);
   }
+
+  @Get(':id')
+  @ApiOperation({ summary: '견적 요청서 상세 조회' })
+  @ApiParam({ name: 'id', description: '견적 요청서 ID(UUID)' })
+  @UseGuards(AccessTokenGuard)
+  async getRequestById(@Param('id') id: string) {
+    return this.requestService.getRequestById(id);
+  }
 }

@@ -263,4 +263,12 @@ export class RequestService implements IRequestService {
       },
     };
   }
+
+  async getRequestById(requestId: string) {
+    const request = await this.requestRepository.findById(requestId);
+    if (!request) {
+      throw new NotFoundException('견적 요청서를 찾을 수 없습니다.');
+    }
+    return request;
+  }
 }
