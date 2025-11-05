@@ -96,7 +96,7 @@ export class AuthController {
   async googleAuthCallback(@Req() req: OAuthRequest, @Res({ passthrough: true }) res: Response) {
     const { accessToken, refreshToken, user } = req.user;
     this.cookiesService.setAuthCookies(res, accessToken, refreshToken);
-    const frontendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const frontendUrl = process.env.NEXT_URL || 'http://localhost:3000';
     const userData = encodeURIComponent(JSON.stringify(user));
 
     return res.redirect(`${frontendUrl}/auth/google/callback?user=${userData}`);
