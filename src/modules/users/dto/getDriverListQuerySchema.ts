@@ -8,6 +8,7 @@ export const GetDriverListQuerySchema = z.object({
   sort: DriverSortTypeSchema.default('RATING_DESC'),
   take: z.coerce.number().int().min(1).max(50).default(20),
   cursor: z.string().trim().min(1).optional(),
+  search: z.string().optional(),
 });
 
 export type GetDriverListQuery = z.infer<typeof GetDriverListQuerySchema>;

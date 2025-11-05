@@ -12,6 +12,7 @@ export type RepoFindDriversInput = {
   cursorPrimary?: number;
   cursorId?: string;
   takePlusOne: number;
+  search?: string;
 };
 
 export interface DriverAggregate {

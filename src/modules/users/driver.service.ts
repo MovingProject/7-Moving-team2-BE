@@ -35,7 +35,7 @@ export default class DriverService implements IDriverService {
   ) {}
 
   async getDrivers(user: AccessTokenPayload | null, query: GetDriverListQuery) {
-    const { area, type, sort, take, cursor } = query;
+    const { area, type, sort, take, cursor, search } = query;
     const sortField = SORT_FIELD_MAP[sort];
 
     let cursorPrimaryNumeric: number | undefined;
@@ -59,6 +59,7 @@ export default class DriverService implements IDriverService {
       cursorPrimary: cursorPrimaryNumeric,
       cursorId,
       takePlusOne: Number(take) + 1,
+      search,
     };
 
     const aggregates = await this.driverProfileRepository.findDrivers(repoInput);
