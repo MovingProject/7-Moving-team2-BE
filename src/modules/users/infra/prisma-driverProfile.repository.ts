@@ -16,13 +16,21 @@ export class PrismaDriverProfileRepository implements IDriverProfileRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findDrivers(input: RepoFindDriversInput): Promise<DriverAggregate[]> {
-    const { area, type, sortField, cursorPrimary, cursorId, takePlusOne } = input;
+    const { area, type, sortField, cursorPrimary, cursorId, takePlusOne, search } = input;
 
     const baseWhere: Prisma.DriverProfileWhereInput = {
       deletedAt: null,
       driver: { role: Role.DRIVER, deletedAt: null },
       ...(area ? { driverServiceAreas: { some: { serviceArea: area } } } : {}),
       ...(type ? { driverServiceTypes: { some: { serviceType: type } } } : {}),
+      ...(search
+        ? {
+            nickname: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          }
+        : {}),
     };
 
     const where: Prisma.DriverProfileWhereInput =
