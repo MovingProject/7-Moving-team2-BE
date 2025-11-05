@@ -14,12 +14,6 @@ export class GoogleStrategy extends PassportStrategy(GoogleOAuthStrategy, 'googl
     @Inject(AUTH_SERVICE)
     private readonly authService: IAuthService,
   ) {
-    console.log('GOOGLE ENV:', {
-      id: configService.get('GOOGLE_CLIENT_ID'),
-      secret: configService.get('GOOGLE_CLIENT_SECRET'),
-      callback: configService.get('GOOGLE_CALLBACK_URL'),
-    });
-
     super({
       clientID: configService.get('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
