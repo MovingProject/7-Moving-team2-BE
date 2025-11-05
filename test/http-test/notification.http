@@ -1,0 +1,3 @@
+###  알림 목록 조회 (읽지 않은 것만, 최신순)
+GET http://localhost:4000/notifications?limit=5
+Cookie: access_token=YOUR_TEST_ACCESS_TOKEN_HERE
