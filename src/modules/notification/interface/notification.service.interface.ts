@@ -10,6 +10,9 @@ export interface GetNotificationsResult {
 export interface INotificationService {
   createNotification(payload: CreateNotificationInput): Promise<void>;
   getNotifications(userId: string, input: GetNotificationsQuery): Promise<GetNotificationsResult>;
+  getAllByUser(userId: string): Promise<NotificationEntity[]>;
+  getOneById(userId: string, id: string): Promise<NotificationEntity>;
+  markAsRead(userId: string, ids?: string[]): Promise<{ success: boolean; readAt: Date }>;
 }
 
 export const NOTIFICATION_SERVICE = 'INotificationService';

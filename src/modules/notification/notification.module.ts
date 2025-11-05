@@ -10,9 +10,11 @@ import { PrismaNotificationRepository } from './infra/prisma-notification.reposi
 import { NOTIFICATION_REPOSITORY } from './interface/notification.repository.interface';
 import { NotificationService } from './notification.service';
 import { NotificationGateway } from './ws/notification.gateway';
+import { NotificationController } from './notification.controller';
 
 @Module({
   imports: [JwtModule, CookieModule, PrismaModule],
+  controllers: [NotificationController],
   providers: [
     PrismaService,
     { provide: NOTIFICATION_REPOSITORY, useClass: PrismaNotificationRepository },
