@@ -184,8 +184,13 @@ POST {{host}}/auth/signin
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
   "email": "gotest8@test.com",
   "password": "12345678",
+=======
+  "email": "kimcash@test.com",
+  "password": "kimcash123",
+>>>>>>> fd0e85d (feat:알림조회기능 구현 #140)
   "role": "CONSUMER"
 }
 
@@ -240,4 +245,17 @@ Content-Type: application/json
 {
   "quotationId": "4957faf1-40f1-4be8-833c-9bb8deb28b85",
   "moveAt": "2025-11-04T13:48:00+09:00"
+}
+### 전체알람조회
+GET {{host}}/notifications
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNjYyNjQ4OS1iMmVlLTRiYTYtOTU4OC04YmQ1YjRmNjgyNGYiLCJqdGkiOiJmMDUyYzViMi05Mzk5LTRiNTctYTk4NC1iZmVhNDRkN2FlZjQiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjIzMjUzNTksImV4cCI6MTc2MjMyNjI1OSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.2bvizipWiMefZxvANXPfKcIxPmSq2S7SFifvhGXdkXo
+
+### 알람조회
+POST  {{host}}/notifications/totalread
+Content-Type: application/json
+Cookie: __Host-access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNjYyNjQ4OS1iMmVlLTRiYTYtOTU4OC04YmQ1YjRmNjgyNGYiLCJqdGkiOiI5NWZkNzQyZC0xMTA3LTRmZGYtODk0NS0zYWQ3MGJmNzQ5NDIiLCJyb2xlIjoiQ09OU1VNRVIiLCJpYXQiOjE3NjIzMjYyNjEsImV4cCI6MTc2MjMyNzE2MSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo0MDAwIn0.qTA-h_AiMshO9q8y6TakL5HApaHyhPfJ6-fj03OIH80
+
+{
+  "ids": ["171f333b-2f0c-4ccc-8486-ffd91a18e722"]
 }
