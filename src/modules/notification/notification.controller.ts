@@ -8,13 +8,14 @@ import { getNotificationsQuerySchema } from './interface/dto/get-notifications.d
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Body, Param, Post } from '@nestjs/common';
+import { NotificationService } from './notification.service';
+import type { MarkReadDto } from './dto/notifications.dto';
 
 @Controller('Notifications')
+@UseGuards(AccessTokenGuard)
 export class NotificationController {
-  constructor(
-    @Inject(NOTIFICATION_SERVICE)
-    private readonly notificationService: INotificationService,
-  ) {}
+  constructor(private readonly notificationService: NotificationService) {}
 
   @Get()
   @UseGuards(AccessTokenGuard)
@@ -25,5 +26,28 @@ export class NotificationController {
     @Query(new ZodValidationPipe(getNotificationsQuerySchema)) query: GetNotificationsQueryDto,
   ) {
     return this.notificationService.getNotifications(user.sub, query);
+  }
+
+  @Get('getall')
+  async getAll(@AuthUser() user: AccessTokenPayload) {
+    return this.notificationService.getAllByUser(user.sub);
+  }
+
+  @Get(':id')
+  async getOne(@AuthUser() user: AccessTokenPayload, @Param('id') id: string) {
+    return this.notificationService.getOneById(user.sub, id);
+  }
+
+  @Post('read')
+  async markRead(@AuthUser() user: AccessTokenPayload, @Body() dto: MarkReadDto) {
+    return this.notificationService.markRead(user.sub, dto.ids);
+  }
+  @Post('readAll')
+  async markAll(@AuthUser() user: AccessTokenPayload) {
+    return this.notificationService.markAllRead(user.sub);
+  }
+  @Post('totalread')
+  async totalMarkRead(@AuthUser() user: AccessTokenPayload, @Body() body?: { ids?: string[] }) {
+    return this.notificationService.markAsRead(user.sub, body?.ids);
   }
 }

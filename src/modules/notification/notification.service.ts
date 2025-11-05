@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { IUserRepository } from '../users/interface/users.repository.interface';
 import { USER_REPOSITORY } from '../users/interface/users.repository.interface';
 import { GetNotificationsQuery } from './interface/dto/get-notifications.dto';
@@ -9,6 +9,7 @@ import {
 import { GetNotificationsResult, INotificationService } from './interface/notification.service.interface';
 import { CreateNotificationInput } from './types';
 import { NotificationGateway } from './ws/notification.gateway';
+import { NotFoundException } from '@/shared/exceptions';
 
 @Injectable()
 export class NotificationService implements INotificationService {
@@ -49,5 +50,43 @@ export class NotificationService implements INotificationService {
       nextCursor,
       hasNext,
     };
+  }
+  async getAllByUser(userId: string) {
+    return this.notificationRepository.findAllByReceiverId(userId);
+  }
+
+  async getOneById(userId: string, id: string) {
+    const notification = await this.notificationRepository.findOneById(id);
+
+    if (!notification || notification.receiverId !== userId) {
+      throw new NotFoundException('존재하지않거나 접근권한이 없습니다.');
+    }
+
+    return notification;
+  }
+
+  //하나읽기
+  async markRead(userId: string, ids: string[]) {
+    const now = new Date();
+    await this.notificationRepository.markReadByIds(userId, ids, now);
+    return { success: true, readAt: now };
+  }
+  //전체읽기
+  async markAllRead(userId: string) {
+    const now = new Date();
+    await this.notificationRepository.markAllRead(userId, now);
+    return { success: true, readAt: now };
+  }
+
+  //통합된버젼 (전체읽기 or 하나읽기 )
+  async markAsRead(userId: string, ids?: string[]) {
+    const now = new Date();
+
+    if (ids && ids.length > 0) {
+      await this.notificationRepository.markReadByIds(userId, ids, now);
+    } else {
+      await this.notificationRepository.markAllRead(userId, now);
+    }
+    return { success: true, readAt: now };
   }
 }
