@@ -1,5 +1,5 @@
 import { PrismaService } from '@/shared/prisma/prisma.service';
-import { IPrismaNotificationRepository } from '../interface/notification.repository.interface';
+import { FindNotificationsArgs, IPrismaNotificationRepository } from '../interface/notification.repository.interface';
 import { Injectable } from '@nestjs/common';
 import { CreateNotificationInput, NotificationEntity } from '../types';
 
@@ -12,5 +12,24 @@ export class PrismaNotificationRepository implements IPrismaNotificationReposito
       data: payload,
     });
     return notification;
+  }
+
+  async findManyByUser(args: FindNotificationsArgs): Promise<NotificationEntity[]> {
+    const { userId, take, cursor, onlyUnread } = args;
+
+    return this.prisma.notification.findMany({
+      where: {
+        receiverId: userId,
+        ...(onlyUnread && { readAt: null }),
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      ...(cursor && {
+        cursor: { id: cursor },
+        skip: 1,
+      }),
+      take,
+    });
   }
 }
