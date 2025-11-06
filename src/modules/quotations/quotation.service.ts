@@ -116,6 +116,7 @@ export class QuotationService {
           updatedQuotation.request.moveAt,
           this.quotationRepository,
           QuotationStatus.COMPLETED,
+          true, //테스트모드 on =true 값없으면 배포용
         );
         console.log(
           `🕒 quotation ${updatedQuotation.id} 자동 스케줄 등록됨 (moveAt: ${updatedQuotation.request.moveAt.toISOString()})`,
