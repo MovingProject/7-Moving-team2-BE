@@ -14,22 +14,23 @@ export async function scheduleQuotationCompletionJob(
   moveAt: Date,
   quotationRepository: IQuotationRepository,
   status: QuotationStatus = QuotationStatus.COMPLETED,
+  isTestMode = false,
 ) {
   const quotation = await quotationRepository.findById(quotationId);
-
-  if (quotation?.status !== QuotationStatus.CONCLUDED) {
-    return;
-  }
+  if (quotation?.status !== QuotationStatus.CONCLUDED) return;
 
   if (registeredJobs.has(quotationId)) {
     console.log(`⚠️ quotation ${quotationId} 이미 스케줄 등록됨`);
     return;
   }
-  const cronTime = `${moveAt.getSeconds()} ${moveAt.getMinutes()} ${moveAt.getHours()} ${moveAt.getDate()} ${
-    moveAt.getMonth() + 1
+
+  const targetDate = isTestMode ? new Date(Date.now() + 10 * 1000) : moveAt;
+
+  const cronTime = `${targetDate.getSeconds()} ${targetDate.getMinutes()} ${targetDate.getHours()} ${targetDate.getDate()} ${
+    targetDate.getMonth() + 1
   } *`;
 
-  console.log(`🕒 quotation ${quotationId} 스케줄 등록됨: ${cronTime}`);
+  console.log(`🕒 quotation ${quotationId} 스케줄 등록됨: ${cronTime} ${isTestMode ? '(테스트 모드)' : ''}`);
 
   const job = cron.schedule(
     cronTime,
@@ -37,12 +38,13 @@ export async function scheduleQuotationCompletionJob(
       const quotation = await quotationRepository.findById(quotationId);
       if (quotation?.status === QuotationStatus.CONCLUDED) {
         await quotationRepository.updateStatus(quotationId, QuotationStatus.COMPLETED);
-      } else {
+        console.log(`✅ quotation ${quotationId} 완료됨 (${isTestMode ? '테스트' : '실제'})`);
       }
       registeredJobs.delete(quotationId);
     },
     { timezone: 'Asia/Seoul' },
   );
+
   console.log(`현재 등록된 job 수: ${registeredJobs.size + 1}`);
   registeredJobs.set(quotationId, job);
 }
