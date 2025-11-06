@@ -85,7 +85,11 @@ export default class ChatService implements IChattingRoomsService {
 
   async getMyRooms(user: AccessTokenPayload) {
     const meId = user.sub;
-    const rooms = await this.chattingRoomsRepository.findJoinableByUser(meId);
+
+    const allRooms = await this.chattingRoomsRepository.findJoinableByUser(meId);
+
+    const rooms = user.role === 'CONSUMER' ? allRooms.filter((room) => room.lastMessage) : allRooms;
+
     const roomIds = rooms.map((r) => r.id);
     const unreadMap = await this.readRepository.countUnreadByRooms(meId, roomIds);
 
@@ -96,7 +100,7 @@ export default class ChatService implements IChattingRoomsService {
       const other: OtherUserBrief = {
         userId: otherRaw.id,
         role: otherRaw.role,
-        name: otherRaw.name, // users.name
+        name: otherRaw.name,
         displayName: otherRaw.role === 'DRIVER' ? (otherRaw.nickname ?? otherRaw.name) : otherRaw.name,
         avatarUrl: otherRaw.avatarUrl ?? null,
       };
@@ -112,7 +116,7 @@ export default class ChatService implements IChattingRoomsService {
 
       return {
         roomId: r.id,
-        requestId: r.requestId, // 추가: 견적 보내기 위해 필요
+        requestId: r.requestId,
         other,
         lastMessage,
         unreadCount: unreadMap.get(r.id) ?? 0,
