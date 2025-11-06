@@ -24,7 +24,7 @@ export async function scheduleQuotationCompletionJob(
     return;
   }
 
-  const targetDate = isTestMode ? new Date(Date.now() + 10 * 1000) : moveAt;
+  const targetDate = isTestMode ? new Date(Date.now() + 60 * 1000) : moveAt;
 
   const cronTime = `${targetDate.getSeconds()} ${targetDate.getMinutes()} ${targetDate.getHours()} ${targetDate.getDate()} ${
     targetDate.getMonth() + 1
