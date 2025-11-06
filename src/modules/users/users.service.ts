@@ -4,6 +4,7 @@ import type { IUserRepository } from './interface/users.repository.interface';
 import { NotFoundException, BadRequestException } from '@/shared/exceptions';
 import { HASHING_SERVICE, type IHashingService } from '@/shared/hashing/hashing.service.interface';
 import { UpdateUserProfileDto } from './dto/user.update.dto';
+import { MeProfileDto } from './dto/me-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -20,11 +21,62 @@ export class UsersService {
 
     return user;
   }
-
-  async getProfileById(id: string) {
+  async getUserProfile(id: string) {
     const user = await this.userRepository.getProfileById(id);
     if (!user) throw new NotFoundException('User not found');
     return user;
+  }
+
+  async getUserwithFullProfile(id: string) {
+    const existingUser = await this.userRepository.findById(id);
+    if (!existingUser) throw new NotFoundException('유저를 찾을 수 없습니다.');
+    if (existingUser.driverProfile) {
+      const { driverProfile } = existingUser;
+
+      const region = driverProfile.driverServiceAreas.map((a) => a.serviceArea);
+      const service = driverProfile.driverServiceTypes.map((t) => t.serviceType);
+
+      const dto = new MeProfileDto();
+      dto.id = existingUser.id;
+      dto.email = existingUser.email;
+      dto.name = existingUser.name;
+      dto.role = existingUser.role;
+      dto.profileType = 'DRIVER';
+
+      dto.nickname = driverProfile.nickname;
+      dto.image = driverProfile.image;
+      dto.experience = driverProfile.careerYears;
+      dto.bio = driverProfile.oneLiner;
+      dto.description = driverProfile.description;
+
+      dto.region = region;
+      dto.service = service;
+
+      dto.likeCount = driverProfile.likeCount;
+      dto.rating = driverProfile.rating;
+      dto.reviewCount = driverProfile.reviewCount;
+      dto.confirmedCount = driverProfile.confirmedCount;
+
+      return dto;
+    }
+
+    // 소비자 프로필인 경우
+    if (existingUser.consumerProfile) {
+      const { consumerProfile } = existingUser;
+
+      const dto = new MeProfileDto();
+      dto.id = existingUser.id;
+      dto.email = existingUser.email;
+      dto.name = existingUser.name;
+      dto.role = existingUser.role;
+      dto.profileType = 'CONSUMER';
+      dto.image = consumerProfile.image;
+
+      return dto;
+    }
+
+    // 프로필 둘 다 없는 경우
+    throw new NotFoundException('프로필이 없습니다.');
   }
 
   async updateProfile(id: string, dto: UpdateUserProfileDto) {
