@@ -12,7 +12,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { type IUserRepository, USER_REPOSITORY } from '../users/interface/users.repository.interface';
 import { CreateQuoteRequestBody } from './dto/create-quote-request.dto';
 import { type IInviteRepository, INVITE_REPOSITORY } from './interface/invite.repository.interface';
-import { type IRequestRepository, REQUEST_REPOSITORY } from './interface/request.repository.interface';
+import {
+  DriverReceivedRequestFilter,
+  type IRequestRepository,
+  REQUEST_REPOSITORY,
+} from './interface/request.repository.interface';
 import { InviteResult, type IRequestService } from './interface/request.service.interface';
 import { CreateRequestData } from './types';
 import { PrismaClient, Quotation } from '@prisma/client';
@@ -85,14 +89,10 @@ export class RequestService implements IRequestService {
   }
 
   async findReceivedByDriverId(driverId: string) {
-    const result = await this.requestRepository.findInvitesByDriverId(driverId);
+    const existingDriver = await this.userRepository.findById(driverId);
+    if (!existingDriver) throw new UnauthorizedException('유효하지 않은 사용자입니다.');
 
-    if (!result) {
-      throw new UnauthorizedException('유효하지 않은 사용자입니다.');
-    }
-    if (Array.isArray(result) && result.length === 0) {
-      throw new NotFoundException('결과값이 비어있습니다.');
-    }
+    const result = await this.requestRepository.findInvitesByDriverId(driverId);
 
     return ReceivedRequestsResponseSchema.parse(result);
   }
@@ -160,11 +160,16 @@ export class RequestService implements IRequestService {
 
     return result;
   }
+
   async filterReceivedRequests(driverId: string, filter: ReceivedRequestFilter) {
-    console.log('filter received(서비스):', filter);
-    const result = await this.requestRepository.filterRequests(driverId, filter);
-    if (!result) throw new UnauthorizedException('유효하지 않은 사용자입니다.');
-    if (Array.isArray(result) && result.length === 0) throw new NotFoundException('조건에 맞는 결과가 없습니다.');
+    const existingDriver = await this.userRepository.findById(driverId);
+    if (!existingDriver) throw new UnauthorizedException('유효하지 않은 사용자입니다.');
+
+    const fixedFilter: DriverReceivedRequestFilter = {
+      ...filter,
+      status: 'PENDING',
+    };
+    const result = await this.requestRepository.filterRequests(driverId, fixedFilter);
 
     return ReceivedRequestsResponseSchema.parse(result);
   }
@@ -243,7 +248,7 @@ export class RequestService implements IRequestService {
             rating: driverProfile?.rating ?? 0,
             careerYears: driverProfile?.careerYears ?? 0,
             confirmedCount: driverProfile?.confirmedCount ?? 0,
-            image: (driverProfile?.image ?? null) as string | null,
+            image: driverProfile?.image ?? null,
           },
         };
       });
