@@ -53,6 +53,7 @@ export interface IDriverProfileRepository {
   decrementLikeCount(driverId: string, ctx?: TransactionContext): Promise<void>;
   findDrivers(input: RepoFindDriversInput): Promise<DriverAggregate[]>;
   findById(driverId: string, ctx?: TransactionContext): Promise<DriverProfileEntity | null>;
+  incrementDriverConfirmedCount(driverId: string, ctx?: TransactionContext): Promise<void>;
 }
 
 export const DRIVER_PROFILE_REPOSITORY = 'IDriverProfileRepository';

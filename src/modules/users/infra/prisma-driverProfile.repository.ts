@@ -123,4 +123,17 @@ export class PrismaDriverProfileRepository implements IDriverProfileRepository {
       },
     });
   }
+
+  async incrementDriverConfirmedCount(driverId: string, ctx?: TransactionContext): Promise<void> {
+    const db = getDb(ctx, this.prisma);
+
+    await db.driverProfile.update({
+      where: { userId: driverId },
+      data: {
+        confirmedCount: {
+          increment: 1,
+        },
+      },
+    });
+  }
 }

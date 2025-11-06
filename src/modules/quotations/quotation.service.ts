@@ -9,10 +9,14 @@ import { Prisma } from '@prisma/client';
 import { UpdateQuotationStatusDto } from './dto/quotation-status.dto';
 import { scheduleQuotationCompletionJob } from './infra/quotation.scheduler';
 import { QuotationWithReviewDto } from './dto/consumer-quotation.dto';
+import { type IDriverProfileRepository } from '../users/interface/driverProfile.repository.interface';
+import { DRIVER_PROFILE_REPOSITORY } from '../users/interface/driverProfile.repository.interface';
 
 @Injectable()
 export class QuotationService {
   constructor(
+    @Inject(DRIVER_PROFILE_REPOSITORY)
+    private readonly driverProfileRepository: IDriverProfileRepository,
     @Inject(QUOTATION_REPOSITORY)
     private readonly quotationRepository: IQuotationRepository,
     private readonly transactionRunner: PrismaTransactionRunner,
@@ -103,9 +107,11 @@ export class QuotationService {
 
       await this.quotationRepository.rejectOtherQuotations(quotation.request.id, quotationId, ctx);
 
+      await this.driverProfileRepository.incrementDriverConfirmedCount(quotation.driver.id, ctx);
+
       const updatedQuotation = await this.quotationRepository.findById(quotationId);
       if (updatedQuotation?.request.moveAt) {
-        scheduleQuotationCompletionJob(
+        await scheduleQuotationCompletionJob(
           updatedQuotation.id,
           updatedQuotation.request.moveAt,
           this.quotationRepository,
