@@ -24,13 +24,17 @@ export interface IRequestWithRelations extends PrismaRequest {
   invites: Invite[];
 }
 
+export type DriverReceivedRequestFilter = Omit<ReceivedRequestFilter, 'status'> & {
+  status: 'PENDING';
+};
+
 export interface IRequestRepository {
   findPendingRequestById(requestId: string, ctx?: TransactionContext): Promise<RequestEntity | null>;
   findPendingByConsumerId(consumerId: string, ctx?: TransactionContext): Promise<RequestEntity | null>;
   createRequest(data: CreateRequestData): Promise<RequestEntity>;
   findInvitesByDriverId(driverId: string): Promise<ReceivedRequest[]>;
   incrementInvitedCountIfAvailable(requestId: string, ctx?: TransactionContext): Promise<boolean>;
-  filterRequests(driverId: string, filter: ReceivedRequestFilter): Promise<ReceivedRequest[]>;
+  filterRequests(driverId: string, filter: DriverReceivedRequestFilter): Promise<ReceivedRequest[]>;
   countRequests(driverId: string): Promise<{
     HOME_MOVE: number;
     SMALL_MOVE: number;
