@@ -45,6 +45,7 @@ export class CookiesService {
       path: '/',
       sameSite,
       maxAge,
+      ...(this.isProd ? { partitioned: true } : {}),
     };
   }
 
@@ -57,6 +58,7 @@ export class CookiesService {
       path: '/auth/refresh',
       sameSite,
       maxAge,
+      ...(this.isProd ? { partitioned: true } : {}),
     };
 
     const domain = this.config.get<string>('REFRESH_DOMAIN');
