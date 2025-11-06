@@ -8,6 +8,8 @@ import { UsersModule } from '../users/users.module';
 import { PrismaModule } from '@/shared/prisma/prisma.module';
 import { CookieModule } from '@/shared/utils/cookie.module';
 import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runner';
+import { PrismaDriverProfileRepository } from '../users/infra/prisma-driverProfile.repository';
+import { DRIVER_PROFILE_REPOSITORY } from '../users/interface/driverProfile.repository.interface';
 
 @Module({
   imports: [UsersModule, PrismaModule, CookieModule],
@@ -16,6 +18,10 @@ import { PrismaTransactionRunner } from '@/shared/prisma/prisma-transaction-runn
     PrismaService,
     QuotationService,
     PrismaTransactionRunner,
+    {
+      provide: DRIVER_PROFILE_REPOSITORY,
+      useClass: PrismaDriverProfileRepository,
+    },
     {
       provide: QUOTATION_REPOSITORY,
       useClass: PrismaQuotationRepository,

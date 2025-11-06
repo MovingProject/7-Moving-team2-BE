@@ -26,14 +26,18 @@ export type CreateQuotationInput = {
   chattingMessageId: string;
 };
 export interface IQuotationRepository {
-  findDriverQuotations(driverId: string, statuses: QuotationStatus[]): Promise<QuotationWithRelations[]>;
-  findConsumerQuotations(consumerId: string, statuses: QuotationStatus[]): Promise<any[]>;
+  findDriverQuotations(
+    driverId: string,
+    statuses: QuotationStatus[],
+    ctx?: TransactionContext,
+  ): Promise<QuotationWithRelations[]>;
+  findConsumerQuotations(consumerId: string, statuses: QuotationStatus[], ctx?: TransactionContext): Promise<any[]>;
   create(input: CreateQuotationInput, ctx?: TransactionContext): Promise<QuotationEntity>;
   acceptQuotation(id: string, ctx?: TransactionContext): Promise<Quotation>;
   rejectOtherQuotations(requestId: string, excludeQuotationId: string, ctx?: TransactionContext): Promise<void>;
-  findById(id: string): Promise<QuotationWithRelationsPlusId | null>;
-  updateStatus(id: string, status: QuotationStatus): Promise<Quotation>;
-  findUncompletedAfterNow(): Promise<Quotation[]>;
+  findById(id: string, ctx?: TransactionContext): Promise<QuotationWithRelationsPlusId | null>;
+  updateStatus(id: string, status: QuotationStatus, ctx?: TransactionContext): Promise<Quotation>;
+  findUncompletedAfterNow(ctx?: TransactionContext): Promise<Quotation[]>;
 }
 
 export const QUOTATION_REPOSITORY = 'IQuotationRepository';
