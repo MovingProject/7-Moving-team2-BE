@@ -88,7 +88,7 @@ export class ChatMessageWsService {
             chattingMessageId: savedMessage.id,
           };
 
-          const newQuotation = await this.quotationRepo.create(quotationInput, ctx);
+          const newQuotation = await this.quotationRepo.upsertForRequestDriver(quotationInput, ctx);
           return { message: savedMessage, quotation: newQuotation, isFirst: nextIdx === 1 };
         }
 

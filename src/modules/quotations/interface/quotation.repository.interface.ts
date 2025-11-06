@@ -32,7 +32,7 @@ export interface IQuotationRepository {
     ctx?: TransactionContext,
   ): Promise<QuotationWithRelations[]>;
   findConsumerQuotations(consumerId: string, statuses: QuotationStatus[], ctx?: TransactionContext): Promise<any[]>;
-  create(input: CreateQuotationInput, ctx?: TransactionContext): Promise<QuotationEntity>;
+  upsertForRequestDriver(input: CreateQuotationInput, ctx?: TransactionContext): Promise<QuotationEntity>;
   acceptQuotation(id: string, ctx?: TransactionContext): Promise<Quotation>;
   rejectOtherQuotations(requestId: string, excludeQuotationId: string, ctx?: TransactionContext): Promise<void>;
   findById(id: string, ctx?: TransactionContext): Promise<QuotationWithRelationsPlusId | null>;

@@ -84,11 +84,53 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     });
   }
 
-  async create(input: CreateQuotationInput, ctx?: TransactionContext) {
+  async upsertForRequestDriver(input: CreateQuotationInput, ctx?: TransactionContext) {
     const db = getDb(ctx, this.prisma);
 
-    const quotation = await db.quotation.create({
-      data: input,
+    const quotation = await db.quotation.upsert({
+      where: {
+        requestId_driverId: {
+          requestId: input.requestId,
+          driverId: input.driverId,
+        },
+      },
+      create: {
+        consumerId: input.consumerId,
+        driverId: input.driverId,
+        chattingRoomId: input.chattingRoomId,
+        requestId: input.requestId,
+        serviceType: input.serviceType,
+        moveAt: input.moveAt,
+        departureAddress: input.departureAddress,
+        departureFloor: input.departureFloor,
+        departurePyeong: input.departurePyeong,
+        departureElevator: input.departureElevator,
+        arrivalAddress: input.arrivalAddress,
+        arrivalFloor: input.arrivalFloor,
+        arrivalPyeong: input.arrivalPyeong,
+        arrivalElevator: input.arrivalElevator,
+        additionalRequirements: input.additionalRequirements,
+        price: input.price,
+        previousQuotationId: input.previousQuotationId,
+        validUntil: input.validUntil,
+        chattingMessageId: input.chattingMessageId,
+      },
+      update: {
+        serviceType: input.serviceType,
+        moveAt: input.moveAt,
+        departureAddress: input.departureAddress,
+        departureFloor: input.departureFloor,
+        departurePyeong: input.departurePyeong,
+        departureElevator: input.departureElevator,
+        arrivalAddress: input.arrivalAddress,
+        arrivalFloor: input.arrivalFloor,
+        arrivalPyeong: input.arrivalPyeong,
+        arrivalElevator: input.arrivalElevator,
+        additionalRequirements: input.additionalRequirements,
+        price: input.price,
+        validUntil: input.validUntil,
+        chattingMessageId: input.chattingMessageId,
+      },
     });
     return quotation;
   }

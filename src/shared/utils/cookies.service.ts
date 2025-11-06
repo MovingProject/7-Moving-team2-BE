@@ -55,7 +55,7 @@ export class CookiesService {
     const opts: CookieOptions = {
       httpOnly: true,
       secure: this.useSecure,
-      path: '/auth/refresh',
+      path: '/api/auth/refresh',
       sameSite,
       maxAge,
       ...(this.isProd ? { partitioned: true } : {}),
