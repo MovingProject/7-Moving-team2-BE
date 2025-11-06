@@ -5,11 +5,10 @@ import { TransactionContext } from '@/shared/prisma/transaction-runner.interface
 import { Injectable } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { ReceivedRequest } from '../dto/request-quote-request-received.dto';
-import { type IRequestRepository } from '../interface/request.repository.interface';
+import { CreateDriverRequestActionInput } from '../dto/request-reject-request-received.dto';
+import { DriverReceivedRequestFilter, type IRequestRepository } from '../interface/request.repository.interface';
 import { CreateRequestData, RequestEntity } from '../types';
 
-import { ReceivedRequestFilter } from '../dto/request-filter-post.dto';
-import { CreateDriverRequestActionInput } from '../dto/request-reject-request-received.dto';
 @Injectable()
 export class PrismaRequestRepository implements IRequestRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -74,6 +73,7 @@ export class PrismaRequestRepository implements IRequestRepository {
     //일반견적조회
     const requests = await this.prisma.request.findMany({
       where: {
+        requestStatus: 'PENDING',
         OR: [
           { invites: { some: { driverId } } },
           {
@@ -119,7 +119,7 @@ export class PrismaRequestRepository implements IRequestRepository {
     );
     return affected === 1; // 1행 갱신되면 성공, 0이면 한도 초과
   }
-  async filterRequests(driverId: string, filter: ReceivedRequestFilter) {
+  async filterRequests(driverId: string, filter: DriverReceivedRequestFilter) {
     console.log('레포지토리: ', filter);
     // driver의 서비스 지역 조회
     const driverAreas = await this.prisma.driverServiceArea.findMany({
@@ -129,21 +129,20 @@ export class PrismaRequestRepository implements IRequestRepository {
     console.log('기사님 서비스지역 : ', driverAreas);
     const serviceAreas = driverAreas.map((a) => a.serviceArea);
 
-    // 요청 조회 (지정 + 일반 + 필터)
     const requests = await this.prisma.request.findMany({
       where: {
-        // 지정견적 필터
+        requestStatus: filter.status,
+
         ...(filter.isInvited === true
           ? { invites: { some: { driverId } } }
           : filter.isInvited === false
             ? { invites: { none: { driverId } } }
             : {}),
 
-        // 지역 필터 (지정/일반 상관없이 둘 다 가능)
         OR: filter.areas?.length
           ? [
               { departureArea: { in: filter.areas ?? serviceAreas } },
-              // { arrivalArea: { in: filter.areas ?? serviceAreas } },
+              { arrivalArea: { in: filter.areas ?? serviceAreas } },
             ]
           : undefined,
 
@@ -197,16 +196,48 @@ export class PrismaRequestRepository implements IRequestRepository {
     });
     const serviceAreas = driverAreas.map((a) => a.serviceArea);
 
+    // 공통: 이 기사에게 유의미한 "대기 중" 요청
+    const basePendingWhere: Prisma.RequestWhereInput = {
+      requestStatus: 'PENDING',
+      driverRequestActions: {
+        none: {
+          driverId,
+          state: 'REJECTED',
+        },
+      },
+    };
+
     const [home, small, office, invited, area] = await Promise.all([
-      // 서비스 타입별
-      this.prisma.request.count({ where: { serviceType: 'HOME_MOVE' } }),
-      this.prisma.request.count({ where: { serviceType: 'SMALL_MOVE' } }),
-      this.prisma.request.count({ where: { serviceType: 'OFFICE_MOVE' } }),
-      // 지정견적 요청
-      this.prisma.request.count({ where: { invites: { some: { driverId } } } }),
-      // 기사 서비스 지역 기준
+      // 서비스 타입별 PENDING 카운트
       this.prisma.request.count({
         where: {
+          ...basePendingWhere,
+          serviceType: 'HOME_MOVE',
+        },
+      }),
+      this.prisma.request.count({
+        where: {
+          ...basePendingWhere,
+          serviceType: 'SMALL_MOVE',
+        },
+      }),
+      this.prisma.request.count({
+        where: {
+          ...basePendingWhere,
+          serviceType: 'OFFICE_MOVE',
+        },
+      }),
+      // 지정 견적: 이 기사에게 초대가 온 PENDING 요청
+      this.prisma.request.count({
+        where: {
+          ...basePendingWhere,
+          invites: { some: { driverId } },
+        },
+      }),
+      // 기사 서비스 지역 기준 PENDING 요청
+      this.prisma.request.count({
+        where: {
+          ...basePendingWhere,
           OR: [{ departureArea: { in: serviceAreas } }, { arrivalArea: { in: serviceAreas } }],
         },
       }),
