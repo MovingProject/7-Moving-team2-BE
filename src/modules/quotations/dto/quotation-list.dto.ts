@@ -22,6 +22,7 @@ export type QuotationWithRelations = {
   status: QuotationStatus;
   serviceType: MoveType;
   consumer: { id: string; name: string };
+  driver: { id: string };
   request: {
     moveAt: Date;
     departureAddress: string;

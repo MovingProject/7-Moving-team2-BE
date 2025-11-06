@@ -11,11 +11,18 @@ import { CreateQuotationInput, IQuotationRepository } from '../interface/quotati
 export class PrismaQuotationRepository implements IQuotationRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findDriverQuotations(driverId: string, statuses: QuotationStatus[]): Promise<QuotationWithRelations[]> {
-    return this.prisma.quotation.findMany({
+  async findDriverQuotations(
+    driverId: string,
+    statuses: QuotationStatus[],
+    ctx?: TransactionContext,
+  ): Promise<QuotationWithRelations[]> {
+    const db = getDb(ctx, this.prisma);
+
+    return db.quotation.findMany({
       where: { driverId, status: { in: statuses } },
       include: {
         consumer: { select: { id: true, name: true } },
+        driver: { select: { id: true } },
         request: {
           select: {
             moveAt: true,
@@ -28,8 +35,10 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     });
   }
 
-  async findConsumerQuotations(consumerId: string, statuses: QuotationStatus[]) {
-    return this.prisma.quotation.findMany({
+  async findConsumerQuotations(consumerId: string, statuses: QuotationStatus[], ctx?: TransactionContext) {
+    const db = getDb(ctx, this.prisma);
+
+    return db.quotation.findMany({
       where: {
         consumerId,
         status: { in: statuses },
@@ -77,6 +86,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
 
   async create(input: CreateQuotationInput, ctx?: TransactionContext) {
     const db = getDb(ctx, this.prisma);
+
     const quotation = await db.quotation.create({
       data: input,
     });
@@ -85,6 +95,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
 
   async acceptQuotation(id: string, ctx?: TransactionContext): Promise<Quotation> {
     const db = getDb(ctx, this.prisma);
+
     return db.quotation.update({
       where: { id },
       data: {
@@ -96,14 +107,17 @@ export class PrismaQuotationRepository implements IQuotationRepository {
 
   async rejectOtherQuotations(requestId: string, excludeQuotationId: string, ctx?: TransactionContext): Promise<void> {
     const db = getDb(ctx, this.prisma);
+
     await db.quotation.updateMany({
       where: { requestId, id: { not: excludeQuotationId } },
       data: { status: QuotationStatus.REJECTED },
     });
   }
 
-  async findById(id: string): Promise<QuotationWithRelationsPlusId | null> {
-    return this.prisma.quotation.findUnique({
+  async findById(id: string, ctx?: TransactionContext): Promise<QuotationWithRelationsPlusId | null> {
+    const db = getDb(ctx, this.prisma);
+
+    return db.quotation.findUnique({
       where: { id },
       select: {
         id: true,
@@ -111,6 +125,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
         serviceType: true,
         status: true,
         consumer: { select: { id: true, name: true } },
+        driver: { select: { id: true } },
         request: {
           select: {
             id: true,
@@ -124,8 +139,10 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     });
   }
 
-  async findUncompletedAfterNow() {
-    return this.prisma.quotation.findMany({
+  async findUncompletedAfterNow(ctx?: TransactionContext) {
+    const db = getDb(ctx, this.prisma);
+
+    return db.quotation.findMany({
       where: {
         status: { notIn: [QuotationStatus.COMPLETED, QuotationStatus.CANCELLED] },
         moveAt: { gt: new Date() },
