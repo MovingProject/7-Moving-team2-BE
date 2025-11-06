@@ -333,6 +333,7 @@ model Quotation {
   chattingMessage        ChattingMessage @relation(fields: [chattingMessageId], references: [id], onUpdate: Cascade, onDelete: Restrict)
   notifications          Notification[]
 
+  @@unique([requestId, driverId])
   @@index([driverId, createdAt])
   @@index([consumerId, createdAt])
   @@index([requestId, createdAt])
