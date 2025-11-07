@@ -41,6 +41,7 @@ export class UsersService {
       dto.email = existingUser.email;
       dto.name = existingUser.name;
       dto.role = existingUser.role;
+      dto.phoneNumber = existingUser.phoneNumber;
       dto.profileType = 'DRIVER';
 
       dto.nickname = driverProfile.nickname;
@@ -70,7 +71,10 @@ export class UsersService {
       dto.name = existingUser.name;
       dto.role = existingUser.role;
       dto.profileType = 'CONSUMER';
+      dto.phoneNumber = existingUser.phoneNumber;
       dto.image = consumerProfile.image;
+      dto.region = consumerProfile.areas ? [consumerProfile.areas] : undefined;
+      dto.service = consumerProfile.serviceType ? [consumerProfile.serviceType] : undefined;
 
       return dto;
     }

@@ -14,6 +14,9 @@ export class MeProfileDto {
   @ApiProperty()
   name: string;
 
+  @ApiProperty()
+  phoneNumber: string;
+
   @ApiProperty({ enum: ROLES })
   role: Role;
 
