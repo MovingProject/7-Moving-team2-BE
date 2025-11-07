@@ -93,7 +93,7 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(@Req() req: OAuthRequest, @Res({ passthrough: true }) res: Response) {
+  async googleAuthCallback(@Req() req: OAuthRequest, @Res() res: Response) {
     const { accessToken, refreshToken, user } = req.user;
     this.cookiesService.setAuthCookies(res, accessToken, refreshToken);
     const frontendUrl = process.env.NEXT_URL || 'http://localhost:3000';
