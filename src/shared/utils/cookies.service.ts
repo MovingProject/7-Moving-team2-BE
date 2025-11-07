@@ -39,7 +39,7 @@ export class CookiesService {
   private buildAccessOpts(): CookieOptions {
     const sameSite = this.pickSameSite(this.config.get<string>('ACCESS_SAMESITE'), this.isProd ? 'none' : 'lax');
     const maxAge = this.toNumber(this.config.get('JWT_ACCESS_MAX_AGE_MS'), 900_000);
-    return {
+    const opts: CookieOptions = {
       httpOnly: true,
       secure: this.useSecure,
       path: '/',
@@ -47,10 +47,18 @@ export class CookiesService {
       maxAge,
       ...(this.isProd ? { partitioned: true } : {}),
     };
+
+    if (this.isProd) {
+      const domain = this.config.get<string>('COOKIE_DOMAIN');
+      if (domain) {
+        opts.domain = domain;
+      }
+    }
+    return opts;
   }
 
   private buildRefreshOpts(): CookieOptions {
-    const sameSite = this.pickSameSite(this.config.get<string>('REFRESH_SAMESITE'), this.isProd ? 'strict' : 'lax');
+    const sameSite = this.pickSameSite(this.config.get<string>('REFRESH_SAMESITE'), this.isProd ? 'none' : 'lax');
     const maxAge = this.toNumber(this.config.get('JWT_REFRESH_MAX_AGE_MS'), 604_800_000);
     const opts: CookieOptions = {
       httpOnly: true,
@@ -61,8 +69,12 @@ export class CookiesService {
       ...(this.isProd ? { partitioned: true } : {}),
     };
 
-    const domain = this.config.get<string>('REFRESH_DOMAIN');
-    if (domain && this.useSecure) opts.domain = domain;
+    if (this.isProd) {
+      const domain = this.config.get<string>('COOKIE_DOMAIN');
+      if (domain) {
+        opts.domain = domain;
+      }
+    }
 
     return opts;
   }
