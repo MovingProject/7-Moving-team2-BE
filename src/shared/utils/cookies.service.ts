@@ -45,7 +45,7 @@ export class CookiesService {
       path: '/',
       sameSite,
       maxAge,
-      ...(this.isProd ? { partitioned: true } : {}),
+      // ...(this.isProd ? { partitioned: true } : {}),
     };
 
     if (this.isProd) {
@@ -66,7 +66,7 @@ export class CookiesService {
       path: '/api/auth/refresh',
       sameSite,
       maxAge,
-      ...(this.isProd ? { partitioned: true } : {}),
+      // ...(this.isProd ? { partitioned: true } : {}),
     };
 
     if (this.isProd) {
